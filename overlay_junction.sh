@@ -17,7 +17,7 @@
 #
 set -e
 
-help='Create an overlay of non-intersecting polygons from a collection of possibly overlapping shapes, represented as a view linking those polygons back to the original shapes.'
+help='Creates an overlay of non-intersecting polygons from a collection of possibly overlapping shapes. Produces a polygon table and a junction table between the polygon and original shape tables.'
 args=(
 # "-short:--long:variable:default:required"
   "-u:--user:::true:PostgreSQL username"
@@ -26,8 +26,6 @@ args=(
   "-S:--suffix:::true:Suffix to append to shape table name to generate other table names"
   "-g:--geometry::geometry:false:Column name for geometry in 'shape' table"
   "-w:--where::TRUE:false:WHERE clause for selecting from 'shape' table"
-  "-c:--columns::id:false:Comma separated list of columns to retrieve from linked shape data"
-  "-n:--number:::false:Number of links to copy to view; default is minimum required"
 )
 
 ######################## START OF ARGUMENT PARSING CODE ########################
@@ -130,13 +128,9 @@ dump=${shape}_${suffix}_dump
 poly=${shape}_${suffix}_poly
 point=${shape}_${suffix}_point
 junction=${shape}_${suffix}_junction
-denorm=${shape}_${suffix}_denorm
-view=${shape}_${suffix}_view
 
 echo "Creating dump table ${dump}"
 psql ${database} ${user} \
-    --quiet --tuples-only --no-align \
-    --command="\timing off" \
     --command="DROP TABLE IF EXISTS ${dump}" \
     --command="CREATE TABLE ${dump} AS
                   SELECT id, (ST_Dump(${geometry})).geom AS geometry FROM ${shape} WHERE ${where}"
@@ -161,7 +155,6 @@ psql ${database} ${user} \
 echo "Creating point in polygon table ${point}"
 psql ${database} ${user} \
     --quiet \
-    --command="\timing off" \
     --command="DROP TABLE IF EXISTS ${point}" \
     --command="CREATE TABLE ${point} (id INTEGER, point geometry(Point, 4326))" \
     --command="INSERT INTO ${point}
@@ -171,7 +164,6 @@ psql ${database} ${user} \
 echo "Creating junction table ${junction}"
 psql ${database} ${user} \
     --quiet \
-    --command="\timing off" \
     --command="DROP TABLE IF EXISTS ${junction}" \
     --command="CREATE TABLE ${junction} (poly_id INTEGER, shape_id INTEGER)" \
     --command="INSERT INTO ${junction}  (poly_id, shape_id)
@@ -184,74 +176,9 @@ psql ${database} ${user} \
 echo "Dropping point in polygon table ${point}"
 psql ${database} ${user} \
     --quiet \
-    --command="\timing off" \
     --command="DROP TABLE IF EXISTS ${point}"
 
 echo "Dropping shape dump table ${dump}"
 psql ${database} ${user} \
-    --quiet --tuples-only --no-align \
-    --command="\timing off" \
+    --quiet \
     --command="DROP TABLE IF EXISTS ${dump}"
-
-echo "Creating denormalised table ${denorm}"
-if [[ ! -n "${number}" ]]; then
-    number=$(psql ${database} ${user} \
-                --quiet --tuples-only --no-align \
-                --command="\timing off" \
-                --command="SELECT max(count)
-                          FROM (SELECT poly_id, count(shape_id) AS count 
-                                FROM ${junction}
-                                GROUP BY poly_id) AS foo")
-fi
-echo "Number of links to copy is ${number}"
-
-# CREATE TABLE <denorm> (poly_id INTEGER REFERENCES <poly>(id), shape_count INTEGER shape_id_1 INTEGER REFERENCES <shape>(id) ...)
-CREATE_TABLE_SQL="CREATE TABLE ${denorm} (poly_id INTEGER REFERENCES ${poly}(id), shape_count INTEGER"
-for ((linkidx=1; linkidx<=${number}; linkidx++)) do
-    CREATE_TABLE_SQL+=", shape_id_${linkidx} INTEGER REFERENCES ${shape}(id)"
-done
-CREATE_TABLE_SQL+=")"
-
-# UPDATE <denorm> AS denorm SET shape_count = array_length(agg.shape_ids, 1), shape_id_1 = agg.shape_idx[1] ...
-UPDATE_TABLE_SQL="UPDATE ${denorm} AS denorm SET shape_count = array_length(agg.shape_ids, 1)"
-for ((linkidx=1; linkidx<=${number}; linkidx++)) do
-    UPDATE_TABLE_SQL+=", shape_id_${linkidx} = agg.shape_ids[${linkidx}]"
-done
-UPDATE_TABLE_SQL+="FROM (SELECT poly_id, array_agg(shape_id) as shape_ids
-                     FROM ${junction} AS junction
-                     JOIN ${shape} AS shape ON shape.id = shape_id
-                     GROUP BY poly_id) agg
-                   WHERE agg.poly_id = denorm.poly_id"
-
-psql ${database} ${user} \
-    --quiet \
-    --command="$CREATE_TABLE_SQL" \
-    --command="INSERT INTO ${denorm} (poly_id) 
-               SELECT DISTINCT poly_id FROM ${junction}" \
-    --command="$UPDATE_TABLE_SQL"
-
-echo "Dropping junction table ${junction}"
-psql ${database} ${user} \
-    --quiet --tuples-only --no-align \
-    --command="\timing off" \
-    --command="DROP TABLE IF EXISTS ${junction}"
-
-echo "Creating view ${view}"
-# CREATE VIEW <view> AS SELECT poly_id AS id, poly.geometry AS poly_geometry, shape_count AS fire_count, shape1.col1 AS <column>_1, ...
-CREATE_VIEW_SQL="CREATE VIEW ${view} AS SELECT poly_id AS id, poly.geometry AS poly_geometry, shape_count AS fire_count"
-IFS=',' read -r -a columnarray <<< "${columns}"
-for ((linkidx=1; linkidx<=${number}; linkidx++)) do
-    for ((colidx=0; colidx<${#columnarray[@]}; colidx++)) do
-        CREATE_VIEW_SQL+=", shape${linkidx}.${columnarray[colidx]} AS ${columnarray[colidx]}_${linkidx}"
-    done
-done
-CREATE_VIEW_SQL+=" FROM ${denorm}
-    JOIN ${poly} AS poly ON poly.id = poly_id"
-for ((linkidx=1; linkidx<=${number}; linkidx++)) do
-    CREATE_VIEW_SQL+=" LEFT JOIN ${shape} as shape${linkidx} ON shape${linkidx}.id = shape_id_${linkidx}"
-done
-
-psql ${database} ${user} \
-    --quiet \
-    --command="DROP VIEW IF EXISTS ${view}" \
-    --command="$CREATE_VIEW_SQL"
