@@ -2,6 +2,7 @@
 .headers on
 .once Esperance.csv
 SELECT stations."Station Number", "Station Name", "DateTime", 
+    "Precipitation in mm",
     "Air temperature in Degrees C",
     "Dew point temperature in Degrees C",
     "Relative humidity in percentage %",
@@ -14,6 +15,7 @@ ORDER BY DateTime ASC ;
     
 .once Bremer.csv
 SELECT stations."Station Number", "Station Name", "DateTime", 
+    "Precipitation in mm",
     "Air temperature in Degrees C",
     "Dew point temperature in Degrees C",
     "Relative humidity in percentage %",
@@ -27,6 +29,7 @@ ORDER BY DateTime ASC ;
     
 .once Waroona.csv
 SELECT stations."Station Number", "Station Name", "DateTime", 
+    "Precipitation in mm",
     "Air temperature in Degrees C",
     "Dew point temperature in Degrees C",
     "Relative humidity in percentage %",
@@ -39,6 +42,7 @@ ORDER BY DateTime ASC ;
 
 .once Northcliffe.csv
 SELECT stations."Station Number", "Station Name", "DateTime", 
+    "Precipitation in mm",
     "Air temperature in Degrees C",
     "Dew point temperature in Degrees C",
     "Relative humidity in percentage %",
@@ -52,6 +56,7 @@ ORDER BY DateTime ASC ;
     
 .once Stirlings.csv
 SELECT stations."Station Number", "Station Name", "DateTime", 
+    "Precipitation in mm",
     "Air temperature in Degrees C",
     "Dew point temperature in Degrees C",
     "Relative humidity in percentage %",

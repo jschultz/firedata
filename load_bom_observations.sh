@@ -22,7 +22,8 @@ args=(
 # "-short:--long:variable:default:required:description:input:output:private"CSV
   "-d:--database:::true:SQLite database"
   "-l:--logfile:::false:Log file to record processing, defaults to \$database + .log"
-  ":filename::::CSV file name; otherwise use stdin":true
+  ":filename:::true:CSV file name":true
+  ":joinname:::true:Old CSV file name":true
 )
 
 source $(dirname "$0")/argrecord.sh
@@ -31,25 +32,53 @@ if [[ ! -n "${logfile}" ]] && [[ -n "${filename}" ]]; then
     logfile=$(basename ${filename})
     logfile="${logfile%.*}.log"
 fi
-echo -n "${COMMENTS}" > ${logfile}
+echo -n "${COMMENTS}" >> ${logfile}
 
-INCOMMENTS=$(awk '/^#/{print};!/^#/{exit}' ${filename})
-echo "${INCOMMENTS}" >> ${logfile}
-
-sqlite3 ${database} -cmd '
+csvFilter --jobs 1 --verbosity 1 \
+  --prelude "joinfile = open(\"${joinname}\", \"r\")" \
+            "joinreader = csv.DictReader(joinfile)" \
+            "def humidity(station, year, month, day, hour, minute):" \
+            "    try:" \
+            "        joinrow = next(joinreader)" \
+            "        assert(joinrow[\"Station Number\"] == station and" \
+            "               joinrow[\"Year\"] == year and" \
+            "               joinrow[\"Month\"] == month and" \
+            "               joinrow[\"Day\"] == day and" \
+            "               joinrow[\"Hour\"] == hour and" \
+            "               joinrow[\"Minute in Local Standard Time\"] == minute)" \
+            "        return joinrow[\"Relative humidity in percentage %\"]" \
+            "    except StopIteration:" \
+            "        return None" \
+  --header  "Station Number" \
+            "DateTime" \
+            "Precipitation in mm" \
+            "Air temperature in Degrees C" \
+            "Dew point temperature in Degrees C" \
+            "Relative humidity in percentage %" \
+            "Wind speed measured in km/h" \
+            "Wind direction measured in degrees" \
+  --data    "[Station_Number]" \
+            "[Year+'-'+Month+'-'+Day+' '+Hour+':'+Minute_in_Local_Standard_Time]" \
+            "[Precipitation_in_mm]" \
+            "[Air_temperature_in_Degrees_C]" \
+            "[Dew_point_temperature_in_Degrees_C]" \
+            "[humidity(Station_Number,Year,Month,Day,Hour,Minute_in_Local_Standard_Time)]" \
+            "[Wind_speed_measured_in_km_h]" \
+            "[Wind_direction_measured_in_degrees]" \
+  --no-comments \
+  --no-header \
+  "${filename}" \
+| sqlite3 ${database} -cmd '
 CREATE TABLE IF NOT EXISTS observations(
 "Station Number" INTEGER,
+"DateTime" TEXT,
+"Precipitation in mm" REAL,
 "Air temperature in Degrees C" REAL,
-"Quality of air temperature" TEXT,
 "Dew point temperature in Degrees C" REAL,
-"Quality of dew point temperature" TEXT,
 "Relative humidity in percentage %" INTEGER,
-"Quality of relative humidity" TEXT,
 "Wind speed measured in km/h" REAL,
-"Quality of wind speed" TEXT,
 "Wind direction measured in degrees" INTEGER,
-"Quality of wind direction" TEXT,
-"DateTime" TEXT
+PRIMARY KEY ("Station Number", "DateTime")
 );' \
 -cmd '.mode csv' \
 -cmd '.import /dev/stdin observations'
