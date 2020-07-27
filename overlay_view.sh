@@ -24,8 +24,9 @@ args=(
   "-d:--database:::true:PostgreSQL database"
   "-s:--shape:::false:Table name containing geometrical data"
   "-S:--suffix:::true:Suffix to append to shape table name to generate other table names"
-  "-c:--columns::id:false:Comma separated list of columns to retrieve from linked shape data"
+  "-c:--columns::objectid:false:Comma separated list of columns to retrieve from linked shape data"
   "-n:--number:::false:Number of links to copy to view; default is minimum required to hold all links in the junction table"
+  "-w:--where:::false:WHERE clause for selecting from 'poly' table"
   "-S:--shapefile:::false:Shapefile to generate"::true
   "-l:--logfile:::false:Log file to record processing, defaults to \$shape + \$suffix + .log"::true
 )
@@ -43,30 +44,49 @@ junction=${shape}_${suffix}_junction
 view=${shape}_${suffix}_view
 IFS=',' read -r -a columnarray <<< "${columns}"
 
+if [[ ! -n "${where}" ]]; then
+    where="TRUE"
+fi
 if [[ ! -n "${number}" ]]; then
+    if [[ "${where}" == "TRUE" ]]; then
+        NUMBER_SELECT="SELECT max(count)
+                      FROM (SELECT poly_id, count(shape_id) AS count 
+                            FROM ${junction}
+                            GROUP BY poly_id) AS foo"
+    else
+        NUMBER_SELECT="SELECT max(count)
+                      FROM (SELECT poly_id, count(shape_id) AS count 
+                            FROM ${junction}
+                            JOIN ${poly} AS poly ON poly.id = poly_id
+                            WHERE ${where}
+                            GROUP BY poly_id) AS foo"
+    fi
     number=$(psql ${database} ${user} \
                 --quiet --tuples-only --no-align \
                 --command="\timing off" \
-                --command="SELECT max(count)
-                           FROM (SELECT poly_id, count(shape_id) AS count 
-                                 FROM ${junction}
-                                 GROUP BY poly_id) AS foo")
+                --command="${NUMBER_SELECT}")
 fi
 echo "Number of links to copy is ${number}"
-
-VIEW_QUERY="SELECT poly_id, poly_geometry, array_length(agg.${columnarray[0]}, 1) AS shape_count"
+VIEW_QUERY="SELECT poly_id, poly_geometry, st_area(poly_geometry::geography)/10000 as area, 
+                   array_length(agg.${columnarray[0]}, 1) AS shape_count, 
+                   (SELECT min(diff) as min_interval
+                    FROM (SELECT season_year - lag(season_year) OVER (ORDER BY season_year) AS diff FROM unnest(season_year) AS season_year) foo),
+                   (SELECT max(diff) as max_interval
+                    FROM (SELECT season_year - lag(season_year) OVER (ORDER BY season_year) AS diff FROM unnest(season_year) AS season_year) foo)"
 for ((linkidx=1; linkidx<=${number}; linkidx++)) do
     for ((colidx=0; colidx<${#columnarray[@]}; colidx++)) do
         VIEW_QUERY+=", agg.${columnarray[colidx]}[${linkidx}] AS ${columnarray[colidx]}_${linkidx}"
     done
 done
 VIEW_QUERY+=" FROM (SELECT poly_id, poly.geometry AS poly_geometry"
+VIEW_QUERY+=", array_agg(substring(shape.fih_fire_seaso, '/([0-9]{4})')::integer) AS season_year"
 for ((colidx=0; colidx<${#columnarray[@]}; colidx++)) do
     VIEW_QUERY+=", array_agg(shape.${columnarray[colidx]} ORDER by fih_date1 DESC, objectid DESC) AS ${columnarray[colidx]}"
 done
 VIEW_QUERY+=" FROM ${junction} AS junction
                JOIN ${poly} AS poly on poly.id = poly_id
                JOIN ${shape} AS shape ON shape.objectid = shape_id
+               WHERE ${where}
                GROUP BY poly_id, poly_geometry) agg"
 
 if [[ -n "${shapefile}" ]]; then

@@ -25,7 +25,7 @@ args=(
   "-s:--shape:::false:Table name containing geometrical data"
   "-S:--suffix:::true:Suffix to append to shape table name to generate other table names"
   "-g:--geometry::geometry:false:Column name for geometry in 'shape' table"
-  "-w:--where::TRUE:false:WHERE clause for selecting from 'shape' table"
+  "-w:--where:::false:WHERE clause for selecting from 'shape' table"
   "-l:--logfile:::false:Log file to record processing, defaults to \$shape + \$suffix + .log"
 )
 
@@ -42,6 +42,9 @@ point=${shape}_${suffix}_point
 junction=${shape}_${suffix}_junction
 
 echo "Creating dump table ${dump}"
+if [[ ! -n "${where}" ]]; then
+    where="TRUE"
+fi
 psql ${database} ${user} \
     --command="DROP TABLE IF EXISTS ${dump}" \
     --command="CREATE TABLE ${dump} AS
