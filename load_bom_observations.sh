@@ -19,14 +19,15 @@ set -e
 
 help='Load BOM station data from CSV file.'
 args=(
+# "-short:--long:variable:default:required:description:flags"
 # "-short:--long:variable:default:required:description:input:output:private"CSV
-  "-d:--database:::true:SQLite database"
-  "-l:--logfile:::false:Log file to record processing, defaults to \$database + .log"
-  ":filename:::true:CSV file name":true
-  ":joinname:::true:Old CSV file name":true
+  "-d:--database:::SQLite database:required"
+  "-l:--logfile:::Log file to record processing, defaults to 'database' + .log"
+  ":filename:::CSV file name:required,input"
+  ":joinname:::Old CSV file name:required,input"
 )
 
-source $(dirname "$0")/argrecord.sh
+source $(dirname "$0")/argparse.sh
 
 if [[ ! -n "${logfile}" ]] && [[ -n "${filename}" ]]; then
     logfile=$(basename ${filename})

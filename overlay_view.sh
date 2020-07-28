@@ -19,29 +19,34 @@ set -e
 
 help='Produces a view containing polygon ID and geometry and a selection of shape columns. The view is generated as a PostGIS view, or as a shapefile. Requires a shape, polygon and junction tables. The last two can be generated from a shape table by overlay_junction.sh'
 args=(
-# "-short:--long:variable:default:required:description:input:output:private"
-  "-u:--user:::true:PostgreSQL username"
-  "-d:--database:::true:PostgreSQL database"
-  "-s:--shape:::false:Table name containing geometrical data"
-  "-S:--suffix:::true:Suffix to append to shape table name to generate other table names"
-  "-c:--columns::objectid:false:Comma separated list of columns to retrieve from linked shape data"
-  "-n:--number:::false:Number of links to copy to view; default is minimum required to hold all links in the junction table"
-  "-w:--where:::false:WHERE clause for selecting from 'poly' table"
-  "-S:--shapefile:::false:Shapefile to generate"::true
-  "-l:--logfile:::false:Log file to record processing, defaults to \$shape + \$suffix + .log"::true
+# "-short:--long:variable:default:required:description:flags"
+  "-u:--user:::PostgreSQL username:required"
+  "-d:--database:::PostgreSQL database:required"
+  "-s:--shape:::Table name containing geometrical data"
+  "-S:--suffix:::Suffix to append to shape table name to generate other table names:required"
+  "-c:--columns::objectid:Comma separated list of columns to retrieve from linked shape data"
+  "-n:--number:::Number of links to copy to view; default is minimum required to hold all links in the junction table"
+  "-w:--where:::WHERE clause for selecting from 'poly' table"
+  "-v:--view:::View to generate"
+  "-S:--shapefile:::Shapefile to generate:output"
+  "-l:--logfile:::Log file to record processing, defaults to 'shape' + 'suffix' + .log:private"
+  ":--nologfile:::Don't write a lot file:private"
 )
 
-source $(dirname "$0")/argrecord.sh
+source $(dirname "$0")/argparse.sh
 
-if [[ ! -n ${logfile} ]]; then
-    logfile="${shape}_${suffix}.log"
+if [[ "${nologfile}" != "true" ]]; then
+    if [[ ! -n ${logfile} ]]; then
+        logfile="${shape}_${suffix}.log"
+    fi
+    INCOMMENTS=$([ -r "${logfile}" ] && cat "${logfile}")
+    echo "${COMMENTS}${INCOMMENTS}" > ${logfile}
 fi
-INCOMMENTS=$([ -r "${logfile}" ] && cat "${logfile}")
-echo "${COMMENTS}${INCOMMENTS}" > ${logfile}
-
 poly=${shape}_${suffix}_poly
 junction=${shape}_${suffix}_junction
-view=${shape}_${suffix}_view
+if [[ ! -n "${view}" ]]; then
+    view=${shape}_${suffix}_view
+fi
 IFS=',' read -r -a columnarray <<< "${columns}"
 
 if [[ ! -n "${where}" ]]; then

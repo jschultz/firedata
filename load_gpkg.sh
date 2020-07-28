@@ -19,14 +19,14 @@ set -e
 
 help='Load a GeoPackage file into a PostGIS table.'
 args=(
-# "-short:--long:variable:default:required:description:input:output:private"
-  "-u:--user:::true:PostgreSQL username"
-  "-d:--database:::true:PostgreSQL database"
-  "-t:--table:::false:Table name, defaults to file name without extension"
-  ":filename:::true:GeoPackage file name":true
+# "-short:--long:variable:default:required:description:flags"
+  "-u:--user:::PostgreSQL username:required"
+  "-d:--database:::PostgreSQL database:required"
+  "-t:--table:::Table name, defaults to file name without extension"
+  ":filename:::GeoPackage file name:required,input"
 )
 
-source $(dirname "$0")/argrecord.sh
+source $(dirname "$0")/argparse.sh
 
 if [[ ! -n "${table}" ]]; then
     table=$(basename ${filename})

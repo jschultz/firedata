@@ -19,17 +19,17 @@ set -e
 
 help='Creates an overlay of non-intersecting polygons from a collection of possibly overlapping shapes. Produces a polygon table and a junction table between the polygon and original shape tables.'
 args=(
-# "-short:--long:variable:default:required:description:input:output:private"
-  "-u:--user:::true:PostgreSQL username"
-  "-d:--database:::true:PostgreSQL database"
-  "-s:--shape:::false:Table name containing geometrical data"
-  "-S:--suffix:::true:Suffix to append to shape table name to generate other table names"
-  "-g:--geometry::geometry:false:Column name for geometry in 'shape' table"
-  "-w:--where:::false:WHERE clause for selecting from 'shape' table"
-  "-l:--logfile:::false:Log file to record processing, defaults to \$shape + \$suffix + .log"
+# "-short:--long:variable:default:required:description:flags"
+  "-u:--user:::PostgreSQL username":"required"
+  "-d:--database:::PostgreSQL database":"required"
+  "-s:--shape:::Table name containing geometrical data"
+  "-S:--suffix:::Suffix to append to shape table name to generate other table names":"required"
+  "-g:--geometry:::Column name for geometry in 'shape' table"
+  "-w:--where:::WHERE clause for selecting from 'shape' table"
+  "-l:--logfile:::Log file to record processing, defaults to 'shape' + 'suffix' + .log"
 )
 
-source $(dirname "$0")/argrecord.sh
+source $(dirname "$0")/argparse.sh
 
 if [[ ! -n ${logfile} ]]; then
     logfile="${shape}_${suffix}.log"

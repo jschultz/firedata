@@ -19,12 +19,12 @@ set -e
 
 help='Load BOM stations from CSV file.'
 args=(
-# "-short:--long:variable:default:required:description:input:output:private"
-  "-d:--database:::true:SQLite database"
-  ":filename:::true:CSV file name":true
+# "-short:--long:variable:default:required:description:flags"
+  "-d:--database:::SQLite database:required"
+  ":filename:::CSV file name:required,input"
 )
 
-source $(dirname "$0")/argrecord.sh
+source $(dirname "$0")/argparse.sh
 
 if [[ ! -n "${table}" ]]; then
     logfile=$(basename ${filename})
