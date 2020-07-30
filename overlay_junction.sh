@@ -23,18 +23,23 @@ args=(
   "-u:--user:::PostgreSQL username":"required"
   "-d:--database:::PostgreSQL database":"required"
   "-s:--shape:::Table name containing geometrical data"
+  ":--shapeid::objectid:Id column in shape table"
   "-S:--suffix:::Suffix to append to shape table name to generate other table names":"required"
   "-g:--geometry:::Column name for geometry in 'shape' table"
   "-w:--where:::WHERE clause for selecting from 'shape' table"
   "-l:--logfile:::Log file to record processing, defaults to 'shape' + 'suffix' + .log"
+  ":--nologfile:::Don't write a log file:private,flag"
+  ":--leavedump:::Don't drop intermediate dump table:flag"
 )
 
 source $(dirname "$0")/argparse.sh
 
-if [[ ! -n ${logfile} ]]; then
-    logfile="${shape}_${suffix}.log"
+if [[ "${nologfile}" != "true" ]]; then
+    if [[ ! -n ${logfile} ]]; then
+        logfile="${shape}_${suffix}.log"
+    fi
+    echo "${COMMENTS}" > ${logfile}
 fi
-echo "${COMMENTS}" > ${logfile}
 
 dump=${shape}_${suffix}_dump
 poly=${shape}_${suffix}_poly
@@ -48,7 +53,7 @@ fi
 psql ${database} ${user} \
     --command="DROP TABLE IF EXISTS ${dump}" \
     --command="CREATE TABLE ${dump} AS
-                  SELECT objectid AS id, (ST_Dump(${geometry})).geom AS geometry FROM ${shape} WHERE ${where}"
+                  SELECT ${shapeid} AS id, (ST_Dump(${geometry})).geom AS geometry FROM ${shape} WHERE ${where}"
 
 echo "Creating polygon table ${poly}"
 psql ${database} ${user} \
@@ -79,7 +84,7 @@ psql ${database} ${user} \
 echo "Creating junction table ${junction}"
 psql ${database} ${user} \
     --quiet \
-    --command="DROP TABLE IF EXISTS ${junction}" \
+    --command="DROP TABLE IF EXISTS ${junction}" CASCADE \
     --command="CREATE TABLE ${junction} (poly_id INTEGER, shape_id INTEGER)" \
     --command="INSERT INTO ${junction}  (poly_id, shape_id)
                 SELECT poly.id, dump.id
@@ -93,7 +98,9 @@ psql ${database} ${user} \
     --quiet \
     --command="DROP TABLE IF EXISTS ${point}"
 
-echo "Dropping shape dump table ${dump}"
-psql ${database} ${user} \
-    --quiet \
-    --command="DROP TABLE IF EXISTS ${dump}"
+if [[ "${leavedump}" != "true" ]]; then
+    echo "Dropping shape dump table ${dump}"
+    psql ${database} ${user} \
+        --quiet \
+        --command="DROP TABLE IF EXISTS ${dump}"
+fi
