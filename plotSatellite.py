@@ -90,7 +90,7 @@ def plotSatellite(arglist=None):
         satcode = satcodes[satline['satellite']]
         tletuples = tledict[satcode]
         tleidx = tleindexes.get(satcode, 0)
-        while tletuples[tleidx+1][0] <= passdatetime:
+        while tletuples[tleidx+1][0] <= passdatetime - timedelta(hours = 1):
             tleidx += 1
         tleindexes[satcode] = tleidx
 
@@ -102,7 +102,7 @@ def plotSatellite(arglist=None):
             orb = Orbital("", line1=line1, line2=line2)
             lastline1 = line1
             lastline2 = line2
-        next_passes = orb.get_next_passes(passdatetime - timedelta(hours = 12), 24, float(satline['longitude']), float(satline['latitude']), 0, horizon=0)
+        next_passes = orb.get_next_passes(passdatetime - timedelta(minutes = 30), 3, float(satline['longitude']), float(satline['latitude']), 0, horizon=0)
 
         passidx = 0
         bestidx = None

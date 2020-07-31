@@ -66,7 +66,8 @@ def retrieveTLE(arglist=None):
     drange = op.inclusive_range(args.startdate, args.enddate or date.today())
     lines = st.tle(norad_cat_id=norad_cat_id, epoch=drange, format='tle', limit=args.limit).split("\n")
     for line in lines:
-        outfile.write(line + "\n")
+        if len(line):
+            outfile.write(line + "\n")
         
     if args.outfile is not None:
         outfile.close()
