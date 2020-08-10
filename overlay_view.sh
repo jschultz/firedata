@@ -114,7 +114,6 @@ if [[ -n "${where}" ]]; then
     VIEW_QUERY+=" WHERE ${where}"
 fi
 VIEW_QUERY+=" GROUP BY poly_id, poly_geometry) agg"
-echo $VIEW_QUERY
 if [[ -n "${shapefile}" ]]; then
     echo "Creating shapefile ${shapefile}"
     pgsql2shp -f ${shapefile} -u qgis fire "${VIEW_QUERY}"
