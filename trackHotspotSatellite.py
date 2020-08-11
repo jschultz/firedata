@@ -57,8 +57,9 @@ def trackHotspotSatellite(arglist=None):
     if not args.no_logfile:
         if not args.logfile:
             args.logfile = args.hotspots + '_' + args.suffix + '.log'
-            if os.path.exists(args.logfile):
-                shutil.move(args.logfile, args.logfile.split('/')[-1].rsplit('.',1)[0] + '.bak')
+
+        if os.path.exists(args.logfile):
+            shutil.move(args.logfile, args.logfile.split('/')[-1].rsplit('.',1)[0] + '.bak')
             
         logfile = open(args.logfile, 'w')
         parser.write_comments(args, logfile, incomments=ArgumentHelper.separator())
