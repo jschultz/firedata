@@ -23,6 +23,9 @@ from qgis.PyQt import QtGui
 from PyQt5.QtGui import QColor, QFont
 from PyQt5.QtCore import QDate, QTime, QDateTime
 from dateutil import parser as dateparser
+import subprocess
+import sys
+import csv
 
 def fireProgression(arglist=None):
 
@@ -31,17 +34,23 @@ def fireProgression(arglist=None):
 
     parser.add_argument('-v', '--verbosity',  type=int, default=1, private=True)
 
-    parser.add_argument('-q', '--qgisfile',   type=str, help='QGIS base file')
-    parser.add_argument('-t', '--temporal',   type=str, required=True, help='Date/time for temporal data in any sensible format')
+    parser.add_argument('-u', '--user',       type=str, required=True, help="PostgreSQL username")
+    parser.add_argument('-d', '--database',   type=str, required=True, help="PostgreSQL database")
+    parser.add_argument('-t', '--table',      type=str, required=True, help="PostgreSQL table with hotspot datas")
 
-    parser.add_argument('-o', '--outfile',    type=str, required=True, help='Output SVG file, otherwise plot on screen.', output=True)
+    parser.add_argument('-q', '--qgisfile',   type=str, required=True, help='QGIS base file')
+    parser.add_argument('-l', '--layout',     type=str, required=True, help='Layout from QGIS file')
+
+    parser.add_argument('-o', '--outfile',    type=str, help='Output SVG file base name, otherwise use table name.', output=True)
+
     parser.add_argument('--logfile',          type=str, help="Logfile", private=True)
     parser.add_argument('--no-logfile',       action='store_true', help='Do not output descriptive comments')
 
     args = parser.parse_args(arglist)
 
-    temporal = dateparser.parse(args.temporal)
-
+    if not args.outfile:
+        args.outfile = args.table
+        
     if not args.no_logfile:
         if not args.logfile and not args.outfile:
             logfile = sys.stdout
@@ -57,20 +66,32 @@ def fireProgression(arglist=None):
         
         if args.logfile or args.outfile:
             logfile.close()
-    
+
     QgsApplication.setPrefixPath("/usr", True)
     qgs = QgsApplication([], True)
     qgs.initQgis()
 
     project = QgsProject.instance()
-    project.read('/home/jschultz/data/Fire/Stirlings/Stirlings.qgz')
+    project.read(args.qgisfile)
 
     manager = QgsProject.instance().layoutManager()
-    layout = manager.layoutByName("Single map")
-    layout.items()[0].setTemporalRange(QgsDateTimeRange(QDateTime(temporal),QDateTime(temporal)))
+    layout = manager.layoutByName(args.layout)
 
-    exporter = QgsLayoutExporter(layout)
-    exporter.exportToSvg(args.outfile,QgsLayoutExporter.SvgExportSettings())
+    psqlin = subprocess.Popen(['psql', args.database, args.user,
+                               '--quiet',
+                               '--command', r'\timing off',
+                               '--command', r'\copy (SELECT satellite, instrument, acq_date + acq_time AS datetime FROM ' + args.table +
+                                             '       GROUP BY satellite, instrument, datetime ORDER BY datetime) TO STDOUT CSV HEADER'],
+                               stdout=subprocess.PIPE, encoding='UTF-8')
+
+    satcsv = csv.DictReader(psqlin.stdout)
+    for satline in satcsv:
+        temporal = QDateTime(dateparser.parse(satline['datetime']))
+        print ("Outputting: ", temporal.toString())
+        layout.items()[0].setTemporalRange(QgsDateTimeRange(temporal,temporal))
+
+        exporter = QgsLayoutExporter(layout)
+        exporter.exportToSvg(args.outfile + '_' + satline['datetime'] + '.svg', QgsLayoutExporter.SvgExportSettings())
 
     qgs.exitQgis()
 
