@@ -107,7 +107,8 @@ def trackHotspotSatellite(arglist=None):
                                                   ADD COLUMN prev_datetime TIMESTAMP WITHOUT TIME ZONE, \
                                                   ADD COLUMN next_azimuth NUMERIC(8,5),                 \
                                                   ADD COLUMN next_elevation NUMERIC(8,5),               \
-                                                  ADD COLUMN next_datetime TIMESTAMP WITHOUT TIME ZONE ,\
+                                                  ADD COLUMN next_datetime TIMESTAMP WITHOUT TIME ZONE, \
+                                                  DROP COLUMN IF EXISTS geometry,                       \
                                                   ADD COLUMN geometry geometry GENERATED ALWAYS AS (ST_Rotate(ST_MakeEnvelope((ST_X(ST_Transform(ST_SetSRID(ST_MakePoint((longitude)::DOUBLE PRECISION, (latitude)::DOUBLE PRECISION), 4326), 28350)) - ((scan * (500)::NUMERIC))::DOUBLE PRECISION), (ST_Y(ST_Transform(ST_SetSRID(ST_MakePoint((longitude)::DOUBLE PRECISION, (latitude)::DOUBLE PRECISION), 4326), 28350)) - ((track * (500)::NUMERIC))::DOUBLE PRECISION), (ST_X(ST_Transform(ST_SetSRID(ST_MakePoint((longitude)::DOUBLE PRECISION, (latitude)::DOUBLE PRECISION), 4326), 28350)) + ((scan * (500)::NUMERIC))::DOUBLE PRECISION), (ST_Y(ST_Transform(ST_SetSRID(ST_MakePoint((longitude)::DOUBLE PRECISION, (latitude)::DOUBLE PRECISION), 4326), 28350)) + ((track * (500)::NUMERIC))::DOUBLE PRECISION), 28350), ((((- pass_bearing) * 3.1415926) / (180)::NUMERIC))::DOUBLE PRECISION, ST_Transform(ST_SetSRID(ST_MakePoint((longitude)::DOUBLE PRECISION, (latitude)::DOUBLE PRECISION), 4326), 28350))) STORED',
                                 '--command', r'\copy ' + args.hotspots + '_' + args.suffix + ' FROM STDIN CSV HEADER'],
                                 stdin=subprocess.PIPE, encoding='UTF-8')
