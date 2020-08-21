@@ -19,13 +19,14 @@ set -e
 
 help='Produce a view or shapefile containing the optionally cumulative union of hotspots at times taken froma hotspot table.'
 args=(
-# "-short:--long:variable:default:required:description:flags"
+# "-short:--long:variable:default:description:flags"
   "-u:--user:::PostgreSQL username:required"
   "-d:--database:::PostgreSQL database:required"
   "-H:--hotspots:::Hotspot table name:required"
-  "-v:--view:::View to generate"
+  "-t:--table:::Table to generate"
   "-S:--shapefile:::Shapefile to generate:output"
   "-c:--cumulative:::Generate cumulative shapes:flag"
+  "-d:--distance::50:Distance in metres to blur the shape merge"
   "-l:--logfile:::Log file to record processing, defaults to 'view'/'shapefile' + .log:private"
   ":--nologfile:::Don't write a log file:private,flag"
 )
@@ -41,27 +42,65 @@ if [[ "${nologfile}" != "true" ]]; then
             logfile="${view}.log"
         fi
     fi
-    INCOMMENTS=$([ -r "${logfile}" ] && cat "${logfile}")
-    echo "${COMMENTS}${INCOMMENTS}" > ${logfile}
+    echo "${COMMENTS}" > ${logfile}
 fi
 
 if [[ "${cumulative}" == "true" ]]; then op="<="; else op="="; fi
 
-QUERY="SELECT datetime, 
-              (SELECT ST_Union(geometry) 
-               FROM ${hotspots} 
+# QUERY="SELECT datetime,
+#               (SELECT ST_Union(ST_Union(hotspots1.geometry, 
+#                                ST_setSRID((SELECT ST_Union(ST_Intersection(ST_Buffer(hotspots1.geometry,${distance}),
+#                                                                            ST_Buffer(hotspots2.geometry,${distance})))
+#                                            FROM ${hotspots} AS hotspots2 
+#                                            WHERE hotspots1.acq_date = hotspots2.acq_date 
+#                                            AND hotspots1.acq_time = hotspots2.acq_time 
+#                                            AND hotspots2.id <> hotspots1.id
+#                                            AND ST_Intersects(ST_Buffer(hotspots1.geometry,${distance}), hotspots2.geometry)
+#                                            AND ST_Intersects(ST_Buffer(hotspots2.geometry,${distance}), hotspots1.geometry)),
+#                                            28350)))
+#               FROM ${hotspots} AS hotspots1
+#               WHERE (acq_date+acq_time)::TIMESTAMP $op datetime)
+#               AS geometry
+#       FROM (SELECT DISTINCT (acq_date + acq_time)::TIMESTAMP AS datetime 
+#             FROM ${hotspots}) AS foo
+#       GROUP BY datetime"
+
+QUERY="SELECT datetime,
+              (SELECT ST_Union(ST_ConcaveHull((SELECT ST_Union(hotspots2.geometry)
+               FROM ${hotspots} AS hotspots2
+               WHERE hotspots1.acq_date = hotspots2.acq_date 
+               AND hotspots1.acq_time = hotspots2.acq_time 
+               AND ST_Intersects(ST_Buffer(hotspots1.geometry,${distance}), hotspots2.geometry)), 0.5))
+               FROM ${hotspots} AS hotspots1
                WHERE (acq_date+acq_time)::TIMESTAMP $op datetime)
-       FROM (SELECT DISTINCT (acq_date + acq_time)::TIMESTAMP AS datetime 
-             FROM ${hotspots}) AS foo 
-       GROUP BY datetime"
+               AS geometry
+      FROM (SELECT DISTINCT (acq_date + acq_time)::TIMESTAMP AS datetime 
+            FROM ${hotspots}) AS foo
+      GROUP BY datetime"
+
+# QUERY="SELECT datetime, 
+#               (SELECT ST_Union(geometry) 
+#                FROM ${hotspots} 
+#                WHERE (acq_date+acq_time)::TIMESTAMP $op datetime)
+#        FROM (SELECT DISTINCT (acq_date + acq_time)::TIMESTAMP AS datetime 
+#              FROM ${hotspots}) AS foo 
+#        GROUP BY datetime"
+
+# QUERY="SELECT datetime, 
+#               (SELECT ST_ConcaveHull(ST_Union(geometry), 0.5)
+#                FROM ${hotspots} 
+#                WHERE (acq_date+acq_time)::TIMESTAMP $op datetime) AS geometry
+#        FROM (SELECT DISTINCT (acq_date + acq_time)::TIMESTAMP AS datetime 
+#              FROM ${hotspots}) AS foo 
+#        GROUP BY datetime"
 
 if [[ -n "${shapefile}" ]]; then
     echo "Creating shapefile ${shapefile}"
     pgsql2shp -f ${shapefile} -u qgis fire "${QUERY}"
 else
-    echo "Creating view ${view}"
+    echo "Creating table ${table}"
     psql ${database} ${user} \
         --quiet \
-        --command="DROP VIEW IF EXISTS ${view}" \
-        --command="CREATE VIEW ${view} AS ${QUERY}"
+        --command="DROP TABLE IF EXISTS ${table}" \
+        --command="CREATE TABLE ${table} AS ${QUERY}"
 fi
