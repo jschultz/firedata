@@ -98,6 +98,7 @@ def trackHotspotSatellite(arglist=None):
                               (['--command', 'DROP TABLE IF EXISTS ' + args.hotspots + '_' + args.suffix] if args.drop_table else []) +
                                ['--command', 'CREATE TABLE ' + args.hotspots + '_' + args.suffix + ' AS TABLE ' + args.hotspots + ' WITH NO DATA',
                                 '--command', 'ALTER TABLE ' + args.hotspots + '_' + args.suffix + '     \
+                                                  ADD COLUMN id SERIAL,                                 \
                                                   ADD COLUMN pass_azimuth NUMERIC(8,5),                 \
                                                   ADD COLUMN pass_elevation NUMERIC(8,5),               \
                                                   ADD COLUMN pass_bearing NUMERIC(8,5),                 \
