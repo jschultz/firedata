@@ -98,7 +98,6 @@ def trackHotspotSatellite(arglist=None):
                               (['--command', 'DROP TABLE IF EXISTS ' + args.hotspots + '_' + args.suffix] if args.drop_table else []) +
                                ['--command', 'CREATE TABLE ' + args.hotspots + '_' + args.suffix + ' AS TABLE ' + args.hotspots + ' WITH NO DATA',
                                 '--command', 'ALTER TABLE ' + args.hotspots + '_' + args.suffix + '     \
-                                                  ADD COLUMN id SERIAL,                                 \
                                                   ADD COLUMN pass_azimuth NUMERIC(8,5),                 \
                                                   ADD COLUMN pass_elevation NUMERIC(8,5),               \
                                                   ADD COLUMN pass_bearing NUMERIC(8,5),                 \
@@ -111,7 +110,9 @@ def trackHotspotSatellite(arglist=None):
                                                   ADD COLUMN next_datetime TIMESTAMP WITHOUT TIME ZONE, \
                                                   DROP COLUMN IF EXISTS geometry,                       \
                                                   ADD COLUMN geometry geometry GENERATED ALWAYS AS (ST_Rotate(ST_MakeEnvelope((ST_X(ST_Transform(ST_SetSRID(ST_MakePoint((longitude)::DOUBLE PRECISION, (latitude)::DOUBLE PRECISION), 4326), 28350)) - ((scan * (500)::NUMERIC))::DOUBLE PRECISION), (ST_Y(ST_Transform(ST_SetSRID(ST_MakePoint((longitude)::DOUBLE PRECISION, (latitude)::DOUBLE PRECISION), 4326), 28350)) - ((track * (500)::NUMERIC))::DOUBLE PRECISION), (ST_X(ST_Transform(ST_SetSRID(ST_MakePoint((longitude)::DOUBLE PRECISION, (latitude)::DOUBLE PRECISION), 4326), 28350)) + ((scan * (500)::NUMERIC))::DOUBLE PRECISION), (ST_Y(ST_Transform(ST_SetSRID(ST_MakePoint((longitude)::DOUBLE PRECISION, (latitude)::DOUBLE PRECISION), 4326), 28350)) + ((track * (500)::NUMERIC))::DOUBLE PRECISION), 28350), ((((- pass_bearing) * 3.1415926) / (180)::NUMERIC))::DOUBLE PRECISION, ST_Transform(ST_SetSRID(ST_MakePoint((longitude)::DOUBLE PRECISION, (latitude)::DOUBLE PRECISION), 4326), 28350))) STORED',
-                                '--command', r'\copy ' + args.hotspots + '_' + args.suffix + ' FROM STDIN CSV HEADER'],
+                                '--command', r'\copy ' + args.hotspots + '_' + args.suffix + ' FROM STDIN CSV HEADER',
+                                '--command', 'ALTER TABLE ' + args.hotspots + '_' + args.suffix + '     \
+                                                  ADD COLUMN id SERIAL'],
                                 stdin=subprocess.PIPE, encoding='UTF-8')
     
     satout = csv.DictWriter(psqlout.stdin, fieldnames = satcsv.fieldnames + ['pass_azimuth', 'pass_elevation', 'pass_bearing', 'pass_datetime', 'prev_azimuth', 'prev_elevation', 'prev_datetime', 'next_azimuth', 'next_elevation', 'next_datetime'])
@@ -150,16 +151,15 @@ def trackHotspotSatellite(arglist=None):
         for passidx in range(len(passdatetimes)):
             max_elevation_time = passdatetimes[passidx]
             (azimuth, elevation) = orb.get_observer_look(max_elevation_time, float(satline['longitude']), float(satline['latitude']), 0)
-            if elevation > 20:
-                thisoffset = (max_elevation_time - thisdatetime).total_seconds()
-                if abs(thisoffset) < abs(leastoffset):
-                    leastoffsetidx = len(nearpasses)
-                    leastoffset = thisoffset
+            thisoffset = (max_elevation_time - thisdatetime).total_seconds()
+            if abs(thisoffset) < abs(leastoffset):
+                leastoffsetidx = len(nearpasses)
+                leastoffset = thisoffset
 
-                nearpasses += [(max_elevation_time, azimuth, elevation)]
+            nearpasses += [(max_elevation_time, azimuth, elevation)]
 
         if abs(leastoffset) > 600:
-            print("WARNING: offset=", leastoffset)
+            print("WARNING: offset=", leastoffset, "prev offset=", (nearpasses[leastoffsetidx-1][0] - thisdatetime).total_seconds() if leastoffsetidx > 0 else "", "next offset=", (nearpasses[leastoffsetidx+1][0] - thisdatetime).total_seconds() if leastoffsetidx < len(nearpasses)-1 else "", " satellite ", satline['satellite'])
             #print("   ", satline)
             
         if len(nearpasses):
