@@ -17,7 +17,7 @@
 #
 set -e
 
-help='Produces a view containing polygon ID and geometry and a selection of shape columns. The view is generated as a PostGIS view, or as a shapefile. Requires a shape, polygon and junction tables. The last two can be generated from a shape table by overlay_junction.sh'
+help='Produces a table or shapefile containing polygon ID and geometry and a selection of shape columns. Requires a shape, polygon and junction tables. The last two can be generated from a shape table by overlay_junction.sh'
 args=(
 # "-short:--long:variable:default:required:description:flags"
   "-u:--user:::PostgreSQL username:required"
@@ -29,12 +29,12 @@ args=(
   ":--polycolumns::poly_id,poly_geometry:Columns to retrieve from polygon table"
   "-S:--suffix:::Suffix to append to poly or shape table name to generate other table names:required"
   "-c:--columns::objectid:List separated by '|' of columns to retrieve from linked shape data"
-  ":--columnaliases::objectid:List separated by '|' of aliases for retrieved shape data columns; empty value means no alias"
-  "-n:--number:::Number of links to copy to view; default is minimum required to hold all links in the junction table"
-  "-w:--where:::WHERE clause for selecting from 'poly' table"
-  "-v:--view:::View to generate"
+  ":--columnaliases:::List separated by '|' of aliases for retrieved shape data columns; empty value means no alias"
+  "-n:--number:::Number of links to copy; default is minimum required to hold all links in the junction table"
+  "-w:--where:::WHERE clause for selecting from \$poly table"
+  "-t:--table:::Table to generate, defaults to \$shape + \$suffix + '_view'"
   "-S:--shapefile:::Shapefile to generate:output"
-  "-l:--logfile:::Log file to record processing, defaults to 'shape' + 'suffix' + .log:private"
+  "-l:--logfile:::Log file to record processing, defaults to \$shapefile with extension replaced by '.log', or \$table.log, or \$shape + \$suffix' + '.log' if neither shapefile nor table is defined:private"
   ":--nologfile:::Don't write a log file:private,flag"
 )
 
@@ -47,18 +47,29 @@ else
     base=${polygon}
 fi
 
+if [[ ! -n "${table}" ]]; then
+    table=${base}_${suffix}_view
+fi
+
 if [[ "${nologfile}" != "true" ]]; then
     if [[ ! -n "${logfile}" ]]; then
-        logfile="${base}_${suffix}.log"
+        if [[ -n "${shapefile}" ]]; then
+            logfile=$(basename ${shapefile})
+            logfile="${logfile%.*}.log"
+        else
+            logfile="${table}.log"
+        fi
     fi
-    INCOMMENTS=$([ -r "${logfile}" ] && cat "${logfile}")
+    if [[ -r "${logfile}" ]]; then
+        INCOMMENTS="$(< "${logfile}")"
+    else
+        INCOMMENTS=""
+    fi
     echo "${COMMENTS}${INCOMMENTS}" > ${logfile}
 fi
 
 junction=${base}_${suffix}_junction
-if [[ ! -n "${view}" ]]; then
-    view=${base}_${suffix}_view
-fi
+
 IFS='|' read -r -a columnarray <<< "${columns}"
 IFS='|' read -r -a columnaliasarray <<< "${columnaliases}"
 for ((colidx=0; colidx<${#columnarray[@]}; colidx++)) do
@@ -118,9 +129,9 @@ if [[ -n "${shapefile}" ]]; then
     echo "Creating shapefile ${shapefile}"
     pgsql2shp -f ${shapefile} -u qgis fire "${VIEW_QUERY}"
 else
-    echo "Creating view ${view}"
+    echo "Creating table ${table}"
     psql ${database} ${user} \
         --quiet \
-        --command="DROP VIEW IF EXISTS ${view}" \
-        --command="CREATE VIEW ${view} AS ${VIEW_QUERY}"
+        --command="DROP TABLE IF EXISTS ${table}" \
+        --command="CREATE TABLE ${table} AS ${VIEW_QUERY}"
 fi
