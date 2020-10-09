@@ -19,7 +19,8 @@ set -e
 
 help='Produces a table or shapefile containing polygon ID and geometry and a selection of shape columns. Requires a shape, polygon and junction tables. The last two can be generated from a shape table by overlay_junction.sh'
 args=(
-# "-short:--long:variable:default:required:description:flags"
+# "-short:--long:variable:default:description:flags"
+  ":--debug:::Debug execution:flag"
   "-u:--user:::PostgreSQL username:required"
   "-d:--database:::PostgreSQL database:required"
   "-s:--shape:::Table name containing geometrical data"
@@ -28,8 +29,8 @@ args=(
   ":--polyid::id:ID column in polygon table"
   ":--polycolumns::poly_id,poly_geometry:Columns to retrieve from polygon table"
   "-S:--suffix:::Suffix to append to poly or shape table name to generate other table names:required"
-  "-c:--columns::objectid:List separated by '|' of columns to retrieve from linked shape data"
-  ":--columnaliases:::List separated by '|' of aliases for retrieved shape data columns; empty value means no alias"
+  "-c:--columns::objectid:List (separated by '|') of columns to retrieve from linked shape data"
+  ":--columnaliases:::List (separated by '|' of aliases) columns retrieved from linked shape data; empty value means use column name as alias"
   "-n:--number:::Number of links to copy; default is minimum required to hold all links in the junction table"
   "-w:--where:::WHERE clause for selecting from \$poly table"
   "-t:--table:::Table to generate, defaults to \$shape + \$suffix + '_view'"
@@ -66,6 +67,10 @@ if [[ "${nologfile}" != "true" ]]; then
         INCOMMENTS=""
     fi
     echo "${COMMENTS}${INCOMMENTS}" > ${logfile}
+fi
+
+if [[ "${debug}" == "true" ]]; then
+    set -x
 fi
 
 junction=${base}_${suffix}_junction
@@ -116,7 +121,7 @@ done
 VIEW_QUERY+=" FROM (SELECT poly_id, poly.geometry AS poly_geometry"
 VIEW_QUERY+=", array_agg(substring(shape.fih_fire_seaso, '/([0-9]{4})')::integer) AS season_year"
 for ((colidx=0; colidx<${#columnarray[@]}; colidx++)) do
-    VIEW_QUERY+=", array_agg(${columnarray[colidx]} ORDER by fih_date1 DESC, ${shapeid} DESC) AS ${columnaliasarray[colidx]}"
+    VIEW_QUERY+=", array_agg(${columnarray[colidx]} ORDER BY fih_date1 DESC, ${shapeid} DESC) AS ${columnaliasarray[colidx]}"
 done
 VIEW_QUERY+=" FROM ${junction} AS junction
                JOIN ${polygon} AS poly ON poly.${polyid} = poly_id
