@@ -24,11 +24,11 @@ set -e
 
 help='Create a PostgreSQL table from GeoCSV files (.csv, .csvt, .prj).'
 args=(
-# "-short:--long:variable:default:required"
-  "-u:--user:::true:PostgreSQL username"
-  "-d:--database:::true:PostgreSQL database"
-  "-c:--csv:::true:GeoCSV file name with no extension"
-  "-t:--table:::false:Table name to load, default is GeoCSV file name"
+# "-short:--long:variable:default:help:flags"
+  "-u:--user:::PostgreSQL username:required"
+  "-d:--database:::PostgreSQL database:required"
+  "-c:--csv:::GeoCSV file name with no extension:required"
+  "-t:--table:::Table name to load, default is GeoCSV file name:"
 )
 
 source $(dirname "$0")/argparse.sh
