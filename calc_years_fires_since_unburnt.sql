@@ -1,13 +1,19 @@
 ALTER TABLE :table ADD COLUMN years_since_unburnt int, ADD COLUMN fires_since_unburnt int;
-
+SET ROLE dba;
 CREATE OR REPLACE FUNCTION calc_years_fires_since_unburnt(arg :table)
   RETURNS :table
   AS $$
     fires=[]
     idx = 1
     while True:
-      if arg.get('fih_season1_'+str(idx)) is not None:
-        fires += [{'fih_season1': arg['fih_season1_'+str(idx)], 'season': int(arg['fih_fire_seaso_'+str(idx)][5:]), 'fih_fire_type': arg['fih_fire_type_'+str(idx)]}]
+      fih_date1 = arg.get('fih_date1_'+str(idx))
+      if fih_date1:
+        if int(fih_date1[5:7]) >= 7:
+          season = int(fih_date1[0:4]) + 1
+        else:
+          season = int(fih_date1[0:4])
+
+        fires += [{'season': season, 'fih_fire_type': arg['fih_fire_type_'+str(idx)]}]
       else:
         break;
       idx += 1
@@ -28,7 +34,7 @@ CREATE OR REPLACE FUNCTION calc_years_fires_since_unburnt(arg :table)
 
     return arg
   $$ LANGUAGE plpython3u;
-
+RESET ROLE;
 UPDATE :table AS update_table
   SET years_since_unburnt = calc.years_since_unburnt, fires_since_unburnt = calc.fires_since_unburnt 
   FROM (SELECT poly_id, (row).years_since_unburnt, (row).fires_since_unburnt 
