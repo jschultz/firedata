@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Copyright 2020 Jonathan Schultz
+# Copyright 2021 Jonathan Schultz
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,48 +17,49 @@
 #
 set -e
 
-help='Produces a table or shapefile containing polygon ID and geometry and a selection of shape columns. Requires a shape, polygon and junction tables. The last two can be generated from a shape table by overlay_junction.sh'
+help='Produces a table or shapefile containing polygon ID and geometry and a selection of event columns. Requires event, polygon and junction tables. The last two can be generated from an event table by overlay_junction.sh'
 args=(
 # "-short:--long:variable:default:description:flags"
   ":--debug:::Debug execution:flag"
   "-u:--user:::PostgreSQL username:required"
   "-d:--database:::PostgreSQL database:required"
-  "-s:--shape:::Table name containing geometrical data"
-  ":--shapeid::objectid:Id column in shape table"
+  "-e:--eventtable:::Name of database table containing event data"
+  ":--eventid::id:Id column in event table"
+  "-s:--suffix:::Suffix to append to poly or shape table name to generate other table names:required"
   "-p:--polygon:::Polygon table"
-  ":--polyid::id:ID column in polygon table"
-  ":--polycolumns::poly_id,poly_geometry:Columns to retrieve from polygon table"
-  "-S:--suffix:::Suffix to append to poly or shape table name to generate other table names:required"
-  "-c:--columns::objectid:List (separated by '|') of columns to retrieve from linked shape data"
-  ":--columnaliases:::List (separated by '|' of aliases) columns retrieved from linked shape data; empty value means use column name as alias"
+  ":--polycolumns:::Comma-separated list of columns to retrieve from polygon table"
+  ":--polyaliases:::Comma-separated list of aliases for columns retrieved from polygon table"
+  "-c:--eventcolumns::objectid:Comma-separated list of columns to retrieve from event data"
+  ":--eventaliases:::Comma-separated list of aliases for columns retrieved from burn data; empty value means use column name as alias"
   "-n:--number:::Number of links to copy; default is minimum required to hold all links in the junction table"
-  "-w:--where:::WHERE clause for selecting from \$poly table"
-  "-t:--table:::Table to generate, defaults to \$shape + \$suffix + '_view'"
-  "-S:--shapefile:::Shapefile to generate:output"
-  "-l:--logfile:::Log file to record processing, defaults to \$shapefile with extension replaced by '.log', or \$table.log, or \$shape + \$suffix' + '.log' if neither shapefile nor table is defined:private"
+  "-g:--geometry::geom:Column name for geometry in tables"
+  "-w:--where:::WHERE clause for selecting from polygon table"
+  "-v:--viewtable:::Table to generate, defaults to \$eventtable + \$suffix + '_view'"
+  "-S:--viewfile:::Shapefile to generate:output"
+  "-l:--logfile:::Log file to record processing, defaults to \$shapefile with extension replaced by '.log', or \$table.log, or \$eventtable + \$suffix' + '.log' if neither shapefile nor table is defined:private"
   ":--nologfile:::Don't write a log file:private,flag"
 )
 
 source $(dirname "$0")/argparse.sh
 
 if [[ ! -n "${polygon}" ]]; then
-    base=${shape}
+    base=${eventtable}
     polygon=${base}_${suffix}_poly
 else
     base=${polygon}
 fi
 
-if [[ ! -n "${table}" ]]; then
+if [[ ! -n "${viewtable}" ]]; then
     table=${base}_${suffix}_view
 fi
 
 if [[ "${nologfile}" != "true" ]]; then
     if [[ ! -n "${logfile}" ]]; then
-        if [[ -n "${shapefile}" ]]; then
-            logfile=$(basename ${shapefile})
+        if [[ -n "${viewfile}" ]]; then
+            logfile=$(basename ${viewfile})
             logfile="${logfile%.*}.log"
         else
-            logfile="${table}.log"
+            logfile="${viewtable}.log"
         fi
     fi
     if [[ -r "${logfile}" ]]; then
@@ -66,7 +67,7 @@ if [[ "${nologfile}" != "true" ]]; then
     else
         INCOMMENTS=""
     fi
-    echo "${COMMENTS}${INCOMMENTS}" > ${logfile}
+    echo "${COMMENTS}${INCOMMENTS}" > ${logfile}bowie
 fi
 
 if [[ "${debug}" == "true" ]]; then
@@ -75,11 +76,19 @@ fi
 
 junction=${base}_${suffix}_junction
 
-IFS='|' read -r -a columnarray <<< "${columns}"
-IFS='|' read -r -a columnaliasarray <<< "${columnaliases}"
-for ((colidx=0; colidx<${#columnarray[@]}; colidx++)) do
-    if [[ ! -n "${columnaliasarray[colidx]}" ]]; then
-        columnaliasarray[colidx]="${columnarray[colidx]}"
+IFS=',' read -r -a polycolumnarray <<< "${polycolumns}"
+IFS=',' read -r -a polyaliasarray <<< "${polyaliases}"
+for ((colidx=0; colidx<${#polycolumnarray[@]}; colidx++)) do
+    if [[ ! -n "${polyaliasarray[colidx]}" ]]; then
+        polyaliasarray[colidx]="${polycolumnarray[colidx]}"
+    fi
+done
+
+IFS=',' read -r -a eventcolumnarray <<< "${eventcolumns}"
+IFS=',' read -r -a eventaliasarray <<< "${eventaliases}"
+for ((colidx=0; colidx<${#eventcolumnarray[@]}; colidx++)) do
+    if [[ ! -n "${eventaliasarray[colidx]}" ]]; then
+        eventaliasarray[colidx]="${eventcolumnarray[colidx]}"
     fi
 done
 
@@ -93,10 +102,11 @@ if [[ ! -n "${number}" ]]; then
         NUMBER_SELECT="SELECT max(count)
                       FROM (SELECT poly_id, count(shape_id) AS count 
                             FROM ${junction}
-                            JOIN ${polygon} AS poly ON poly.${polyid} = poly_id
+                            JOIN ${polygon} AS poly ON poly.id = poly_id
                             WHERE ${where}
                             GROUP BY poly_id) AS foo"
     fi
+#     echo $NUMBER_SELECT
     number=$(psql ${database} ${user} \
                 --quiet --tuples-only --no-align \
                 --command="\timing off" \
@@ -107,36 +117,51 @@ if [[ ! -n "${number}" ]]; then
     exit 1
 fi
 echo "Number of links to copy is ${number}"
-VIEW_QUERY="SELECT ${polycolumns}, st_area(poly_geometry::geography)/10000 as area, 
-                   array_length(agg.${columnaliasarray[0]}, 1) AS shape_count, 
-                   (SELECT min(diff) as min_interval
-                    FROM (SELECT season_year - lag(season_year) OVER (ORDER BY season_year) AS diff FROM unnest(season_year) AS season_year) foo),
-                   (SELECT max(diff) as max_interval
-                    FROM (SELECT season_year - lag(season_year) OVER (ORDER BY season_year) AS diff FROM unnest(season_year) AS season_year) foo)"
+VIEW_QUERY="SELECT"
+separator=""
+for ((colidx=0; colidx<${#polyaliasarray[@]}; colidx++)) do
+    VIEW_QUERY+="${separator} agg.${polyaliasarray[colidx]}"
+    separator=","
+done
 for ((linkidx=1; linkidx<=${number}; linkidx++)) do
-    for ((colidx=0; colidx<${#columnarray[@]}; colidx++)) do
-        VIEW_QUERY+=", agg.${columnaliasarray[colidx]}[${linkidx}] AS ${columnaliasarray[colidx]}_${linkidx}"
+    for ((colidx=0; colidx<${#eventaliasarray[@]}; colidx++)) do
+        VIEW_QUERY+="${separator} agg.${eventaliasarray[colidx]}[${linkidx}] AS ${eventaliasarray[colidx]}_${linkidx}"
+        separator=","
     done
 done
-VIEW_QUERY+=" FROM (SELECT poly_id, poly.geometry AS poly_geometry"
-VIEW_QUERY+=", array_agg(substring(shape.fih_fire_seaso, '/([0-9]{4})')::integer) AS season_year"
-for ((colidx=0; colidx<${#columnarray[@]}; colidx++)) do
-    VIEW_QUERY+=", array_agg(${columnarray[colidx]} ORDER BY fih_date1 DESC, ${shapeid} DESC) AS ${columnaliasarray[colidx]}"
+VIEW_QUERY+=" FROM (SELECT"
+separator=""
+for ((colidx=0; colidx<${#polycolumnarray[@]}; colidx++)) do
+    VIEW_QUERY+="${separator} poly.${polycolumnarray[colidx]} AS ${polyaliasarray[colidx]}"
+    separator=","
+done
+for ((colidx=0; colidx<${#eventcolumnarray[@]}; colidx++)) do
+    VIEW_QUERY+="${separator} array_agg(event.${eventcolumnarray[colidx]} ORDER BY fih_date1 DESC, event.${eventid} DESC) AS ${eventaliasarray[colidx]}"
+    separator=","
 done
 VIEW_QUERY+=" FROM ${junction} AS junction
-               JOIN ${polygon} AS poly ON poly.${polyid} = poly_id
-               JOIN ${shape} AS shape ON shape.${shapeid} = shape_id"
+               JOIN ${polygon} AS poly ON poly.id = junction.poly_id
+               JOIN ${eventtable} AS event ON event.${eventid} = shape_id"
 if [[ -n "${where}" ]]; then
     VIEW_QUERY+=" WHERE ${where}"
 fi
-VIEW_QUERY+=" GROUP BY poly_id, poly_geometry) agg"
-if [[ -n "${shapefile}" ]]; then
-    echo "Creating shapefile ${shapefile}"
-    pgsql2shp -f ${shapefile} -u qgis fire "${VIEW_QUERY}"
+if [[ ${#polycolumnarray[@]} -gt 0 ]]; then
+    VIEW_QUERY+=" GROUP BY"
+    separator=""
+    for ((colidx=0; colidx<${#polycolumnarray[@]}; colidx++)) do
+        VIEW_QUERY+="${separator} poly.${polycolumnarray[colidx]}"
+        separator=","
+    done
+fi
+VIEW_QUERY+=") agg"
+# echo $VIEW_QUERY
+if [[ -n "${viewfile}" ]]; then
+    echo "Creating shapefile ${viewfile}"
+    pgsql2shp -f ${viewfile} -u qgis fire "${VIEW_QUERY}"
 else
-    echo "Creating table ${table}"
+    echo "Creating table ${viewtable}"
     psql ${database} ${user} \
         --quiet \
-        --command="DROP TABLE IF EXISTS ${table}" \
-        --command="CREATE TABLE ${table} AS ${VIEW_QUERY}"
+        --command="DROP TABLE IF EXISTS ${viewtable}" \
+        --command="CREATE TABLE ${viewtable} AS ${VIEW_QUERY}"
 fi

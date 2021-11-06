@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Copyright 2020 Jonathan Schultz
+# Copyright 2021 Jonathan Schultz
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -16,28 +16,29 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 set -e
+# set -x
 
-help='Creates an overlay of non-intersecting polygons from a collection of possibly overlapping shapes. Produces a polygon table and a junction table between the polygon and original shape tables.'
+help='Creates an overlay of non-intersecting polygons from a collection of shapes in an event table. Produces a polygon table and a junction table between the polygon and original event tables.'
 args=(
 # "-short:--long:variable:default:description:flags"
   ":--debug:::Debug execution:flag"
   "-u:--user:::PostgreSQL username:required"
   "-d:--database:::PostgreSQL database:required"
-  "-s:--shape:::Table name containing geometrical data"
-  ":--shapeid::objectid:Id column in shape table"
-  "-S:--suffix:::Suffix to append to shape table name to generate other table names":"required"
-  "-g:--geometry::geometry:Column name for geometry in 'shape' table"
-  "-w:--where:::WHERE clause for selecting from 'shape' table"
-  "-l:--logfile:::Log file to record processing, defaults to 'shape' + 'suffix' + .log"
+  "-e:--eventtable:::Name of database table containing event data"
+  ":--eventid::id:Id column in event table"
+  "-S:--suffix:::Suffix to append to event table name to generate dump, polygon, point-in-polygon and junction table names":"required"
+  "-g:--geometry::geom:Name of geometry column in tables"
+  "-w:--where:::WHERE clause for selecting from event table"
+  "-l:--logfile:::Log file to record processing, defaults to 'event' + 'suffix' + .log"
   ":--nologfile:::Don't write a log file:private,flag"
-  ":--leavedump:::Don't drop intermediate dump table:flag"
+  ":--keepdump:::Keep intermediate dump table:flag"
 )
 
 source $(dirname "$0")/argparse.sh
 
 if [[ "${nologfile}" != "true" ]]; then
     if [[ ! -n ${logfile} ]]; then
-        logfile="${shape}_${suffix}.log"
+        logfile="${eventtable}_${suffix}.log"
     fi
     echo "${COMMENTS}" > ${logfile}
 fi
@@ -46,11 +47,32 @@ if [[ "${debug}" == "true" ]]; then
     set -x
 fi
 
-dump=${shape}_${suffix}_dump
-poly=${shape}_${suffix}_poly
-point=${shape}_${suffix}_point
-junction=${shape}_${suffix}_junction
+dump=${eventtable}_${suffix}_dump
+poly=${eventtable}_${suffix}_poly
+point=${eventtable}_${suffix}_point
+junction=${eventtable}_${suffix}_junction
 
+SRID_COUNT=$(psql ${database} ${user} \
+              --quiet --tuples-only --no-align \
+              --command="\timing off" \
+              --command "SELECT count(DISTINCT srid) FROM
+                            (SELECT ST_SRID(${geometry}) AS srid FROM ${eventtable} ) AS foo" )
+if [[ $SRID_COUNT -gt 1 ]]; then
+    echo "ERROR: Multiple SRIDs in shape table geometries"
+    return 1
+else
+    SRID=$(psql ${database} ${user} \
+              --quiet --tuples-only --no-align \
+              --command="\timing off" \
+              --command "SELECT srid FROM
+                            (SELECT ST_SRID(${geometry}) AS srid FROM ${eventtable} ) AS foo
+                            LIMIT 1" )
+    if [[ $SRID -eq 0 ]]; then
+        echo "ERROR: No SRID in shape table geometries"
+        return 1
+    fi
+fi
+        
 echo "Creating dump table ${dump}"
 if [[ ! -n "${where}" ]]; then
     where="TRUE"
@@ -58,7 +80,7 @@ fi
 psql ${database} ${user} \
     --command="DROP TABLE IF EXISTS ${dump}" \
     --command="CREATE TABLE ${dump} AS
-                  SELECT ${shapeid} AS id, (ST_Dump(${geometry})).geom AS geometry FROM ${shape} WHERE ${where}"
+                  SELECT ${eventid} AS id, (ST_Dump(${geometry})).geom AS ${geometry} FROM ${eventtable} WHERE ${where}"
 
 echo "Creating polygon table ${poly}"
 psql ${database} ${user} \
@@ -69,9 +91,9 @@ psql ${database} ${user} \
 psql ${database} ${user} \
     --quiet --tuples-only --no-align \
     --command="\timing off" \
-    --command="SELECT ST_ExteriorRing((ST_DumpRings(geometry)).geom) FROM ${dump}" | \
+    --command="SELECT ST_ExteriorRing((ST_DumpRings(${geometry})).geom) FROM ${dump}" | \
 jtsop.sh -a stdin -b "POLYGON (EMPTY)" -f wkb -explode OverlayNG.union 100000000 | \
-jtsop.sh -a stdin -f wkb -explode Polygonize.polygonize | \
+jtsop.sh -a stdin -f wkb -srid ${SRID} -explode Polygonize.polygonize | \
 psql ${database} ${user} \
     --quiet \
     --command="\timing off" \
@@ -93,9 +115,9 @@ psql ${database} ${user} \
     --command="CREATE TABLE ${junction} (poly_id INTEGER, shape_id INTEGER)" \
     --command="INSERT INTO ${junction}  (poly_id, shape_id)
                 SELECT poly.id, dump.id
-                FROM ${point} poly
-                  JOIN ${dump} dump
-                  ON ST_Contains(dump.geometry, poly.point)
+                FROM ${dump} dump
+                  JOIN ${point} poly
+                  ON ST_Contains(dump.${geometry}, poly.point)
                 GROUP BY poly.id, dump.id"
 
 echo "Dropping point in polygon table ${point}"
@@ -103,7 +125,7 @@ psql ${database} ${user} \
     --quiet \
     --command="DROP TABLE IF EXISTS ${point}"
 
-if [[ "${leavedump}" != "true" ]]; then
+if [[ "${keepdump}" != "true" ]]; then
     echo "Dropping shape dump table ${dump}"
     psql ${database} ${user} \
         --quiet \
