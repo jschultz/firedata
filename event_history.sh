@@ -25,10 +25,10 @@ args=(
   "-d:--database:::PostgreSQL database:required"
   "-v:--viewtable:::Name of table containing event history view:required"
   "-a:--area:::Specification of area of which history will be extracted:required"
-  "-T:--threshhold::10:Minimum percentage of specified area for event to be included"
   "-c:--viewcolumns::objectid:Semicolon-separated list of columns to retrieve from view data"
   "-g:--viewgroups::objectid:Semicolon-separated list of columns to group view data"
   ":--viewaliases:::Semicolon-separated list of aliases for columns retrieved from view data; empty value for no alias"
+  "-w:--where:::Condition clause for query"
   "-C:--csvfile:::CSV file to generate:output"
   "-S:--shapefile:::Shapefile to generate:output"
   "-l:--logfile:::Log file to record processing, defaults to out file name with extension replaced by '.log':private"
@@ -77,7 +77,10 @@ done
 HISTORY_QUERY+="
     FROM ${viewtable} AS view
 WHERE
-    ST_Intersects(view.geom, ${area})"
+    ST_Intersects(view.geom, (SELECT geom from area))"
+if [[ -n "${where}" ]]; then
+    HISTORY_QUERY+=" AND (${where})"
+fi
 if [[ ${#viewgrouparray[@]} -gt 0 ]]; then
     HISTORY_QUERY+="
         GROUP BY"
@@ -87,9 +90,26 @@ if [[ ${#viewgrouparray[@]} -gt 0 ]]; then
         separator=","
     done
 fi
-# echo $HISTORY_QUERY
+echo $HISTORY_QUERY
 
-psql ${database} ${user} \
-    --quiet \
-    --command="$HISTORY_QUERY"
-
+if [[ -n "${shapefile}" ]]; then
+    echo "Creating shapefile ${shapefile}"
+#     pgsql2shp -f ${shapefile} -u qgis fire "${HISTORY_QUERY}"
+#   Note work-around for pgsql2shp bug: https://trac.osgeo.org/postgis/ticket/5018
+    pgsql2shp -f ${shapefile} -u ${user} ${database} "SELECT * FROM (${HISTORY_QUERY}) AS query"
+elif [[ -n "${csvfile}" ]]; then
+    echo "Creating CSV file ${csvfile}"
+    psql ${database} ${user} \
+        --quiet --csv \
+        --command="${HISTORY_QUERY}" > "${csvfile}"
+elif [[ -n "${table}" ]]; then
+    echo "Creating table ${table}"
+    psql ${database} ${user} \
+        --quiet \
+        --command="DROP TABLE IF EXISTS ${table}" \
+        --command="CREATE TABLE ${table} AS ${VIEW_QUERY}"
+else
+    psql ${database} ${user} \
+        --quiet \
+        --command="$HISTORY_QUERY"
+fi
