@@ -17,7 +17,7 @@
 #
 set -e
 
-help='Produces a list of events that intersect an area specified in one of several ways: burn ID, forest block'
+help='Produces a list of events that intersect a specified area'
 args=(
 # "-short:--long:variable:default:description:flags"
   ":--debug:::Debug execution:flag"
@@ -28,7 +28,7 @@ args=(
   "-c:--viewcolumns::objectid:Semicolon-separated list of columns to retrieve from view data"
   "-g:--viewgroups::objectid:Semicolon-separated list of columns to group view data"
   ":--viewaliases:::Semicolon-separated list of aliases for columns retrieved from view data; empty value for no alias"
-  "-w:--where:::Condition clause for query"
+  "-w:--where:::Condition applied after query execution"
   "-C:--csvfile:::CSV file to generate:output"
   "-S:--shapefile:::Shapefile to generate:output"
   "-l:--logfile:::Log file to record processing, defaults to out file name with extension replaced by '.log':private"
@@ -65,7 +65,7 @@ IFS=';' read -r -a viewcolumnarray <<< "${viewcolumns}"
 IFS=';' read -r -a viewaliasarray <<< "${viewaliases}"
 IFS=';' read -r -a viewgrouparray <<< "${viewgroups}"
 
-HISTORY_QUERY="WITH area AS ${area} SELECT"
+HISTORY_QUERY="WITH area AS ${area} SELECT * FROM (SELECT"
 separator=""
 for ((colidx=0; colidx<${#viewcolumnarray[@]}; colidx++)) do
     HISTORY_QUERY+="${separator} ${viewcolumnarray[colidx]}"
@@ -78,9 +78,6 @@ HISTORY_QUERY+="
     FROM ${viewtable} AS view
 WHERE
     ST_Intersects(view.geom, (SELECT geom from area))"
-if [[ -n "${where}" ]]; then
-    HISTORY_QUERY+=" AND (${where})"
-fi
 if [[ ${#viewgrouparray[@]} -gt 0 ]]; then
     HISTORY_QUERY+="
         GROUP BY"
@@ -90,6 +87,11 @@ if [[ ${#viewgrouparray[@]} -gt 0 ]]; then
         separator=","
     done
 fi
+HISTORY_QUERY+=")"
+if [[ -n "${where}" ]]; then
+    HISTORY_QUERY+=" WHERE (${where})"
+fi
+
 echo $HISTORY_QUERY
 
 if [[ -n "${shapefile}" ]]; then
