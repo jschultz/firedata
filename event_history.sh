@@ -98,7 +98,7 @@ if [[ -n "${shapefile}" ]]; then
     echo "Creating shapefile ${shapefile}"
 #     pgsql2shp -f ${shapefile} -u qgis fire "${HISTORY_QUERY}"
 #   Note work-around for pgsql2shp bug: https://trac.osgeo.org/postgis/ticket/5018
-    pgsql2shp -f ${shapefile} -u ${user} ${database} "SELECT * FROM (${HISTORY_QUERY}) AS query"
+    pgsql2shp -f "${shapefile}" -u ${user} ${database} "SELECT * FROM (${HISTORY_QUERY}) AS query"
 elif [[ -n "${csvfile}" ]]; then
     echo "Creating CSV file ${csvfile}"
     psql ${database} ${user} \
