@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Copyright 2020 Jonathan Schultz
+# Copyright 2021 Jonathan Schultz
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,13 +17,14 @@
 #
 set -e
 
-help='Load a shapefile into a PostGIS table.'
+help='Load a file into a PostGIS table. The file may be of any kind supported by ogr2ogr'
 args=(
-# "-short:--long:variable:default:required:description:flags"
+# "-short:--long:variable:default:description:flags"
   "-u:--user:::PostgreSQL username:required"
   "-d:--database:::PostgreSQL database:required"
-  "-t:--table:::Table name, defaults to file name without extension"
-  ":filename:::Shape file name:required,input"
+  "-t:--table:::Name of table to create, defaults to file name without extension"
+  "-g:--geometry::geom:Name of column to hold geometry data"
+  ":filename:::Name of file to read:required,input"
 )
 
 source $(dirname "$0")/argparse.sh
@@ -34,4 +35,4 @@ if [[ ! -n "${table}" ]]; then
 fi
 echo "${COMMENTS}" > ${table}.log
 
-ogr2ogr -overwrite -f PostgreSQL "PG:dbname=${database} user=${user}" -t_srs EPSG:4326  -lco geometry_name=geometry "${filename}" -nln "${table}"
+ogr2ogr -overwrite -f PostgreSQL "PG:dbname=${database} user=${user}" -lco geometry_name=${geometry} "${filename}" -nln "${table}"
