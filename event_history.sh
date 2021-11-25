@@ -43,18 +43,12 @@ if [[ "${nologfile}" != "true" ]]; then
             logfile=$(basename ${shapefile})
             logfile="${logfile%.*}.log"
         elif [[ -n "${csvfile}" ]]; then
-            logfile=$(basename ${csvfile})
-            logfile="${logfile%.*}.log"
+            logfile=${csvfile}
         else
-            logfile="event_history.log"
+            logfile="/dev/stdout"
         fi
     fi
-    if [[ -r "${logfile}" ]]; then
-        INCOMMENTS="$(< "${logfile}")"
-    else
-        INCOMMENTS=""
-    fi
-    echo "${COMMENTS}${INCOMMENTS}" > ${logfile}
+    echo -n "${COMMENTS}" > "${logfile}"
 fi
 
 if [[ "${debug}" == "true" ]]; then
@@ -70,7 +64,7 @@ separator=""
 for ((colidx=0; colidx<${#viewcolumnarray[@]}; colidx++)) do
     HISTORY_QUERY+="${separator} ${viewcolumnarray[colidx]}"
     if [[ -n "${viewaliasarray[colidx]}" ]]; then
-        HISTORY_QUERY+=" AS ${viewaliasarray[colidx]}"
+        HISTORY_QUERY+=" AS \"${viewaliasarray[colidx]}\""
     fi
     separator=","
 done
@@ -91,18 +85,13 @@ HISTORY_QUERY+=") AS actual_query"
 if [[ -n "${filter}" ]]; then
     HISTORY_QUERY+=" WHERE (${filter})"
 fi
-# echo $HISTORY_QUERY
+# echo "$HISTORY_QUERY"
 
 if [[ -n "${shapefile}" ]]; then
     echo "Creating shapefile ${shapefile}"
 #     pgsql2shp -f ${shapefile} -u qgis fire "${HISTORY_QUERY}"
 #   Note work-around for pgsql2shp bug: https://trac.osgeo.org/postgis/ticket/5018
     pgsql2shp -f "${shapefile}" -u ${user} ${database} "SELECT * FROM (${HISTORY_QUERY}) AS query"
-elif [[ -n "${csvfile}" ]]; then
-    echo "Creating CSV file ${csvfile}"
-    psql ${database} ${user} \
-        --quiet --csv \
-        --command="${HISTORY_QUERY}" > "${csvfile}"
 elif [[ -n "${table}" ]]; then
     echo "Creating table ${table}"
     psql ${database} ${user} \
@@ -110,7 +99,18 @@ elif [[ -n "${table}" ]]; then
         --command="DROP TABLE IF EXISTS ${table}" \
         --command="CREATE TABLE ${table} AS ${VIEW_QUERY}"
 else
-    psql ${database} ${user} \
-        --quiet \
-        --command="$HISTORY_QUERY"
+    if [[ "${nologfile}" != "true" ]]; then
+        echo "################################################################################" >> "${logfile}"
+    fi
+    if [[ -n "${csvfile}" ]]; then
+        psql ${database} ${user} \
+            --quiet --csv \
+            --command="\timing off" \
+            --command="${HISTORY_QUERY}" >> "${csvfile}"
+    else
+        psql ${database} ${user} \
+            --quiet --csv \
+            --command="\timing off" \
+            --command="${HISTORY_QUERY}"
+    fi
 fi
