@@ -99,7 +99,7 @@ def bomPresentation(arglist=None):
           
         if not start or timestamp < start:
             start = timestamp
-        if not end or timestamp > start:
+        if not end or timestamp > end:
             end = timestamp
             
         obsdatetime += [timestamp]
