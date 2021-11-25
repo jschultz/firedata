@@ -28,7 +28,7 @@ args=(
   "-c:--viewcolumns::objectid:Semicolon-separated list of columns to retrieve from view data"
   "-g:--viewgroups::objectid:Semicolon-separated list of columns to group view data"
   ":--viewaliases:::Semicolon-separated list of aliases for columns retrieved from view data; empty value for no alias"
-  "-w:--where:::Condition applied after query execution"
+  "-f:--filter:::Condition applied after query execution"
   "-C:--csvfile:::CSV file to generate:output"
   "-S:--shapefile:::Shapefile to generate:output"
   "-l:--logfile:::Log file to record processing, defaults to out file name with extension replaced by '.log':private"
@@ -87,12 +87,11 @@ if [[ ${#viewgrouparray[@]} -gt 0 ]]; then
         separator=","
     done
 fi
-HISTORY_QUERY+=")"
-if [[ -n "${where}" ]]; then
-    HISTORY_QUERY+=" WHERE (${where})"
+HISTORY_QUERY+=") AS actual_query"
+if [[ -n "${filter}" ]]; then
+    HISTORY_QUERY+=" WHERE (${filter})"
 fi
-
-echo $HISTORY_QUERY
+# echo $HISTORY_QUERY
 
 if [[ -n "${shapefile}" ]]; then
     echo "Creating shapefile ${shapefile}"
