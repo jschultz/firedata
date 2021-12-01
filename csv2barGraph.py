@@ -52,6 +52,9 @@ def csv2barGraph(arglist=None):
     else:
         csvfile = more_itertools.peekable(sys.stdin)
 
+    until = datetime(int(args.until), 1, 1) if args.until else None
+    since = datetime(int(args.since), 1, 1) if args.since else None
+
     # Read comments at start of csvfile.
     incomments = ArgumentHelper.read_comments(csvfile) or ArgumentHelper.separator()
     csvfieldnames = next(csv.reader([next(csvfile)]))
@@ -82,9 +85,9 @@ def csv2barGraph(arglist=None):
     for csvline in csvreader:
         X = datetime(int(csvline[csvfieldnames[0]]), 1, 1)
         Y = [float(csvline[csvfieldnames[idx]]) for idx in range(1, len(csvfieldnames))]
-        if args.since and X < args.since:
+        if since and X < since:
             continue
-        if args.until and X > args.until:
+        if until and X > until:
             continue
           
         if not start or X < start:
@@ -111,6 +114,8 @@ def csv2barGraph(arglist=None):
     ax.xaxis.set_major_locator(mdates.YearLocator(10))
     ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y'))
     ax.xaxis.set_minor_locator(ticker.AutoMinorLocator(10))
+    ax.set_xlim([datetime(int(args.since)-1, 7, 1) if args.since else None,
+                 datetime(int(args.until), 7, 1) if args.until else None])
     pyplot.gca().invert_xaxis()
     pyplot.grid(axis = 'y')
     ax.legend(csvfieldnames[1:])
