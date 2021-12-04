@@ -67,7 +67,7 @@ if [[ "${nologfile}" != "true" ]]; then
     else
         INCOMMENTS=""
     fi
-    echo "${COMMENTS}${INCOMMENTS}" > ${logfile}bowie
+    echo "${COMMENTS}${INCOMMENTS}" > "${logfile}"
 fi
 
 if [[ "${debug}" == "true" ]]; then
