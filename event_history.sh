@@ -29,6 +29,7 @@ args=(
   "-g:--viewgroups::objectid:Semicolon-separated list of columns to group view data"
   ":--viewaliases:::Semicolon-separated list of aliases for columns retrieved from view data; empty value for no alias"
   "-f:--filter:::Condition applied after query execution"
+  "-t:--table:::Database table to generate"
   "-C:--csvfile:::CSV file to generate:output"
   "-S:--shapefile:::Shapefile to generate:output"
   "-l:--logfile:::Log file to record processing, defaults to out file name with extension replaced by '.log':private"
@@ -92,12 +93,13 @@ if [[ -n "${shapefile}" ]]; then
 #     pgsql2shp -f ${shapefile} -u qgis fire "${HISTORY_QUERY}"
 #   Note work-around for pgsql2shp bug: https://trac.osgeo.org/postgis/ticket/5018
     pgsql2shp -f "${shapefile}" -u ${user} ${database} "SELECT * FROM (${HISTORY_QUERY}) AS query"
+    zip --move --junk-paths "${shapefile}".zip "${shapefile}".{cpg,dbf,prj,shp,shx}
 elif [[ -n "${table}" ]]; then
     echo "Creating table ${table}"
     psql ${database} ${user} \
         --quiet \
-        --command="DROP TABLE IF EXISTS ${table}" \
-        --command="CREATE TABLE ${table} AS ${VIEW_QUERY}"
+        --command="DROP TABLE IF EXISTS \"${table}\"" \
+        --command="CREATE TABLE \"${table}\" AS ${HISTORY_QUERY}"
 else
     if [[ "${nologfile}" != "true" ]]; then
         echo "################################################################################" >> "${logfile}"
