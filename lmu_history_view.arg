@@ -1,0 +1,9 @@
+################################################################################
+# event_history.sh
+#    --user "qgis"
+#    --database "fire"
+#    --viewtable "(SELECT (CASE WHEN EXTRACT(MONTH FROM fih_date1_1) <= 6 THEN EXTRACT(YEAR FROM fih_date1_1) ELSE EXTRACT(YEAR FROM fih_date1_1) + 1 END) AS year, fih_fire_type_1 AS fih_fire_type, geom FROM dbca_fire_history_dbca_060_2021_08_20_lmu_history)"
+#    --area "(SELECT ST_Union(geom) AS geom FROM land_management_unit WHERE description = '${lmu}')"
+#    --viewcolumns "year; fih_fire_type; view.geom"
+#    --viewgroups "year; fih_fire_type; view.geom"
+#    --table "${lmu}"
