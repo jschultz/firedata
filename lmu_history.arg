@@ -2,8 +2,9 @@
 # event_history.sh
 #    --user "qgis"
 #    --database "fire"
-#    --viewtable "(SELECT id_1 AS id, geom FROM dbca_fire_history_dbca_060_2021_08_20_lmu_history)"
+#    --viewtable "(SELECT (CASE WHEN EXTRACT(MONTH FROM fih_date1) <= 6 THEN EXTRACT(YEAR FROM fih_date1) ELSE EXTRACT(YEAR FROM fih_date1) + 1 END) AS year, event.geom AS geom FROM dbca_fire_history_dbca_060_2021_08_20_lmu_history AS history, dbca_fire_history_dbca_060_2021_08_20 AS event WHERE history.id_1 = event.id)"
 #    --area "(SELECT ST_Union(geom) AS geom FROM land_management_unit WHERE description = '${lmu}')"
-#    --viewcolumns "id; view.geom"
-#    --viewgroups "id; view.geom"
-#    --table "${lmu}"
+#    --viewcolumns "year; ST_Union(view.geom)"
+#    --viewaliases "year; geom"
+#    --viewgroups "year"
+#    --shapefile "${lmu}"
