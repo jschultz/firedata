@@ -70,19 +70,18 @@ for ((colidx=0; colidx<${#viewcolumnarray[@]}; colidx++)) do
     separator=","
 done
 HISTORY_QUERY+="
-    FROM ${viewtable} AS view
+    FROM ${viewtable} AS view, area
 WHERE
-    ST_Intersects(view.geom, (SELECT geom from area))"
+    ST_Intersects(view.geom, area.geom)"
+HISTORY_QUERY+="
+    GROUP BY
+        area.geom"
 if [[ ${#viewgrouparray[@]} -gt 0 ]]; then
-    HISTORY_QUERY+="
-        GROUP BY"
-    separator=""
     for ((colidx=0; colidx<${#viewgrouparray[@]}; colidx++)) do
-        HISTORY_QUERY+="${separator} ${viewgrouparray[colidx]}"
-        separator=","
+        HISTORY_QUERY+=", ${viewgrouparray[colidx]}"
     done
 fi
-HISTORY_QUERY+=") AS actual_query"
+HISTORY_QUERY+=") AS prefilter_query"
 if [[ -n "${filter}" ]]; then
     HISTORY_QUERY+=" WHERE (${filter})"
 fi

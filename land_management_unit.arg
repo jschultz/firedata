@@ -1,8 +1,0 @@
-################################################################################
-# load_file.sh
-#    --user "qgis"
-#    --database "fire"
-#    --table "land_management_unit"
-#    --geometry "geom"
-#<   "Vegetation.gdb"
-
