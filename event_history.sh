@@ -24,7 +24,7 @@ args=(
   "-u:--user:::PostgreSQL username:required"
   "-d:--database:::PostgreSQL database:required"
   "-v:--viewtable:::Name of table containing event history view:required"
-  "-a:--area:::Specification of area of which history will be extracted:required"
+  "-a:--area:::Specification of area of which history will be extracted"
   "-c:--viewcolumns::objectid:Semicolon-separated list of columns to retrieve from view data"
   "-g:--viewgroups::objectid:Semicolon-separated list of columns to group view data"
   ":--viewaliases:::Semicolon-separated list of aliases for columns retrieved from view data; empty value for no alias"
@@ -60,7 +60,11 @@ IFS=';' read -r -a viewcolumnarray <<< "${viewcolumns}"
 IFS=';' read -r -a viewaliasarray <<< "${viewaliases}"
 IFS=';' read -r -a viewgrouparray <<< "${viewgroups}"
 
-HISTORY_QUERY="WITH area AS ${area} SELECT * FROM (SELECT"
+HISTORY_QUERY=""
+if [[ -n "${area}" ]]; then
+    HISTORY_QUERY+="WITH area AS (SELECT ${area} AS geom) "
+fi
+HISTORY_QUERY+="SELECT * FROM (SELECT"
 separator=""
 for ((colidx=0; colidx<${#viewcolumnarray[@]}; colidx++)) do
     HISTORY_QUERY+="${separator} ${viewcolumnarray[colidx]}"
@@ -70,15 +74,23 @@ for ((colidx=0; colidx<${#viewcolumnarray[@]}; colidx++)) do
     separator=","
 done
 HISTORY_QUERY+="
-    FROM ${viewtable} AS view, area
-WHERE
-    ST_Intersects(view.geom, area.geom)"
-HISTORY_QUERY+="
+    FROM ${viewtable} AS view"
+if [[ -n "${area}" ]]; then
+    HISTORY_QUERY+=", area
+    WHERE
+        ST_Intersects(view.geom, area.geom)
     GROUP BY
         area.geom"
+    separator=","
+else
+    HISTORY_QUERY+="
+    GROUP BY"
+    separator=""
+fi
 if [[ ${#viewgrouparray[@]} -gt 0 ]]; then
     for ((colidx=0; colidx<${#viewgrouparray[@]}; colidx++)) do
-        HISTORY_QUERY+=", ${viewgrouparray[colidx]}"
+        HISTORY_QUERY+="${separator} ${viewgrouparray[colidx]}"
+        separator=","
     done
 fi
 HISTORY_QUERY+=") AS prefilter_query"
@@ -107,7 +119,7 @@ else
         psql ${database} ${user} \
             --quiet --csv \
             --command="\timing off" \
-            --command="${HISTORY_QUERY}" >> "${csvfile}"
+            --command="${HISTORY_QUERY}" > "${csvfile}"
     else
         psql ${database} ${user} \
             --quiet --csv \

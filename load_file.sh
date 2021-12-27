@@ -24,7 +24,10 @@ args=(
   "-d:--database:::PostgreSQL database:required"
   "-t:--table:::Name of table to create, defaults to file name without extension"
   "-g:--geometry::geom:Name of column to hold geometry data"
+  "-s:--srid::geom:SRID to re-project geometry"
   ":filename:::Name of file to read:required,input"
+  "-l:--logfile:::Log file to record processing, defaults to table name with extension '.log':private"
+  ":--nologfile:::Don't write a log file:private,flag"
 )
 
 source $(dirname "$0")/argparse.sh
@@ -33,6 +36,15 @@ if [[ ! -n "${table}" ]]; then
     table=$(basename ${filename})
     table="${table%.*}"
 fi
-echo "${COMMENTS}" > ${table}.log
+if [[ "${nologfile}" != "true" ]]; then
+    if [[ ! -n "${logfile}" ]]; then
+        logfile=${table}.log
+    fi
+    echo "${COMMENTS}" > ${logfile}
+fi
 
-ogr2ogr -overwrite -f PostgreSQL "PG:dbname=${database} user=${user}" -lco geometry_name=${geometry} "${filename}" -nln "${table}"
+if [[ -n "${srid}" ]]; then
+    srid="-t_srs EPSG:${srid}"
+fi
+
+ogr2ogr -overwrite -f PostgreSQL "PG:dbname=${database} user=${user}" -lco geometry_name=${geometry} ${srid} "${filename}" -nln "${table}"

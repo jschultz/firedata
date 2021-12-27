@@ -1,8 +1,17 @@
 ################################################################################
+# psql
+#    --username "qgis"
+#    "fire"
+#    --command "DROP TABLE IF EXISTS land_management_unit"
+#    --command "CREATE TABLE land_management_unit AS (SELECT extcode, description, ST_Multi(ST_Intersection(ST_Union(geom), (SELECT ST_Union(geom) FROM forestmanagementplan2014_2023dbca_041))) AS geom FROM land_management_unit_raw GROUP BY extcode, description)"
+#    --command "CREATE UNIQUE INDEX ON land_management_unit (extcode)"
+#    --command "DROP TABLE land_management_unit_raw"
+################################################################################
 # load_file.sh
 #    --user "qgis"
 #    --database "fire"
-#    --table "land_management_unit"
+#    --table "land_management_unit_raw"
 #    --geometry "geom"
+#    --srid "4283"
 #<   "Vegetation.gdb"
 

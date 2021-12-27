@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# Copyright 2020 Jonathan Schultz
+# Copyright 2021 Jonathan Schultz
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -21,8 +21,9 @@ import more_itertools
 import csv
 import sys
 from dateutil import parser as dateparser
-from datetime import datetime
+#from datetime import datetime
 from matplotlib import pyplot, dates as mdates, ticker
+import numpy
 
 def csv2barGraph(arglist=None):
 
@@ -31,6 +32,8 @@ def csv2barGraph(arglist=None):
 
     parser.add_argument('-v', '--verbosity',  type=int, default=1, private=True)
     
+    parser.add_argument('-b', '--blocks',     type=int, default=1, help='Number of blocks in each bar column')
+
     parser.add_argument('-l', '--limit',      type=int, help='Limit number of rows to process')
     parser.add_argument(      '--since',      type=str, help='X axis lower bound')
     parser.add_argument(      '--until',      type=str, help='X axis upper bound')
@@ -38,6 +41,8 @@ def csv2barGraph(arglist=None):
     parser.add_argument('-W', '--width',      type=int, default=400, help='Plot width in millimetres')
     parser.add_argument('-H', '--height',     type=int, default=200,  help='Plot height in millimetres')
     parser.add_argument('-t', '--title',      type=str,              help='Title of plot')
+    parser.add_argument('-y', '--ylabel',     type=str,              help='Label for Y axis')
+    #parser.add_argument('-s', '--subtitle',   type=str,              help='Subtitle of plot')
     
     parser.add_argument('-o', '--outfile',    type=str, help='Output SVG file, otherwise plot on screen.', output=True)
     parser.add_argument('--logfile',          type=str, help="Logfile", private=True)
@@ -52,8 +57,10 @@ def csv2barGraph(arglist=None):
     else:
         csvfile = more_itertools.peekable(sys.stdin)
 
-    until = datetime(int(args.until), 1, 1) if args.until else None
-    since = datetime(int(args.since), 1, 1) if args.since else None
+    #until = datetime(int(args.until), 1, 1) if args.until else None
+    #since = datetime(int(args.since), 1, 1) if args.since else None
+    until = int(args.until) if args.until else None
+    since = int(args.since) if args.since else None
 
     # Read comments at start of csvfile.
     incomments = ArgumentHelper.read_comments(csvfile) or ArgumentHelper.separator()
@@ -83,7 +90,8 @@ def csv2barGraph(arglist=None):
     linecount = 0    
 
     for csvline in csvreader:
-        X = datetime(int(csvline[csvfieldnames[0]]), 1, 1)
+        #X = datetime(int(csvline[csvfieldnames[0]]), 1, 1)
+        X = int(csvline[csvfieldnames[0]])
         Y = [float(csvline[csvfieldnames[idx]]) for idx in range(1, len(csvfieldnames))]
         if since and X < since:
             continue
@@ -102,23 +110,45 @@ def csv2barGraph(arglist=None):
         if args.limit and linecount == args.limit:
             break
 
+    pyplot.style.use('tableau-colorblind10')
+    
     fig = pyplot.figure()
     fig.set_size_inches(args.width / 25.4, args.height / 25.4)
 
+    titlefont = {'fontname':'Linux Biolinum G', 'weight':'bold'}
+    labelfont = {'fontname':'Linux Biolinum G', 'weight':'normal'}
+    legendfont = {'family':'Linux Biolinum G', 'weight':'normal'}
+
     ax = fig.add_subplot(111)
-    for idx in range(len(Ydata)):
-        ax.bar(Xdata, Ydata[idx], width=280, bottom=(Ydata[idx-1] if idx > 0 else None))
-    #ax.set_xlabel(csvfieldnames[0])
-    ax.set_title(args.title)
-    #ax.xaxis.set_major_locator(pyplot.AutoLocator())
-    ax.xaxis.set_major_locator(mdates.YearLocator(10))
-    ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y'))
+       
+    Ybars = (len(csvfieldnames) - 1 + args.blocks - 1) // args.blocks
+    Ybarwidth = 0.9 / Ybars
+    Ybaridx = 0
+    Ybarnum = 0
+    while Ybaridx < len(csvfieldnames):
+        for Yblockidx in range(args.blocks):
+            if Ybaridx >= len(csvfieldnames) - 1:
+                break
+            ax.bar(numpy.array(Xdata)+0.45-(Ybarnum+0.5)*Ybarwidth, 
+                   Ydata[Ybaridx+Yblockidx], width=Ybarwidth, 
+                   bottom=([sum(Ydata[Ybaridx+Yblockidx-1-Yidx][idx] for Yidx in range(Yblockidx)) for idx in range(len(Xdata))] if Yblockidx > 0 else None)
+#                   bottom=(Ydata[Ybaridx+Yblockidx-1] if Yblockidx > 0 else None))
+                   )
+        Ybaridx += args.blocks
+        Ybarnum += 1
+  
+    ax.set_xlabel(csvfieldnames[0], **labelfont)
+    if args.ylabel:
+        ax.set_ylabel(args.ylabel, **labelfont)
+    if args.title:
+        ax.set_title(args.title, **titlefont)
     ax.xaxis.set_minor_locator(ticker.AutoMinorLocator(10))
-    ax.set_xlim([datetime(int(args.since)-1, 7, 1) if args.since else None,
-                 datetime(int(args.until), 7, 1) if args.until else None])
+    ax.xaxis.set_major_locator(ticker.AutoLocator())
+    ax.set_xlim([int(args.since) if args.since else None,
+                 int(args.until)+0.5 if args.until else None])
     pyplot.gca().invert_xaxis()
-    pyplot.grid(axis = 'y')
-    ax.legend(csvfieldnames[1:])
+    pyplot.grid(axis='y', color='black')
+    ax.legend(csvfieldnames[1:], prop=legendfont, framealpha=1)
     
     if args.outfile:
         pyplot.savefig(args.outfile, transparent=True)

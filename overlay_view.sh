@@ -95,16 +95,17 @@ done
 if [[ ! -n "${number}" ]]; then
     if [[ ! -n "${where}" ]]; then
         NUMBER_SELECT="SELECT max(count)
-                      FROM (SELECT poly_id, count(shape_id) AS count 
-                            FROM ${junction}
-                            GROUP BY poly_id) AS foo"
+                          FROM (SELECT poly_id, count(shape_id) AS count 
+                                FROM ${junction}
+                                GROUP BY poly_id) AS foo"
     else
         NUMBER_SELECT="SELECT max(count)
-                      FROM (SELECT poly_id, count(shape_id) AS count 
-                            FROM ${junction}
-                            JOIN ${polygon} AS poly ON poly.id = poly_id
-                            WHERE ${where}
-                            GROUP BY poly_id) AS foo"
+                          FROM (SELECT poly_id, count(shape_id) AS count 
+                                FROM ${junction}
+                                JOIN ${polygon} AS poly ON poly.id = poly_id
+                                JOIN ${eventtable} AS event ON event.${eventid} = shape_id
+                                WHERE ${where}
+                              GROUP BY poly_id) AS foo"
     fi
 #     echo $NUMBER_SELECT
     number=$(psql ${database} ${user} \
