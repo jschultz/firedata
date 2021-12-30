@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# Copyright 2020 Jonathan Schultz
+# Copyright 2021 Jonathan Schultz
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -27,26 +27,26 @@ import subprocess
 import sys
 import csv
 
-def fireProgression(arglist=None):
+def exportLMUAtlas(arglist=None):
 
-    parser = ArgumentRecorder(description='Present BOM data.',
+    parser = ArgumentRecorder(description='Exports an atlas from a QGIS file.',
                               fromfile_prefix_chars='@')
 
-    parser.add_argument('-L', '--lmu',    type=str, help="LMU to export")
-    parser.add_argument('-l', '--layout', type=str, required=True, help="Print layout in QGIS file to export")
-    parser.add_argument('-o', '--outfile', type=str, help="Name of file to export, default to ?????")
+    parser.add_argument('-L', '--lmu',    type=str, required=True, help="LMU to export")
+    parser.add_argument('-l', '--layout', type=str, required=True, help="Print layout to export")
+    parser.add_argument('-o', '--outfile', type=str, help="Name of PDF file to export, default to 'lmu'_'layout.pdf")
     
     parser.add_argument('--logfile',      type=str, help="Logfile", private=True)
-    parser.add_argument('--no-logfile',   action='store_true', help='Do not output a logfile')
+    parser.add_argument('--nologfile',    action='store_true', help='Do not output a logfile')
     
-    parser.add_argument('qgisfile', type=str, nargs=1, help="Name of QGIS file to export")
+    parser.add_argument('qgisfile', type=str, nargs=1, help="Name of QGIS file")
 
     args = parser.parse_args(arglist)
 
     if not args.outfile:
         args.outfile = args.lmu + '_' + args.layout + '.pdf'
         
-    if not args.no_logfile:
+    if not args.nologfile:
         if args.logfile:
             logfilename = args.logfile
         elif args.outfile:
@@ -63,17 +63,19 @@ def fireProgression(arglist=None):
     project = QgsProject.instance()
     project.read(args.qgisfile[0])
     
-    QgsExpressionContextUtils.setProjectVariable(project,'lmu',args.lmu)
-
     manager = QgsProject.instance().layoutManager()
     layout = manager.layoutByName(args.layout)
     
-    exporter = QgsLayoutExporter(layout)
     settings = QgsLayoutExporter.PdfExportSettings()
     settings.simplifyGeometries = False
-    exporter.exportToPdf(layout.atlas(), args.outfile, settings)
+    settings.forceVectorOutput = True
+    atlas = layout.atlas()
+    atlas.setFilterFeatures(True)
+    atlas.setFilterExpression('"description"=\'{}\''.format(args.lmu))
+    exporter = QgsLayoutExporter(atlas.layout())
+    exporter.exportToPdf(atlas, args.outfile, settings)
     
     qgs.exitQgis()
 
 if __name__ == '__main__':
-    fireProgression(None)
+    exportLMUAtlas(None)

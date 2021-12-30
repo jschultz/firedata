@@ -5,9 +5,9 @@
 #    --width 400
 #    --height 200
 #    --blocks 3
-#    --title "Burn History of ${lmu} LMU covered by Forest Management Plan"
+#    --title "Fire History Summary of ${lmu} LMU covered by Forest Management Plan"
 #    --ylabel "Percent burned"
-#>   --outfile "lmu burn histories/${lmu} Burn History.pdf"
+#>   --outfile "lmu burn histories/${lmu} Fire History Summary.pdf"
 ################################################################################
 #> mlr
 #    --csv
