@@ -3,5 +3,5 @@
 #    --lmu "${lmu}"
 #    --layout "Atlas"
 #    --outfile "lmu burn histories/${lmu} Fire History.pdf"
-#     "lmu_fire_history_maps.qgz"
+#     "/home/jschultz/src/firecheck-gis/lmu_fire_history_maps_v2.qgz"
 ################################################################################
