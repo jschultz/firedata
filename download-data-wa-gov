@@ -1,0 +1,79 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+#
+# Copyright 2021 Jonathan Schultz
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+# Based on https://toolkit.data.wa.gov.au/hc/en-gb/articles/115000962734-How-To-Download-Geospatial-Data-Snapshots#automating-data-snapshot-downloads
+
+from argrecord import ArgumentHelper, ArgumentRecorder
+import requests, json, getpass
+
+def download_data_wa_gov(arglist=None):
+
+    parser = ArgumentRecorder(description='Download data from data.wa.gov.au',
+                              fromfile_prefix_chars='@')
+
+    parser.add_argument('-v', '--verbosity',  type=int, default=1, private=True)
+
+    parser.add_argument('-F', '--folder',   type=str, required=True, 
+                        help='The SLIP Service Name, e.g. Boundaries')
+    parser.add_argument('-f', '--filename', type=str, required=True, 
+                        help='the name of dataset, e.g. LGA_Boundaries_LGATE_233_WA_GDA2020_Public_Shapefile.zip')
+    parser.add_argument('-u', '--user',     type=str, required=True,
+                        help='The email address you signed up to SLIP with')
+    parser.add_argument('-p', '--password', type=str, required=True, private=True, 
+                        help='Your password for SLIP')
+
+    parser.add_argument('-o', '--outfile', type=str,
+                        help="The name of the file to create; default is 'filename'")
+    
+    parser.add_argument('--logfile',          type=str, private=True,
+                        help="Logfile name, default is 'filename'.log")
+    parser.add_argument('--nologfile',        action='store_true', 
+                        help='Do not output a logfile')
+    
+    args = parser.parse_args(arglist)
+    
+    if not args.nologfile:
+        if args.logfile:
+            logfilename = args.logfile
+        elif args.filename:
+            logfilename = args.filename.split('/')[-1].rsplit('.',1)[0] + '.log'
+                
+        logfile = open(logfilename, 'w')
+        parser.write_comments(args, logfile)
+        logfile.close()
+    
+    tokenRequestUrl = "https://sso.slip.wa.gov.au/as/token.oauth2"
+    tokenRequestHeaders = { 'Authorization' : 'Basic ZGlyZWN0LWRvd25sb2Fk'}
+    tokenRequestForm={"grant_type": "password", "username":args.user, "password":args.password}
+    tokenResponse = requests.post(tokenRequestUrl, data=tokenRequestForm, headers=tokenRequestHeaders)
+    accessToken=json.loads(tokenResponse.text)["access_token"]
+    if tokenResponse.status_code == 200:
+        dataDownloadRequestUrl = "https://direct-download.slip.wa.gov.au/datadownload/{0}/{1}".format(args.folder, args.filename)
+        print("Downloading file from URL: " + dataDownloadRequestUrl)
+        dataDownloadRequestHeaders = { 'Authorization' : 'Bearer ' + accessToken}
+        dataDownloadResponse = requests.get(dataDownloadRequestUrl, headers=dataDownloadRequestHeaders)
+        if dataDownloadResponse.status_code == 200:
+            with open(args.outfile or args.filename, 'wb') as f:
+                f.write(dataDownloadResponse.content)
+        else:
+            print("Error download file with error " + str(dataDownloadResponse.status_code) + "-" + dataDownloadResponse.text)
+    else:
+        print("Error getting token: " + str(tokenResponse.status_code) + "-" + tokenResponse.text)
+
+if __name__ == '__main__':
+    download_data_wa_gov(None)
