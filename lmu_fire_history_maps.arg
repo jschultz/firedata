@@ -2,6 +2,6 @@
 # exportLMUAtlas.py
 #    --lmu "${lmu}"
 #    --layout "Atlas"
-#    --outfile "lmu burn histories/${lmu} Fire History.pdf"
-#     "/home/jschultz/src/firecheck-gis/lmu_fire_history_maps_v2.qgz"
+#    --outfile "lmu fire histories/${lmu} Fire History.pdf"
+#     "/home/jschultz/src/firecheck-gis/lmu_fire_history_maps.qgs"
 ################################################################################
