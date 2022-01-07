@@ -1,0 +1,20 @@
+################################################################################
+# load_file.sh
+#    --nologfile
+#    --user "qgis"
+#    --database "fire"
+#    --geometry "geom"
+#    --srid "4283"
+#    --table "DBCA_Fire_History_DBCA_060"
+#<   "DBCA_Fire_History_DBCA_060_WA_GDA94_Public.gpkg"
+################################################################################
+# unzip
+#    "DBCA_Fire_History_DBCA_060_WA_GDA94_Public_Geopackage.2021-08-20.zip"
+#    "DBCA_Fire_History_DBCA_060_WA_GDA94_Public.gpkg"
+################################################################################
+# download-data-wa-gov
+#    --folder "Environment"
+#    --filename "DBCA_Fire_History_DBCA_060_WA_GDA94_Public_Geopackage.zip"
+#    --outfile "DBCA_Fire_History_DBCA_060_WA_GDA94_Public_Geopackage.2021-08-20.zip"
+#    --user "${user}"
+#    --password "${password}"

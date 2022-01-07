@@ -1,0 +1,19 @@
+################################################################################
+# load_file.sh
+#    --nologfile
+#    --user "qgis"
+#    --database "fire"
+#    --geometry "geom"
+#    --srid "4283"
+#    --table "Forest_Blocks_DBCA_025"
+#<   "Forest_Blocks_DBCA_025_WA_GDA94_Public.gpkg"
+################################################################################
+# unzip
+#    "Forest_Blocks_DBCA_025_WA_GDA94_Public_Geopackage.2021-08-20.zip"
+#    "Forest_Blocks_DBCA_025_WA_GDA94_Public.gpkg"
+################################################################################
+# download-data-wa-gov
+#    --folder "Environment"
+#    --filename "Forest_Blocks_DBCA_025_WA_GDA94_Public_Geopackage.zip"
+#    --user "${user}"
+#    --password "${password}"

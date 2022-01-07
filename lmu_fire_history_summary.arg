@@ -29,7 +29,7 @@
 #    --user "qgis"
 #    --database "fire"
 #    --viewtable "(SELECT (CASE WHEN EXTRACT(MONTH FROM fih_date1) <= 6 THEN EXTRACT(YEAR FROM fih_date1) ELSE EXTRACT(YEAR FROM fih_date1) + 1 END) AS year, fih_cause, geom FROM dbca_fire_history_dbca_060_2021_08_20)"
-#    --area "ST_Intersection((SELECT ST_Union(geom) FROM land_management_unit WHERE description = '${lmu}'), (SELECT ST_Union(geom) FROM forestmanagementplan2014_2023dbca_041))"
+#    --area "(SELECT fmp_geom FROM land_management_unit WHERE description = '${lmu}')"
 #    --viewcolumns "year; ST_Area(ST_Intersection(ST_Union((CASE WHEN fih_cause = 0 THEN view.geom ELSE ST_GeomFromText('POLYGON EMPTY', ST_Srid(view.geom)) END)), (SELECT geom FROM area))::geography) / ST_Area((SELECT geom FROM area)::geography)*100; ST_Area(ST_Intersection(ST_Union((CASE WHEN fih_cause = 2 THEN view.geom ELSE ST_GeomFromText('POLYGON EMPTY', ST_Srid(view.geom)) END)), (SELECT geom FROM area))::geography) / ST_Area((SELECT geom FROM area)::geography)*100; ST_Area(ST_Intersection(ST_Union((CASE WHEN fih_cause <> 0 AND fih_cause <> 2 THEN view.geom ELSE ST_GeomFromText('POLYGON EMPTY', ST_Srid(view.geom)) END)), (SELECT geom FROM area))::geography) / ST_Area((SELECT geom FROM area)::geography)*100"
 #    --viewgroups year
 #    --viewaliases "Year ending June;Historic prescribed burns;Historic escape from prescribed burn;Historic other burns"
@@ -40,7 +40,7 @@
 #    --user "qgis"
 #    --database "fire"
 #    --viewtable "(SELECT (CASE WHEN EXTRACT(MONTH FROM fih_date1) <= 6 THEN EXTRACT(YEAR FROM fih_date1) ELSE EXTRACT(YEAR FROM fih_date1) + 1 END) AS year, fih_cause, dbca_fire_history_dbca_060_2021_08_20_lmu_history.geom FROM dbca_fire_history_dbca_060_2021_08_20_lmu_history, dbca_fire_history_dbca_060_2021_08_20 WHERE id = id)"
-#    --area "ST_Intersection((SELECT ST_Union(geom) FROM land_management_unit WHERE description = '${lmu}'), (SELECT ST_Union(geom) FROM forestmanagementplan2014_2023dbca_041))"
+#    --area "(SELECT fmp_geom FROM land_management_unit WHERE description = '${lmu}')"
 #    --viewcolumns "year; ST_Area(ST_Intersection(ST_Union((CASE WHEN fih_cause = 0 THEN view.geom ELSE ST_GeomFromText('POLYGON EMPTY', ST_Srid(view.geom)) END)), (SELECT geom FROM area))::geography) / ST_Area((SELECT geom FROM area)::geography)*100; ST_Area(ST_Intersection(ST_Union((CASE WHEN fih_cause = 2 THEN view.geom ELSE ST_GeomFromText('POLYGON EMPTY', ST_Srid(view.geom)) END)), (SELECT geom FROM area))::geography) / ST_Area((SELECT geom FROM area)::geography)*100; ST_Area(ST_Intersection(ST_Union((CASE WHEN fih_cause <> 0 AND fih_cause <> 2 THEN view.geom ELSE ST_GeomFromText('POLYGON EMPTY', ST_Srid(view.geom)) END)), (SELECT geom FROM area))::geography) / ST_Area((SELECT geom FROM area)::geography)*100"
 #    --viewgroups year
 #    --viewaliases "Year ending June;Last burned prescribed burns;Last burned escape from prescribed burn;Last burned other burns"
