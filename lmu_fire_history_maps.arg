@@ -1,5 +1,6 @@
 ################################################################################
 # exportLMUAtlas.py
+#    --nologfile
 #    --lmu "${lmu}"
 #    --layout "Atlas"
 #    --outfile "lmu fire histories/${lmu} Fire History.pdf"
