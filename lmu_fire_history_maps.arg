@@ -2,6 +2,13 @@
 # exportLMUAtlas.py
 #    --nologfile
 #    --lmu "${lmu}"
+#    --layout "Cover page"
+#    --outfile "lmu fire histories/${lmu} Cover Page.pdf"
+#     "/home/jschultz/src/firecheck-gis/lmu_fire_history_maps.qgs"
+################################################################################
+# exportLMUAtlas.py
+#    --nologfile
+#    --lmu "${lmu}"
 #    --layout "Atlas"
 #    --outfile "lmu fire histories/${lmu} Fire History.pdf"
 #     "/home/jschultz/src/firecheck-gis/lmu_fire_history_maps.qgs"

@@ -13,7 +13,7 @@
 #    --csv
 #    join
 #    -j year
-#<   -f "${lmu} history.csv"
+#<   -f "lmu fire histories/${lmu} history.csv"
 #    --ul
 #    --ur
 #    then
@@ -22,7 +22,7 @@
 #    then
 #    sort
 #    -n "Year ending June"
-#<   "${lmu} fuel age.csv"
+#<   "lmu fire histories/${lmu} fuel age.csv"
 ################################################################################
 # event_history.sh
 #    --nologfile
@@ -33,7 +33,7 @@
 #    --viewcolumns "year; ST_Area(ST_Intersection(ST_Union((CASE WHEN fih_cause = 0 THEN view.geom ELSE ST_GeomFromText('POLYGON EMPTY', ST_Srid(view.geom)) END)), (SELECT geom FROM area))::geography) / ST_Area((SELECT geom FROM area)::geography)*100; ST_Area(ST_Intersection(ST_Union((CASE WHEN fih_cause = 2 THEN view.geom ELSE ST_GeomFromText('POLYGON EMPTY', ST_Srid(view.geom)) END)), (SELECT geom FROM area))::geography) / ST_Area((SELECT geom FROM area)::geography)*100; ST_Area(ST_Intersection(ST_Union((CASE WHEN fih_cause <> 0 AND fih_cause <> 2 THEN view.geom ELSE ST_GeomFromText('POLYGON EMPTY', ST_Srid(view.geom)) END)), (SELECT geom FROM area))::geography) / ST_Area((SELECT geom FROM area)::geography)*100"
 #    --viewgroups year
 #    --viewaliases "Year ending June;Historic prescribed burns;Historic escape from prescribed burn;Historic other burns"
-#>   --csvfile "${lmu} history.csv"
+#>   --csvfile "lmu fire histories/${lmu} history.csv"
 ################################################################################
 # event_history.sh
 #    --nologfile
@@ -44,4 +44,4 @@
 #    --viewcolumns "year; ST_Area(ST_Intersection(ST_Union((CASE WHEN fih_cause = 0 THEN view.geom ELSE ST_GeomFromText('POLYGON EMPTY', ST_Srid(view.geom)) END)), (SELECT geom FROM area))::geography) / ST_Area((SELECT geom FROM area)::geography)*100; ST_Area(ST_Intersection(ST_Union((CASE WHEN fih_cause = 2 THEN view.geom ELSE ST_GeomFromText('POLYGON EMPTY', ST_Srid(view.geom)) END)), (SELECT geom FROM area))::geography) / ST_Area((SELECT geom FROM area)::geography)*100; ST_Area(ST_Intersection(ST_Union((CASE WHEN fih_cause <> 0 AND fih_cause <> 2 THEN view.geom ELSE ST_GeomFromText('POLYGON EMPTY', ST_Srid(view.geom)) END)), (SELECT geom FROM area))::geography) / ST_Area((SELECT geom FROM area)::geography)*100"
 #    --viewgroups year
 #    --viewaliases "Year ending June;Last burned prescribed burns;Last burned escape from prescribed burn;Last burned other burns"
-#>   --csvfile "${lmu} fuel age.csv"
+#>   --csvfile "lmu fire histories/${lmu} fuel age.csv"
