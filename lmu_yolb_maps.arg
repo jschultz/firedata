@@ -1,0 +1,8 @@
+################################################################################
+# exportLMUAtlas.py
+#    --nologfile
+#    --lmu "${lmu}"
+#    --layout "LMU"
+#    --outfile "lmu fire histories/${lmu} yolb.pdf"
+#     "/home/jschultz/src/firecheck-gis/lmu_yolb_maps.qgs"
+################################################################################
