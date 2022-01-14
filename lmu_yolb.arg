@@ -1,0 +1,19 @@
+################################################################################
+#< csv2barGraph.py
+#    --nologfile
+#    --until 2021
+#    --width 400
+#    --height 200
+#    --blocks 1
+#    --title "Year of last burn: ${lmu}"
+#>   --outfile "lmu fire histories/${lmu} YOLB.pdf"
+################################################################################
+#> event_history.sh
+#    --nologfile
+#    --user "qgis"
+#    --database "fire"
+#    --viewtable "(SELECT (CASE WHEN EXTRACT(MONTH FROM fih_date1) <= 6 THEN EXTRACT(YEAR FROM fih_date1) ELSE EXTRACT(YEAR FROM fih_date1) + 1 END) AS year,  dbca_fire_history_dbca_060_lmu_history.geom FROM dbca_fire_history_dbca_060_lmu_history, dbca_fire_history_dbca_060 WHERE id = id_1)"
+#    --area "(SELECT fmp_geom FROM land_management_unit WHERE description = '${lmu}')"
+#    --viewcolumns "year; ST_Area(ST_Intersection(ST_Union(view.geom), (SELECT geom FROM area))::geography)/10000"
+#    --viewgroups year
+#    --viewaliases "Year ending June;Area burned (ha)"

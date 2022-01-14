@@ -140,6 +140,8 @@ def csv2barGraph(arglist=None):
     ax.set_xlabel(csvfieldnames[0], **labelfont)
     if args.ylabel:
         ax.set_ylabel(args.ylabel, **labelfont)
+    elif args.blocks == 1:
+        ax.set_ylabel(csvfieldnames[1], **labelfont)
     if args.title:
         ax.set_title(args.title, **titlefont)
     ax.xaxis.set_minor_locator(ticker.AutoMinorLocator(10))
@@ -148,7 +150,8 @@ def csv2barGraph(arglist=None):
                  int(args.until)+0.5 if args.until else None])
     pyplot.gca().invert_xaxis()
     pyplot.grid(axis='y', color='black')
-    ax.legend(csvfieldnames[1:], prop=legendfont, framealpha=1)
+    if args.blocks > 1:
+        ax.legend(csvfieldnames[1:], prop=legendfont, framealpha=1)
     
     if args.outfile:
         pyplot.savefig(args.outfile, transparent=True)

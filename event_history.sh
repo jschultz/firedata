@@ -32,7 +32,7 @@ args=(
   "-t:--table:::Database table to generate"
   "-C:--csvfile:::CSV file to generate:output"
   "-S:--shapefile:::Shapefile to generate:output"
-  "-l:--logfile:::Log file to record processing, defaults to out file name with extension replaced by '.log':private"
+  "-l:--logfile:::Log file to record processing, defaults to out file name with extension replaced by '.log' or stderr:private"
   ":--nologfile:::Don't write a log file:private,flag"
 )
 
@@ -46,7 +46,7 @@ if [[ "${nologfile}" != "true" ]]; then
         elif [[ -n "${csvfile}" ]]; then
             logfile=${csvfile}
         else
-            logfile="/dev/stdout"
+            logfile="/dev/stderr"
         fi
     fi
     echo -n "${COMMENTS}" > "${logfile}"
