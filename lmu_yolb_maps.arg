@@ -3,6 +3,6 @@
 #    --nologfile
 #    --lmu "${lmu}"
 #    --layout "LMU"
-#    --outfile "lmu fire histories/${lmu} yolb.pdf"
+#    --outfile "lmu fire histories/${lmu} YOLB map.pdf"
 #     "/home/jschultz/src/firecheck-gis/lmu_yolb_maps.qgs"
 ################################################################################
