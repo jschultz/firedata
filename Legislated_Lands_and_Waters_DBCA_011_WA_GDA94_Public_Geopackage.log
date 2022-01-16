@@ -1,0 +1,20 @@
+################################################################################
+# load_file.sh
+#    --nologfile
+#    --user "qgis"
+#    --database "fire"
+#    --geometry "geom"
+#    --srid "4283"
+#    --table "Legislated_Lands_and_Waters_DBCA_011"
+#<   "Legislated_Lands_and_Waters_DBCA_011_WA_GDA94_Public.gpkg"
+################################################################################
+# unzip
+#    "Legislated_Lands_and_Waters_DBCA_011_WA_GDA94_Public_Geopackage.2021-10-11.zip"
+#    "Legislated_Lands_and_Waters_DBCA_011_WA_GDA94_Public.gpkg"
+################################################################################
+# download-data-wa-gov
+#    --folder "Property_and_Planning"
+#    --filename "Legislated_Lands_and_Waters_DBCA_011_WA_GDA94_Public_Geopackage.zip"
+#    --outfile "Legislated_Lands_and_Waters_DBCA_011_WA_GDA94_Public_Geopackage.2021-10-11.zip"
+#    --user "${user}"
+#    --password "${password}"
