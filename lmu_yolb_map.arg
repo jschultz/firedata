@@ -4,5 +4,5 @@
 #    --lmu "${lmu}"
 #    --layout "LMU"
 #    --outfile "lmu fire histories/${lmu} YOLB map.pdf"
-#     "/home/jschultz/src/firecheck-gis/lmu_yolb_maps.qgs"
+#     "/home/jschultz/src/firecheck-gis/lmu_yolb_map.qgs"
 ################################################################################

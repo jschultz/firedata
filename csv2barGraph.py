@@ -92,7 +92,7 @@ def csv2barGraph(arglist=None):
     for csvline in csvreader:
         #X = datetime(int(csvline[csvfieldnames[0]]), 1, 1)
         X = int(csvline[csvfieldnames[0]])
-        Y = [float(csvline[csvfieldnames[idx]]) for idx in range(1, len(csvfieldnames))]
+        Y = [float(csvline[csvfieldnames[idx]] or 0) for idx in range(1, len(csvfieldnames))]
         if since and X < since:
             continue
         if until and X > until:
@@ -150,7 +150,7 @@ def csv2barGraph(arglist=None):
                  int(args.until)+0.5 if args.until else None])
     pyplot.gca().invert_xaxis()
     pyplot.grid(axis='y', color='black')
-    if args.blocks > 1 OR Ybars > 1:
+    if args.blocks > 1 or Ybars > 1:
         ax.legend(csvfieldnames[1:], prop=legendfont, framealpha=1)
     
     if args.outfile:

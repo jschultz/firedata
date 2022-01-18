@@ -29,6 +29,7 @@ args=(
   "-g:--viewgroups::objectid:Semicolon-separated list of columns to group view data"
   ":--viewaliases:::Semicolon-separated list of aliases for columns retrieved from view data; empty value for no alias"
   "-f:--filter:::Condition applied after query execution"
+  "-w:--with:::Common table expression (CTE) for database query"
   "-t:--table:::Database table to generate"
   "-C:--csvfile:::CSV file to generate:output"
   "-S:--shapefile:::Shapefile to generate:output"
@@ -64,6 +65,9 @@ HISTORY_QUERY=""
 if [[ -n "${area}" ]]; then
     HISTORY_QUERY+="WITH area AS (SELECT ${area} AS geom) "
 fi
+if [[ -n "${with}" ]]; then
+    HISTORY_QUERY+=", ${with} "
+fi
 HISTORY_QUERY+="SELECT * FROM (SELECT"
 separator=""
 for ((colidx=0; colidx<${#viewcolumnarray[@]}; colidx++)) do
@@ -97,6 +101,7 @@ HISTORY_QUERY+=") AS prefilter_query"
 if [[ -n "${filter}" ]]; then
     HISTORY_QUERY+=" WHERE (${filter})"
 fi
+
 # echo "$HISTORY_QUERY"
 
 if [[ -n "${shapefile}" ]]; then
