@@ -1,0 +1,14 @@
+################################################################################
+# psql
+#    --username "qgis"
+#    "fire"
+#    --command "DROP FUNCTION IF EXISTS fireseason(dt timestamp with time zone)"
+#    --command "CREATE FUNCTION fireseason(dt timestamp with time zone)
+RETURNS int
+LANGUAGE plpgsql
+AS
+$$
+begin
+return (CASE WHEN EXTRACT(MONTH FROM dt) <= 6 THEN EXTRACT(YEAR FROM dt) ELSE EXTRACT(YEAR FROM dt) + 1 END);
+end;
+$$;"
