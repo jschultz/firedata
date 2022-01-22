@@ -1,0 +1,21 @@
+################################################################################
+# load_file.sh
+#    --nologfile
+#    --user "qgis"
+#    --database "fire"
+#    --geometry "geom"
+#    --srid "4283"
+#    --table "DBCA_Region_Boundaries_DBCA_022"
+#<   "DBCA_Region_Boundaries_DBCA_022_WA_GDA94_Public.gpkg"
+################################################################################
+# unzip
+#    "DBCA_Region_Boundaries_DBCA_022_WA_GDA94_Public_Geopackage.2021-08-24.zip"
+#    "DBCA_Region_Boundaries_DBCA_022_WA_GDA94_Public.gpkg"
+################################################################################
+# download-data-wa-gov
+#    --nologfile
+#    --folder "Boundaries"
+#    --filename "DBCA_Region_Boundaries_DBCA_022_WA_GDA94_Public_Geopackage.zip"
+#    --outfile "DBCA_Region_Boundaries_DBCA_022_WA_GDA94_Public_Geopackage.2021-08-24.zip"
+#    --user "${user}"
+#    --password "${password}"
