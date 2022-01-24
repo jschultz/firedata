@@ -5,16 +5,16 @@
 #    --database "fire"
 #    --geometry "geom"
 #    --srid "4283"
-#    --table "DBCA_Fire_History_DBCA_060"
-#<   "DBCA_Fire_History_DBCA_060_WA_GDA94_Public.gpkg"
+#    --table "Forest_Blocks_DBCA_025"
+#<   "Forest_Blocks_DBCA_025_WA_GDA94_Public.gpkg"
 ################################################################################
 # unzip
-#    "DBCA_Fire_History_DBCA_060_WA_GDA94_Public_Geopackage.2021-08-20.zip"
-#    "DBCA_Fire_History_DBCA_060_WA_GDA94_Public.gpkg"
+#    "Forest_Blocks_DBCA_025_WA_GDA94_Public_Geopackage.2021-08-20.zip"
+#    "Forest_Blocks_DBCA_025_WA_GDA94_Public.gpkg"
 ################################################################################
 # download-data-wa-gov
+#    --nologfile
 #    --folder "Environment"
-#    --filename "DBCA_Fire_History_DBCA_060_WA_GDA94_Public_Geopackage.zip"
-#    --outfile "DBCA_Fire_History_DBCA_060_WA_GDA94_Public_Geopackage.2021-08-20.zip"
+#    --filename "Forest_Blocks_DBCA_025_WA_GDA94_Public_Geopackage.zip"
 #    --user "${user}"
 #    --password "${password}"

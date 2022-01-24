@@ -13,6 +13,7 @@
 #    "Legislated_Lands_and_Waters_DBCA_011_WA_GDA94_Public.gpkg"
 ################################################################################
 # download-data-wa-gov
+#    --nologfile
 #    --folder "Property_and_Planning"
 #    --filename "Legislated_Lands_and_Waters_DBCA_011_WA_GDA94_Public_Geopackage.zip"
 #    --outfile "Legislated_Lands_and_Waters_DBCA_011_WA_GDA94_Public_Geopackage.2021-10-11.zip"
