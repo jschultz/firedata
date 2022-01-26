@@ -44,7 +44,7 @@ def csv2barGraph(arglist=None):
     parser.add_argument('-y', '--ylabel',     type=str,              help='Label for Y axis')
     #parser.add_argument('-s', '--subtitle',   type=str,              help='Subtitle of plot')
     
-    parser.add_argument('-o', '--outfile',    type=str, help='Output SVG file, otherwise plot on screen.', output=True)
+    parser.add_argument('-o', '--outfile',    type=str, help='Output file, otherwise plot on screen.', output=True)
     parser.add_argument('--logfile',          type=str, help="Logfile", private=True)
     parser.add_argument('--nologfile',        action='store_true', help='Do not output descriptive comments')
 

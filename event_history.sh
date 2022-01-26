@@ -45,7 +45,7 @@ if [[ "${nologfile}" != "true" ]]; then
             logfile=$(basename ${shapefile})
             logfile="${logfile%.*}.log"
         elif [[ -n "${csvfile}" ]]; then
-            logfile=${csvfile}
+            logfile="${csvfile%.*}.log"
         else
             logfile="/dev/stderr"
         fi
