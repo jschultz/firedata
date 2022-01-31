@@ -25,8 +25,9 @@ args=(
   "-d:--database:::PostgreSQL database:required"
   "-e:--eventtable:::Name of database table containing event data"
   ":--eventid::id:Id column in event table"
-  "-s:--suffix:::Suffix to append to poly or shape table name to generate other table names:required"
+  "-s:--suffix:::Suffix to append to event table name to generate other table names:required"
   "-p:--polygon:::Polygon table"
+  "-j:--junction:::Junction table"
   ":--polycolumns:::Comma-separated list of columns to retrieve from polygon table"
   ":--polyaliases:::Comma-separated list of aliases for columns retrieved from polygon table"
   "-c:--eventcolumns::objectid:Comma-separated list of columns to retrieve from event data"
@@ -47,6 +48,10 @@ if [[ ! -n "${polygon}" ]]; then
     polygon=${base}_${suffix}_poly
 else
     base=${polygon}
+fi
+
+if [[ ! -n "${junction}" ]]; then
+    junction=${base}_${suffix}_junction
 fi
 
 if [[ ! -n "${viewtable}" ]]; then
@@ -73,8 +78,6 @@ fi
 if [[ "${debug}" == "true" ]]; then
     set -x
 fi
-
-junction=${base}_${suffix}_junction
 
 IFS=',' read -r -a polycolumnarray <<< "${polycolumns}"
 IFS=',' read -r -a polyaliasarray <<< "${polyaliases}"
@@ -155,7 +158,7 @@ if [[ ${#polycolumnarray[@]} -gt 0 ]]; then
     done
 fi
 VIEW_QUERY+=") agg"
-# echo $VIEW_QUERY
+echo $VIEW_QUERY
 if [[ -n "${viewfile}" ]]; then
     echo "Creating shapefile ${viewfile}"
     pgsql2shp -f ${viewfile} -u qgis fire "${VIEW_QUERY}"

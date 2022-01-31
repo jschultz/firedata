@@ -26,6 +26,7 @@ from dateutil import parser as dateparser
 import subprocess
 import sys
 import csv
+import os
 
 def exportburnAtlas(arglist=None):
 
@@ -34,7 +35,8 @@ def exportburnAtlas(arglist=None):
 
     parser.add_argument('-B', '--burn',   type=str, required=True, help="ID of burn to export")
     parser.add_argument('-l', '--layout', type=str, required=True, help="Print layout to export")
-    parser.add_argument('-o', '--outfile', type=str, help="Name of PDF file to export, default to 'burn'_'layout.pdf")
+    parser.add_argument('-p', '--pdffile', type=str, help="Name of PDF file to export")
+    parser.add_argument('-i', '--imagefile', type=str, help="Name of image file to export")
     
     parser.add_argument('--logfile',      type=str, help="Logfile", private=True)
     parser.add_argument('--nologfile',    action='store_true', help='Do not output a logfile')
@@ -43,14 +45,13 @@ def exportburnAtlas(arglist=None):
 
     args = parser.parse_args(arglist)
 
-    if not args.outfile:
-        args.outfile = args.burn + '_' + args.layout + '.pdf'
-        
     if not args.nologfile:
         if args.logfile:
             logfilename = args.logfile
-        elif args.outfile:
-            logfilename = args.outfile.split('/')[-1].rsplit('.',1)[0] + '.log'
+        elif args.pdffile:
+            logfilename = args.pdffile.split('/')[-1].rsplit('.',1)[0] + '.log'
+        elif args.imagefile:
+            logfilename = args.imagefile.split('/')[-1].rsplit('.',1)[0] + '.log'
                 
         logfile = open(logfilename, 'w')
         parser.write_comments(args, logfile, incomments=ArgumentHelper.separator())
@@ -66,14 +67,23 @@ def exportburnAtlas(arglist=None):
     manager = QgsProject.instance().layoutManager()
     layout = manager.layoutByName(args.layout)
     
-    settings = QgsLayoutExporter.PdfExportSettings()
-    settings.simplifyGeometries = False
-    settings.forceVectorOutput = True
     atlas = layout.atlas()
     atlas.setFilterFeatures(True)
     atlas.setFilterExpression('"burnid"=\'{}\''.format(args.burn))
     exporter = QgsLayoutExporter(atlas.layout())
-    exporter.exportToPdf(atlas, args.outfile, settings)
+    if args.pdffile:
+        pdfsettings = QgsLayoutExporter.PdfExportSettings()
+        pdfsettings.simplifyGeometries = False
+        pdfsettings.forceVectorOutput = True
+        exporter.exportToPdf(atlas, args.pdffile, pdfsettings)
+    if args.imagefile:
+        imagesettings = QgsLayoutExporter.ImageExportSettings()
+        imagesettings.simplifyGeometries = False
+        imagesettings.forceVectorOutput = True
+        imagebase, imagename = args.imagefile.rsplit('/',1)
+        imageext = imagename.rsplit('.',1)[1]
+        exporter.exportToImage(atlas, imagebase + '/', imageext, imagesettings)
+        os.rename(imagebase + '/' + 'output_1.' + imageext, args.imagefile)
     
     qgs.exitQgis()
 

@@ -3,6 +3,7 @@
 #    --nologfile
 #    --burn "${burn}"
 #    --layout "Burn"
-#    --outfile "Burn fire histories/${burn} YOLB map.pdf"
+##    --imagefile "Burn fire histories/${burn} YOLB map.jpg"
+#    --pdffile "Burn fire histories/${burn} YOLB map.pdf"
 #     "/home/jschultz/src/firecheck-gis/burn_yolb_map.qgs"
 ################################################################################

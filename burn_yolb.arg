@@ -1,0 +1,20 @@
+################################################################################
+#< csv2barGraph.py
+#    --nologfile
+#    --until 2021
+#    --width 400
+#    --height 200
+#    --blocks 2
+#    --title "Year of last burn: ${burn}"
+#    --ylabel "Percentage of burn area"
+#>   --outfile "Burn fire histories/${burn} YOLB.${image}"
+################################################################################
+#> event_history.sh
+#    --nologfile
+#    --user "qgis"
+#    --database "fire"
+#    --eventtable "(SELECT fireseason(fih_date1) AS year, ST_Intersection(history.geom, (SELECT geom FROM area)) AS geom, fih_cause FROM dbca_fire_history_dbca_060_lmu_history AS history, dbca_fire_history_dbca_060 WHERE id = id_1)"
+#    --area "(SELECT ST_Union(geom) FROM annual_ind_burn_prog_dbca_007 WHERE burnid = '${burn}')"
+#    --eventcolumns "year;ST_Area(ST_Union(event.geom) FILTER(WHERE fih_cause = 0))/ST_Area((SELECT geom FROM area))*100;ST_Area(ST_Union(event.geom) FILTER(WHERE fih_cause <> 0))/ST_Area((SELECT geom FROM area))*100"
+#    --eventgroups year
+#    --eventaliases "Year ending June;Prescribed burn;Other fire"

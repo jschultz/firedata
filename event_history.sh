@@ -23,11 +23,11 @@ args=(
   ":--debug:::Debug execution:flag"
   "-u:--user:::PostgreSQL username:required"
   "-d:--database:::PostgreSQL database:required"
-  "-v:--viewtable:::Name of table containing event history view:required"
+  "-e:--eventtable:::Name of table containing event history:required"
   "-a:--area:::Specification of area of which history will be extracted"
-  "-c:--viewcolumns::objectid:Semicolon-separated list of columns to retrieve from view data"
-  "-g:--viewgroups::objectid:Semicolon-separated list of columns to group view data"
-  ":--viewaliases:::Semicolon-separated list of aliases for columns retrieved from view data; empty value for no alias"
+  "-c:--eventcolumns::objectid:Semicolon-separated list of columns to retrieve from event data"
+  "-g:--eventgroups:::Semicolon-separated list of columns to group event data"
+  ":--eventaliases:::Semicolon-separated list of aliases for columns retrieved from event data; empty value for no alias"
   "-f:--filter:::Condition applied after query execution"
   "-w:--with:::Common table expression (CTE) for database query"
   "-t:--table:::Database table to generate"
@@ -57,32 +57,39 @@ if [[ "${debug}" == "true" ]]; then
     set -x
 fi
 
-IFS=';' read -r -a viewcolumnarray <<< "${viewcolumns}"
-IFS=';' read -r -a viewaliasarray <<< "${viewaliases}"
-IFS=';' read -r -a viewgrouparray <<< "${viewgroups}"
+IFS=';' read -r -a eventcolumnarray <<< "${eventcolumns}"
+IFS=';' read -r -a eventaliasarray <<< "${eventaliases}"
+IFS=';' read -r -a eventgrouparray <<< "${eventgroups}"
 
 HISTORY_QUERY=""
-if [[ -n "${area}" ]]; then
-    HISTORY_QUERY+="WITH area AS (SELECT ${area} AS geom) "
-fi
-if [[ -n "${with}" ]]; then
-    HISTORY_QUERY+=", ${with} "
+
+if [[ -n "${area}" || -n "${with}" ]]; then
+    HISTORY_QUERY+="WITH "
+    if [[ -n "${area}" ]]; then
+        HISTORY_QUERY+="WITH area AS (SELECT ${area} AS geom) "
+        if [[ -n "${with}" ]]; then
+            HISTORY_QUERY+=", "
+        fi
+    fi
+    if [[ -n "${with}" ]]; then
+        HISTORY_QUERY+="${with} "
+    fi
 fi
 HISTORY_QUERY+="SELECT * FROM (SELECT"
 separator=""
-for ((colidx=0; colidx<${#viewcolumnarray[@]}; colidx++)) do
-    HISTORY_QUERY+="${separator} ${viewcolumnarray[colidx]}"
-    if [[ -n "${viewaliasarray[colidx]}" ]]; then
-        HISTORY_QUERY+=" AS \"${viewaliasarray[colidx]}\""
+for ((colidx=0; colidx<${#eventcolumnarray[@]}; colidx++)) do
+    HISTORY_QUERY+="${separator} ${eventcolumnarray[colidx]}"
+    if [[ -n "${eventaliasarray[colidx]}" ]]; then
+        HISTORY_QUERY+=" AS \"${eventaliasarray[colidx]}\""
     fi
     separator=","
 done
 HISTORY_QUERY+="
-    FROM ${viewtable} AS view"
+    FROM ${eventtable} AS event"
 if [[ -n "${area}" ]]; then
     HISTORY_QUERY+=", area
     WHERE
-        ST_Intersects(view.geom, area.geom)
+        ST_Intersects(event.geom, area.geom)
     GROUP BY
         area.geom"
     separator=","
@@ -91,9 +98,9 @@ else
     GROUP BY"
     separator=""
 fi
-if [[ ${#viewgrouparray[@]} -gt 0 ]]; then
-    for ((colidx=0; colidx<${#viewgrouparray[@]}; colidx++)) do
-        HISTORY_QUERY+="${separator} ${viewgrouparray[colidx]}"
+if [[ ${#eventgrouparray[@]} -gt 0 ]]; then
+    for ((colidx=0; colidx<${#eventgrouparray[@]}; colidx++)) do
+        HISTORY_QUERY+="${separator} ${eventgrouparray[colidx]}"
         separator=","
     done
 fi
