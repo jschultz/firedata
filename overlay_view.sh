@@ -98,15 +98,15 @@ done
 if [[ ! -n "${number}" ]]; then
     if [[ ! -n "${where}" ]]; then
         NUMBER_SELECT="SELECT max(count)
-                          FROM (SELECT poly_id, count(shape_id) AS count 
+                          FROM (SELECT poly_id, count(event_id) AS count 
                                 FROM ${junction}
                                 GROUP BY poly_id) AS foo"
     else
         NUMBER_SELECT="SELECT max(count)
-                          FROM (SELECT poly_id, count(shape_id) AS count 
+                          FROM (SELECT poly_id, count(event_id) AS count 
                                 FROM ${junction}
                                 JOIN ${polygon} AS poly ON poly.id = poly_id
-                                JOIN ${eventtable} AS event ON event.${eventid} = shape_id
+                                JOIN ${eventtable} AS event ON event.${eventid} = event_id
                                 WHERE ${where}
                               GROUP BY poly_id) AS foo"
     fi
@@ -145,7 +145,7 @@ for ((colidx=0; colidx<${#eventcolumnarray[@]}; colidx++)) do
 done
 VIEW_QUERY+=" FROM ${junction} AS junction
                JOIN ${polygon} AS poly ON poly.id = junction.poly_id
-               JOIN ${eventtable} AS event ON event.${eventid} = shape_id"
+               JOIN ${eventtable} AS event ON event.${eventid} = event_id"
 if [[ -n "${where}" ]]; then
     VIEW_QUERY+=" WHERE ${where}"
 fi

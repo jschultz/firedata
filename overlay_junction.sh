@@ -16,7 +16,6 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 set -e
-# set -x
 
 help='Creates an overlay of non-intersecting polygons from a collection of shapes in an event table. Produces a polygon table and a junction table between the polygon and original event tables.'
 args=(
@@ -38,7 +37,7 @@ source $(dirname "$0")/argparse.sh
 
 if [[ "${nologfile}" != "true" ]]; then
     if [[ ! -n ${logfile} ]]; then
-        logfile="${eventtable}_${suffix}.log"
+        logfile="${eventtable}_${suffix}_${sequence}.log"
     fi
     echo "${COMMENTS}" > ${logfile}
 fi
@@ -112,8 +111,8 @@ echo "Creating junction table ${junction}"
 psql ${database} ${user} \
     --quiet \
     --command="DROP TABLE IF EXISTS ${junction}" CASCADE \
-    --command="CREATE TABLE ${junction} (poly_id INTEGER, shape_id INTEGER)" \
-    --command="INSERT INTO ${junction}  (poly_id, shape_id)
+    --command="CREATE TABLE ${junction} (poly_id INTEGER, event_id INTEGER)" \
+    --command="INSERT INTO ${junction}  (poly_id, event_id)
                 SELECT poly.id, dump.id
                 FROM ${dump} dump
                   JOIN ${point} poly
