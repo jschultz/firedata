@@ -2,7 +2,8 @@
 # psql
 #    --username "qgis"
 #    "fire"
-#    --command "DROP FUNCTION IF EXISTS fireseason(dt timestamp with time zone)"
+#    --command "
+DROP FUNCTION IF EXISTS fireseason"
 #    --command "
 CREATE FUNCTION fireseason(dt timestamp with time zone)
 RETURNS int
@@ -12,4 +13,42 @@ $$
     begin
         return (CASE WHEN EXTRACT(MONTH FROM dt) <= 6 THEN EXTRACT(YEAR FROM dt) ELSE EXTRACT(YEAR FROM dt) + 1 END);
     end;
-$$;"
+$$"
+#    --command "
+DROP FUNCTION IF EXISTS interval_array"
+#    --command "
+CREATE OR REPLACE FUNCTION interval_array(history anyelement, datefield text, eventtable text, since timestamp without time zone, min_seasongap integer)
+RETURNS interval[]
+LANGUAGE plpgsql
+AS
+$$
+    DECLARE
+      event_idx      integer := 1;
+      interval_idx   integer := 1;
+      lastresult     date;
+      result         date;
+      event_interval interval[] := '{}';
+      this_interval  interval;
+    BEGIN
+      LOOP
+        EXECUTE format('SELECT %s FROM %s WHERE id = $1.id_%s', datefield, eventtable, event_idx)
+        USING history
+        INTO result;
+        --RAISE NOTICE 'Result: (%)', result;
+        EXIT WHEN result IS NULL;
+        IF event_idx > 1 THEN
+          IF fireseason(lastresult) - fireseason(result) >= min_seasongap THEN
+            this_interval := lastresult::timestamp - result::timestamp;
+            event_interval[interval_idx] := this_interval;
+            --RAISE NOTICE 'Interval: (%)', event_interval[interval_idx];
+            interval_idx := interval_idx + 1;
+          END IF;
+        END IF;
+        EXIT WHEN result < since;
+        lastresult := result;
+        event_idx := event_idx + 1;
+      END LOOP;
+      --RAISE NOTICE 'event_interval: (%)', event_interval;
+      RETURN event_interval;
+    END;
+$$"

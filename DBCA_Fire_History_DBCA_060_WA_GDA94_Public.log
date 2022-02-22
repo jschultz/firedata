@@ -1,4 +1,9 @@
 ################################################################################
+# psql
+#    --username "qgis"
+#    "fire"
+#    --command "CREATE UNIQUE INDEX ON dbca_fire_history_dbca_060 (id)"
+################################################################################
 # load_file.sh
 #    --nologfile
 #    --user "qgis"

@@ -113,9 +113,9 @@ fi
 
 if [[ -n "${shapefile}" ]]; then
     echo "Creating shapefile ${shapefile}"
-#     pgsql2shp -f ${shapefile} -u qgis fire "${HISTORY_QUERY}"
-#   Note work-around for pgsql2shp bug: https://trac.osgeo.org/postgis/ticket/5018
-    pgsql2shp -f "${shapefile}" -u ${user} ${database} "SELECT * FROM (${HISTORY_QUERY}) AS query"
+     pgsql2shp -f ${shapefile} -u qgis fire "${HISTORY_QUERY}"
+#    Work-around for pgsql2shp bug: https://trac.osgeo.org/postgis/ticket/5018
+#    pgsql2shp -f "${shapefile}" -u ${user} ${database} "SELECT * FROM (${HISTORY_QUERY}) AS query"
     zip --move --junk-paths "${shapefile}".zip "${shapefile}".{cpg,dbf,prj,shp,shx}
 elif [[ -n "${table}" ]]; then
     echo "Creating table ${table}"

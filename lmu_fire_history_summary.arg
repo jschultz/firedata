@@ -28,7 +28,7 @@
 #    --nologfile
 #    --user "qgis"
 #    --database "fire"
-#    --eventtable "(SELECT eventfireseason(fih_date1) AS year, fih_cause, geom FROM dbca_fire_history_dbca_060)"
+#    --eventtable "(SELECT fireseason(fih_date1) AS year, fih_cause, geom FROM dbca_fire_history_dbca_060)"
 #    --area "(SELECT fmp_geom FROM land_management_unit WHERE description = '${lmu}')"
 #    --eventcolumns "year; ST_Area(ST_Intersection(ST_Union((CASE WHEN fih_cause = 0 THEN event.geom ELSE ST_GeomFromText('POLYGON EMPTY', ST_Srid(event.geom)) END)), (SELECT geom FROM area))::geography) / ST_Area((SELECT geom FROM area)::geography)*100; ST_Area(ST_Intersection(ST_Union((CASE WHEN fih_cause = 2 THEN event.geom ELSE ST_GeomFromText('POLYGON EMPTY', ST_Srid(event.geom)) END)), (SELECT geom FROM area))::geography) / ST_Area((SELECT geom FROM area)::geography)*100; ST_Area(ST_Intersection(ST_Union((CASE WHEN fih_cause <> 0 AND fih_cause <> 2 THEN event.geom ELSE ST_GeomFromText('POLYGON EMPTY', ST_Srid(event.geom)) END)), (SELECT geom FROM area))::geography) / ST_Area((SELECT geom FROM area)::geography)*100"
 #    --eventgroups year
