@@ -25,6 +25,7 @@ args=(
   "-t:--table:::Name of table to create, defaults to file name without extension"
   "-g:--geometry::geom:Name of column to hold geometry data"
   "-s:--srid::geom:SRID to re-project geometry"
+  "-L:--layer:::Layer to import"
   ":filename:::Name of file to read:required,input"
   "-l:--logfile:::Log file to record processing, defaults to table name with extension '.log':private"
   ":--nologfile:::Don't write a log file:private,flag"
@@ -47,4 +48,4 @@ if [[ -n "${srid}" ]]; then
     srid="-t_srs EPSG:${srid}"
 fi
 
-ogr2ogr -overwrite -f PostgreSQL "PG:dbname=${database} user=${user}" -lco geometry_name=${geometry} ${srid} "${filename}" -nln "${table}"
+ogr2ogr -overwrite -f PostgreSQL "PG:dbname=${database} user=${user}" -lco geometry_name=${geometry} ${srid} -nln "${table}" "${filename}" ${layer}

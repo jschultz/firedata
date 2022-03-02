@@ -158,7 +158,7 @@ if [[ ${#polycolumnarray[@]} -gt 0 ]]; then
     done
 fi
 VIEW_QUERY+=") agg"
-echo $VIEW_QUERY
+# echo $VIEW_QUERY
 if [[ -n "${viewfile}" ]]; then
     echo "Creating shapefile ${viewfile}"
     pgsql2shp -f ${viewfile} -u qgis fire "${VIEW_QUERY}"
