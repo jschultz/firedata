@@ -25,6 +25,7 @@ args=(
   "-e:--eventtable:::Name of table containing events:required"
   "-d:--datefield:::Field name of event date in 'eventtable'"
   "-h:--historytable:::Name of table containing unique event history:required"
+  "-p:--programtable:::Name of table programmed future events:"
   "-s:--since:::Only consider events since this date"
   "-g:--seasongap::1:Minimum number of seasons between events"
   "-t:--table:::Database table to generate"
@@ -45,5 +46,5 @@ psql ${database} ${user} \
      --command="DROP TABLE IF EXISTS ${table}" \
      --command="CREATE TABLE ${table} AS
                   (SELECT geom, 
-                          (SELECT AVG(interval_unnest) FROM unnest(interval_array(${historytable}, '${datefield}', '${eventtable}', '${since}'::timestamp, ${seasongap}::integer)) AS interval_unnest) AS mean_interval
+                          (SELECT AVG(interval_unnest) FROM unnest(interval_array(${historytable}, '${datefield}', '${eventtable}', '${programtable}', '${since}'::timestamp, ${seasongap}::integer)) AS interval_unnest) AS mean_interval
                     FROM ${historytable})"

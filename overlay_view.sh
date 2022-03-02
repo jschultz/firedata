@@ -32,7 +32,7 @@ args=(
   ":--polyaliases:::Comma-separated list of aliases for columns retrieved from polygon table"
   "-c:--eventcolumns::objectid:Comma-separated list of columns to retrieve from event data"
   ":--eventaliases:::Comma-separated list of aliases for columns retrieved from burn data; empty value means use column name as alias"
-  "-n:--number:::Number of links to copy; default is minimum required to hold all links in the junction table"
+#   "-n:--number:::Number of links to copy; default is minimum required to hold all links in the junction table"
   "-g:--geometry::geom:Column name for geometry in tables"
   "-w:--where:::WHERE clause for selecting from polygon table"
   "-v:--viewtable:::Table to generate, defaults to \$eventtable + \$suffix + '_view'"
@@ -95,43 +95,48 @@ for ((colidx=0; colidx<${#eventcolumnarray[@]}; colidx++)) do
     fi
 done
 
-if [[ ! -n "${number}" ]]; then
-    if [[ ! -n "${where}" ]]; then
-        NUMBER_SELECT="SELECT max(count)
-                          FROM (SELECT poly_id, count(event_id) AS count 
-                                FROM ${junction}
-                                GROUP BY poly_id) AS foo"
-    else
-        NUMBER_SELECT="SELECT max(count)
-                          FROM (SELECT poly_id, count(event_id) AS count 
-                                FROM ${junction}
-                                JOIN ${polygon} AS poly ON poly.id = poly_id
-                                JOIN ${eventtable} AS event ON event.${eventid} = event_id
-                                WHERE ${where}
-                              GROUP BY poly_id) AS foo"
-    fi
-#     echo $NUMBER_SELECT
-    number=$(psql ${database} ${user} \
-                --quiet --tuples-only --no-align \
-                --command="\timing off" \
-                --command="${NUMBER_SELECT}")
-fi
-if [[ ! -n "${number}" ]]; then
-    echo "ERROR: no links!"
-    exit 1
-fi
-echo "Number of links to copy is ${number}"
+# if [[ ! -n "${number}" ]]; then
+#     if [[ ! -n "${where}" ]]; then
+#         NUMBER_SELECT="SELECT max(count)
+#                           FROM (SELECT poly_id, count(event_id) AS count 
+#                                 FROM ${junction}
+#                                 GROUP BY poly_id) AS foo"
+#     else
+#         NUMBER_SELECT="SELECT max(count)
+#                           FROM (SELECT poly_id, count(event_id) AS count 
+#                                 FROM ${junction}
+#                                 JOIN ${polygon} AS poly ON poly.id = poly_id
+#                                 JOIN ${eventtable} AS event ON event.${eventid} = event_id
+#                                 WHERE ${where}
+#                               GROUP BY poly_id) AS foo"
+#     fi
+# #     echo $NUMBER_SELECT
+#     number=$(psql ${database} ${user} \
+#                 --quiet --tuples-only --no-align \
+#                 --command="\timing off" \
+#                 --command="${NUMBER_SELECT}")
+# fi
+# if [[ ! -n "${number}" ]]; then
+#     echo "ERROR: no links!"
+#     exit 1
+# fi
+# echo "Number of links to copy is ${number}"
 VIEW_QUERY="SELECT"
 separator=""
 for ((colidx=0; colidx<${#polyaliasarray[@]}; colidx++)) do
     VIEW_QUERY+="${separator} agg.${polyaliasarray[colidx]}"
     separator=","
 done
-for ((linkidx=1; linkidx<=${number}; linkidx++)) do
-    for ((colidx=0; colidx<${#eventaliasarray[@]}; colidx++)) do
-        VIEW_QUERY+="${separator} agg.${eventaliasarray[colidx]}[${linkidx}] AS ${eventaliasarray[colidx]}_${linkidx}"
-        separator=","
-    done
+# Old code using underscored field names instad of array
+# for ((linkidx=1; linkidx<=${number}; linkidx++)) do
+#     for ((colidx=0; colidx<${#eventaliasarray[@]}; colidx++)) do
+#         VIEW_QUERY+="${separator} agg.${eventaliasarray[colidx]}[${linkidx}] AS ${eventaliasarray[colidx]}_${linkidx}"
+#         separator=","
+#     done
+# done
+for ((colidx=0; colidx<${#eventaliasarray[@]}; colidx++)) do
+    VIEW_QUERY+="${separator} agg.${eventaliasarray[colidx]} AS ${eventaliasarray[colidx]}"
+    separator=","
 done
 VIEW_QUERY+=" FROM (SELECT"
 separator=""

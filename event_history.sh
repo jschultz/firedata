@@ -66,7 +66,7 @@ HISTORY_QUERY=""
 if [[ -n "${area}" || -n "${with}" ]]; then
     HISTORY_QUERY+="WITH "
     if [[ -n "${area}" ]]; then
-        HISTORY_QUERY+="WITH area AS (SELECT ${area} AS geom) "
+        HISTORY_QUERY+="area AS (SELECT ${area} AS geom) "
         if [[ -n "${with}" ]]; then
             HISTORY_QUERY+=", "
         fi

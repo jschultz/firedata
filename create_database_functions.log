@@ -17,7 +17,7 @@ $$"
 #    --command "
 DROP FUNCTION IF EXISTS interval_array"
 #    --command "
-CREATE OR REPLACE FUNCTION interval_array(history anyelement, datefield text, eventtable text, since timestamp without time zone, min_seasongap integer)
+CREATE OR REPLACE FUNCTION interval_array(history anyelement, datefield text, eventtable text, programtable text, since timestamp without time zone, min_seasongap integer)
 RETURNS interval[]
 LANGUAGE plpgsql
 AS
@@ -30,22 +30,28 @@ $$
       event_interval interval[] := '{}';
       this_interval  interval;
     BEGIN
+      EXECUTE format('SELECT (''20'' || substring(fin_yr from 6 for 2) || ''-01-01'')::timestamp FROM %s WHERE ST_Intersects(%s.geom, $1.geom)', programtable, programtable)
+      USING history
+      INTO result;
       LOOP
-        EXECUTE format('SELECT %s FROM %s WHERE id = $1.id_%s', datefield, eventtable, event_idx)
+        IF result IS NOT NULL THEN
+        --RAISE NOTICE 'Program date: (%)', result;
+          IF event_idx > 1 THEN
+            IF fireseason(lastresult) - fireseason(result) >= min_seasongap THEN
+              this_interval := lastresult::timestamp - result::timestamp;
+              event_interval[interval_idx] := this_interval;
+              --RAISE NOTICE 'Interval: (%)', event_interval[interval_idx];
+              interval_idx := interval_idx + 1;
+            END IF;
+          END IF;
+          EXIT WHEN result < since;
+          lastresult := result;
+        END IF;
+        EXECUTE format('SELECT %s FROM %s WHERE id = $1.id[%s]', datefield, eventtable, event_idx)
         USING history
         INTO result;
-        --RAISE NOTICE 'Result: (%)', result;
         EXIT WHEN result IS NULL;
-        IF event_idx > 1 THEN
-          IF fireseason(lastresult) - fireseason(result) >= min_seasongap THEN
-            this_interval := lastresult::timestamp - result::timestamp;
-            event_interval[interval_idx] := this_interval;
-            --RAISE NOTICE 'Interval: (%)', event_interval[interval_idx];
-            interval_idx := interval_idx + 1;
-          END IF;
-        END IF;
-        EXIT WHEN result < since;
-        lastresult := result;
+        --RAISE NOTICE 'Past date: (%)', result;
         event_idx := event_idx + 1;
       END LOOP;
       --RAISE NOTICE 'event_interval: (%)', event_interval;
