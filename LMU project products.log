@@ -1,0 +1,29 @@
+################################################################################
+# exportQgisLayout.py
+#    --nologfile
+#    --simplify
+#    --layout "3 year indicative burn program"
+#    --outfile "3 year indicative burn program.pdf"
+#     "LMU project products.qgs"
+################################################################################
+# exportQgisLayout.py
+#    --nologfile
+#    --simplify
+#    --layout "Fire interval since 1980"
+#    --outfile "Fire interval since 1980.pdf"
+#     "LMU project products.qgs"
+################################################################################
+# exportQgisLayout.py
+#    --nologfile
+#    --simplify
+#    --layout "Fire interval since 2004"
+#    --outfile "Fire interval since 2004.pdf"
+#     "LMU project products.qgs"
+################################################################################
+# exportQgisLayout.py
+#    --nologfile
+#    --simplify
+#    --layout "Forest condition"
+#    --outfile "Forest condition.pdf"
+#     "LMU project products.qgs"
+################################################################################

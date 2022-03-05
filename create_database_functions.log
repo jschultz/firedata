@@ -3,9 +3,7 @@
 #    --username "qgis"
 #    "fire"
 #    --command "
-DROP FUNCTION IF EXISTS fireseason"
-#    --command "
-CREATE FUNCTION fireseason(dt timestamp with time zone)
+CREATE OR REPLACE FUNCTION fireseason(dt timestamp with time zone)
 RETURNS int
 LANGUAGE plpgsql
 AS
@@ -15,46 +13,85 @@ $$
     end;
 $$"
 #    --command "
-DROP FUNCTION IF EXISTS interval_array"
-#    --command "
-CREATE OR REPLACE FUNCTION interval_array(history anyelement, datefield text, eventtable text, programtable text, since timestamp without time zone, min_seasongap integer)
-RETURNS interval[]
+CREATE OR REPLACE FUNCTION date_array(history anyelement, datefield text, eventtable text, programtable text, since timestamp without time zone)
+RETURNS date[]
 LANGUAGE plpgsql
 AS
 $$
     DECLARE
-      event_idx      integer := 1;
-      interval_idx   integer := 1;
-      lastresult     date;
-      result         date;
-      event_interval interval[] := '{}';
-      this_interval  interval;
+      event_idx integer := 1;
+      date_idx  integer := 1;
+      result    date;
+      dates     date[]  := '{}';
     BEGIN
-      EXECUTE format('SELECT (''20'' || substring(fin_yr from 6 for 2) || ''-01-01'')::timestamp FROM %s WHERE ST_Intersects(%s.geom, $1.geom)', programtable, programtable)
-      USING history
-      INTO result;
+      --RAISE NOTICE 'date_array';
+      IF programtable IS NOT NULL THEN
+        EXECUTE format('SELECT (''20'' || substring(fin_yr from 6 for 2) || ''-01-01'')::date FROM %s WHERE ST_Contains(%s.geom, $1.geom)', programtable, programtable)
+        USING history
+        INTO result;
+      ELSE
+        result := NULL;
+      END IF;
       LOOP
         IF result IS NOT NULL THEN
-        --RAISE NOTICE 'Program date: (%)', result;
-          IF event_idx > 1 THEN
-            IF fireseason(lastresult) - fireseason(result) >= min_seasongap THEN
-              this_interval := lastresult::timestamp - result::timestamp;
-              event_interval[interval_idx] := this_interval;
-              --RAISE NOTICE 'Interval: (%)', event_interval[interval_idx];
-              interval_idx := interval_idx + 1;
-            END IF;
-          END IF;
+        --RAISE NOTICE 'Event date: (%)', result;
+          dates[date_idx] := result;
+          date_idx := date_idx + 1;
           EXIT WHEN result < since;
-          lastresult := result;
         END IF;
         EXECUTE format('SELECT %s FROM %s WHERE id = $1.id[%s]', datefield, eventtable, event_idx)
         USING history
         INTO result;
         EXIT WHEN result IS NULL;
-        --RAISE NOTICE 'Past date: (%)', result;
         event_idx := event_idx + 1;
       END LOOP;
-      --RAISE NOTICE 'event_interval: (%)', event_interval;
-      RETURN event_interval;
+      --RAISE NOTICE '   Returns %', dates;
+      RETURN dates;
+    END;
+$$"
+#    --command "
+CREATE OR REPLACE FUNCTION modified_average(dates date[], reference_date date, min_seasongap integer)
+RETURNS interval
+LANGUAGE plpgsql
+AS
+$$
+    DECLARE
+      date_idx      integer  := 1;
+      interval_idx  integer  := 1;
+      last_date     date     := NULL;
+      average       interval := NULL;
+      intervals     interval[] := '{}';
+      this_interval interval;
+      open_interval interval;
+    BEGIN
+      --RAISE NOTICE 'modified_average';
+      IF array_length(dates, 1) >= 1 THEN
+        open_interval := reference_date::timestamp - dates[1]::timestamp;
+        LOOP
+          EXIT WHEN date_idx > array_length(dates, 1);
+          IF last_date IS NOT NULL THEN
+            IF fireseason(last_date) - fireseason(dates[date_idx]) >= min_seasongap THEN
+              this_interval := last_date::timestamp - dates[date_idx]::timestamp;
+              intervals[interval_idx] := this_interval;
+              --RAISE NOTICE 'Interval: (%)', event_interval[interval_idx];
+              interval_idx := interval_idx + 1;
+            END IF;
+          END IF;
+          last_date := dates[date_idx];
+          date_idx := date_idx + 1;
+        END LOOP;
+          
+        IF array_length(intervals, 1) >= 1 THEN
+          average := (SELECT AVG(interval_unnest) FROM unnest(intervals) AS interval_unnest);
+        END IF;
+        IF average IS NULL OR open_interval > average THEN
+          --RAISE NOTICE '   Average is %', average;
+          --RAISE NOTICE '   Prepending open interval %', open_interval;
+          intervals := open_interval || intervals;
+          average := (SELECT AVG(interval_unnest) FROM unnest(intervals) AS interval_unnest);
+        END IF;
+      END IF;
+      --RAISE NOTICE '   Returns %', average;
+      RETURN average;
     END;
 $$"
