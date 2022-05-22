@@ -1,5 +1,5 @@
 <!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
-<qgis projectname="" saveDateTime="2022-05-07T22:31:04" saveUserFull="Jonathan Schultz" saveUser="jschultz" version="3.24.2-Tisler">
+<qgis projectname="" saveDateTime="2022-05-09T21:29:25" saveUserFull="Jonathan Schultz" saveUser="jschultz" version="3.24.2-Tisler">
   <homePath path=""/>
   <title></title>
   <autotransaction active="0"/>
@@ -27,7 +27,12 @@
         <Option/>
       </customproperties>
     </layer-tree-layer>
-    <layer-tree-layer source="dbname='fire' port=5432 user='qgis' sslmode=disable key='tid' srid=4283 type=MultiSurface checkPrimaryKeyUnicity='0' table=&quot;public&quot;.&quot;burn_previous_fires&quot; (geom)" legend_split_behavior="0" name="burn_previous_fires" providerKey="postgres" patch_size="-1,-1" checked="Qt::Checked" expanded="1" legend_exp="" id="burn_previous_fires_eef2fe47_4338_4a19_af2c_eb368e9f9bdb">
+    <layer-tree-layer source="dbname='fire' port=5432 user='qgis' sslmode=disable key='tid' srid=4283 type=MultiSurface checkPrimaryKeyUnicity='0' table=&quot;public&quot;.&quot;burn_previous_fires&quot; (geom)" legend_split_behavior="0" name="burn_previous_fires" providerKey="postgres" patch_size="-1,-1" checked="Qt::Unchecked" expanded="1" legend_exp="" id="burn_previous_fires_eef2fe47_4338_4a19_af2c_eb368e9f9bdb">
+      <customproperties>
+        <Option/>
+      </customproperties>
+    </layer-tree-layer>
+    <layer-tree-layer source="MultiPolygon?crs=EPSG:4283&amp;uid={b55bdb3c-92cd-4846-a990-92d560e13771}" legend_split_behavior="0" name="Mask" providerKey="memory" patch_size="-1,-1" checked="Qt::Checked" expanded="1" legend_exp="" id="Mask_c93eb6ec_36bb_4183_80da_e7960895f802">
       <customproperties>
         <Option/>
       </customproperties>
@@ -41,12 +46,14 @@
       <item>Custom_a5b2bd81_d6e1_4971_bde4_5cbe6e13de82</item>
       <item>dbca_fire_history_dbca_060_089b27af_928d_4058_837b_7c3bf188bf05</item>
       <item>burn_previous_fires_eef2fe47_4338_4a19_af2c_eb368e9f9bdb</item>
+      <item>Mask_c93eb6ec_36bb_4183_80da_e7960895f802</item>
     </custom-order>
   </layer-tree-group>
   <snapping-settings enabled="0" tolerance="12" type="1" maxScale="0" minScale="0" unit="1" mode="2" self-snapping="0" scaleDependencyMode="0" intersection-snapping="0">
     <individual-layer-settings>
       <layer-setting enabled="0" units="1" tolerance="12" type="1" maxScale="0" minScale="0" id="burn_previous_fires_eef2fe47_4338_4a19_af2c_eb368e9f9bdb"/>
       <layer-setting enabled="0" units="1" tolerance="12" type="1" maxScale="0" minScale="0" id="dbca_fire_history_dbca_060_089b27af_928d_4058_837b_7c3bf188bf05"/>
+      <layer-setting enabled="0" units="1" tolerance="12" type="1" maxScale="0" minScale="0" id="Mask_c93eb6ec_36bb_4183_80da_e7960895f802"/>
     </individual-layer-settings>
   </snapping-settings>
   <relations/>
@@ -54,10 +61,10 @@
   <mapcanvas name="theMapCanvas" annotationsVisible="1">
     <units>meters</units>
     <extent>
-      <xmin>12982950.54256596975028515</xmin>
-      <ymin>-4185330.1926629850640893</ymin>
-      <xmax>13010977.6437509823590517</xmax>
-      <ymax>-4142533.69390273373574018</ymax>
+      <xmin>12996662.11128665134310722</xmin>
+      <ymin>-4157778.09967457549646497</ymin>
+      <xmax>13002436.65833946689963341</xmax>
+      <ymax>-4155031.32953144377097487</ymax>
     </extent>
     <rotation>0</rotation>
     <destinationsrs>
@@ -83,9 +90,14 @@
         <legendlayerfile visible="1" layerid="dbca_fire_history_dbca_060_089b27af_928d_4058_837b_7c3bf188bf05" isInOverview="0"/>
       </filegroup>
     </legendlayer>
-    <legendlayer drawingOrder="-1" name="burn_previous_fires" showFeatureCount="0" open="true" checked="Qt::Checked">
+    <legendlayer drawingOrder="-1" name="burn_previous_fires" showFeatureCount="0" open="true" checked="Qt::Unchecked">
       <filegroup open="true" hidden="false">
-        <legendlayerfile visible="1" layerid="burn_previous_fires_eef2fe47_4338_4a19_af2c_eb368e9f9bdb" isInOverview="0"/>
+        <legendlayerfile visible="0" layerid="burn_previous_fires_eef2fe47_4338_4a19_af2c_eb368e9f9bdb" isInOverview="0"/>
+      </filegroup>
+    </legendlayer>
+    <legendlayer drawingOrder="-1" name="Mask" showFeatureCount="0" open="true" checked="Qt::Checked">
+      <filegroup open="true" hidden="false">
+        <legendlayerfile visible="1" layerid="Mask_c93eb6ec_36bb_4183_80da_e7960895f802" isInOverview="0"/>
       </filegroup>
     </legendlayer>
     <legendlayer drawingOrder="-1" name="Custom" showFeatureCount="0" open="true" checked="Qt::Checked">
@@ -257,6 +269,197 @@
       </pipe>
       <blendMode>0</blendMode>
     </maplayer>
+    <maplayer type="vector" autoRefreshEnabled="0" simplifyAlgorithm="0" readOnly="0" geometry="Polygon" symbologyReferenceScale="-1" maxScale="0" simplifyDrawingHints="1" hasScaleBasedVisibilityFlag="0" refreshOnNotifyEnabled="0" minScale="100000000" styleCategories="AllStyleCategories" wkbType="MultiPolygon" simplifyLocal="1" labelsEnabled="0" autoRefreshTime="0" refreshOnNotifyMessage="" simplifyDrawingTol="1" legendPlaceholderImage="" simplifyMaxScale="1">
+      <extent>
+        <xmin>116.76136479200010854</xmin>
+        <ymin>-34.98607813299997815</ymin>
+        <xmax>116.79319856000006439</xmax>
+        <ymax>-34.96573283999993009</ymax>
+      </extent>
+      <wgs84extent>
+        <xmin>116.76137558851297626</xmin>
+        <ymin>-34.98606470413555058</ymin>
+        <xmax>116.79320935290957095</xmax>
+        <ymax>-34.96571940942717305</ymax>
+      </wgs84extent>
+      <id>Mask_c93eb6ec_36bb_4183_80da_e7960895f802</id>
+      <datasource>memory?geometry=MultiPolygon&amp;crs=EPSG:4283&amp;field=params:string(0,0)</datasource>
+      <keywordList>
+        <value></value>
+      </keywordList>
+      <layername>Mask</layername>
+      <srs>
+        <spatialrefsys nativeFormat="Wkt">
+          <wkt>GEOGCRS["GDA94",DATUM["Geocentric Datum of Australia 1994",ELLIPSOID["GRS 1980",6378137,298.257222101,LENGTHUNIT["metre",1]]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433]],CS[ellipsoidal,2],AXIS["geodetic latitude (Lat)",north,ORDER[1],ANGLEUNIT["degree",0.0174532925199433]],AXIS["geodetic longitude (Lon)",east,ORDER[2],ANGLEUNIT["degree",0.0174532925199433]],USAGE[SCOPE["Horizontal component of 3D system."],AREA["Australia including Lord Howe Island, Macquarie Island, Ashmore and Cartier Islands, Christmas Island, Cocos (Keeling) Islands, Norfolk Island. All onshore and offshore."],BBOX[-60.55,93.41,-8.47,173.34]],ID["EPSG",4283]]</wkt>
+          <proj4>+proj=longlat +ellps=GRS80 +no_defs</proj4>
+          <srsid>3415</srsid>
+          <srid>4283</srid>
+          <authid>EPSG:4283</authid>
+          <description>GDA94</description>
+          <projectionacronym>longlat</projectionacronym>
+          <ellipsoidacronym>EPSG:7019</ellipsoidacronym>
+          <geographicflag>true</geographicflag>
+        </spatialrefsys>
+      </srs>
+      <resourceMetadata>
+        <identifier></identifier>
+        <parentidentifier></parentidentifier>
+        <language></language>
+        <type></type>
+        <title></title>
+        <abstract></abstract>
+        <links/>
+        <fees></fees>
+        <encoding></encoding>
+        <crs>
+          <spatialrefsys nativeFormat="Wkt">
+            <wkt></wkt>
+            <proj4></proj4>
+            <srsid>0</srsid>
+            <srid>0</srid>
+            <authid></authid>
+            <description></description>
+            <projectionacronym></projectionacronym>
+            <ellipsoidacronym></ellipsoidacronym>
+            <geographicflag>false</geographicflag>
+          </spatialrefsys>
+        </crs>
+        <extent/>
+      </resourceMetadata>
+      <provider encoding="">memory</provider>
+      <vectorjoins/>
+      <layerDependencies/>
+      <dataDependencies/>
+      <expressionfields/>
+      <map-layer-style-manager current="default">
+        <map-layer-style name="default"/>
+      </map-layer-style-manager>
+      <auxiliaryLayer/>
+      <metadataUrls/>
+      <flags>
+        <Identifiable>1</Identifiable>
+        <Removable>1</Removable>
+        <Searchable>1</Searchable>
+        <Private>0</Private>
+      </flags>
+      <temporal enabled="0" endField="" durationField="" startField="" fixedDuration="0" durationUnit="min" accumulate="0" limitMode="0" startExpression="" mode="0" endExpression="">
+        <fixedRange>
+          <start></start>
+          <end></end>
+        </fixedRange>
+      </temporal>
+      <renderer-v2 enableorderby="0" symbollevels="0" referencescale="-1" type="invertedPolygonRenderer" preprocessing="0" forceraster="0">
+        <renderer-v2 enableorderby="0" symbollevels="0" referencescale="-1" type="singleSymbol" forceraster="0">
+          <symbols>
+            <symbol name="0" clip_to_extent="1" type="fill" alpha="1" force_rhr="0">
+              <data_defined_properties>
+                <Option type="Map">
+                  <Option value="" name="name" type="QString"/>
+                  <Option name="properties"/>
+                  <Option value="collection" name="type" type="QString"/>
+                </Option>
+              </data_defined_properties>
+              <layer enabled="1" locked="0" class="SimpleFill" pass="0">
+                <Option type="Map">
+                  <Option value="3x:0,0,0,0,0,0" name="border_width_map_unit_scale" type="QString"/>
+                  <Option value="255,255,255,255" name="color" type="QString"/>
+                  <Option value="bevel" name="joinstyle" type="QString"/>
+                  <Option value="0,0" name="offset" type="QString"/>
+                  <Option value="3x:0,0,0,0,0,0" name="offset_map_unit_scale" type="QString"/>
+                  <Option value="MM" name="offset_unit" type="QString"/>
+                  <Option value="227,26,28,255" name="outline_color" type="QString"/>
+                  <Option value="solid" name="outline_style" type="QString"/>
+                  <Option value="0.26" name="outline_width" type="QString"/>
+                  <Option value="MM" name="outline_width_unit" type="QString"/>
+                  <Option value="solid" name="style" type="QString"/>
+                </Option>
+                <prop k="border_width_map_unit_scale" v="3x:0,0,0,0,0,0"/>
+                <prop k="color" v="255,255,255,255"/>
+                <prop k="joinstyle" v="bevel"/>
+                <prop k="offset" v="0,0"/>
+                <prop k="offset_map_unit_scale" v="3x:0,0,0,0,0,0"/>
+                <prop k="offset_unit" v="MM"/>
+                <prop k="outline_color" v="227,26,28,255"/>
+                <prop k="outline_style" v="solid"/>
+                <prop k="outline_width" v="0.26"/>
+                <prop k="outline_width_unit" v="MM"/>
+                <prop k="style" v="solid"/>
+                <data_defined_properties>
+                  <Option type="Map">
+                    <Option value="" name="name" type="QString"/>
+                    <Option name="properties"/>
+                    <Option value="collection" name="type" type="QString"/>
+                  </Option>
+                </data_defined_properties>
+              </layer>
+            </symbol>
+          </symbols>
+          <rotation/>
+          <sizescale/>
+        </renderer-v2>
+      </renderer-v2>
+      <customproperties>
+        <Option/>
+      </customproperties>
+      <blendMode>0</blendMode>
+      <featureBlendMode>0</featureBlendMode>
+      <layerOpacity>0.5</layerOpacity>
+      <geometryOptions removeDuplicateNodes="0" geometryPrecision="0">
+        <activeChecks type="StringList">
+          <Option value="" type="QString"/>
+        </activeChecks>
+        <checkConfiguration/>
+      </geometryOptions>
+      <legend type="default-vector" showLabelLegend="0"/>
+      <referencedLayers/>
+      <fieldConfiguration>
+        <field name="params" configurationFlags="None">
+          <editWidget type="">
+            <config>
+              <Option/>
+            </config>
+          </editWidget>
+        </field>
+      </fieldConfiguration>
+      <aliases>
+        <alias field="params" name="" index="0"/>
+      </aliases>
+      <defaults>
+        <default field="params" expression="" applyOnUpdate="0"/>
+      </defaults>
+      <constraints>
+        <constraint field="params" notnull_strength="0" unique_strength="0" exp_strength="0" constraints="0"/>
+      </constraints>
+      <constraintExpressions>
+        <constraint field="params" desc="" exp=""/>
+      </constraintExpressions>
+      <expressionfields/>
+      <attributeactions>
+        <defaultAction key="Canvas" value="{00000000-0000-0000-0000-000000000000}"/>
+      </attributeactions>
+      <attributetableconfig actionWidgetStyle="dropDown" sortOrder="0" sortExpression="">
+        <columns/>
+      </attributetableconfig>
+      <conditionalstyles>
+        <rowstyles/>
+        <fieldstyles/>
+      </conditionalstyles>
+      <storedexpressions/>
+      <editform tolerant="1"></editform>
+      <editforminit/>
+      <editforminitcodesource>0</editforminitcodesource>
+      <editforminitfilepath></editforminitfilepath>
+      <editforminitcode><![CDATA[]]></editforminitcode>
+      <featformsuppress>0</featformsuppress>
+      <editorlayout>generatedlayout</editorlayout>
+      <editable/>
+      <labelOnTop/>
+      <reuseLastValue/>
+      <dataDefinedFieldProperties/>
+      <widgets/>
+      <previewExpression></previewExpression>
+      <mapTip></mapTip>
+    </maplayer>
     <maplayer type="vector" autoRefreshEnabled="0" simplifyAlgorithm="0" readOnly="0" geometry="Polygon" symbologyReferenceScale="-1" maxScale="0" simplifyDrawingHints="1" hasScaleBasedVisibilityFlag="0" refreshOnNotifyEnabled="0" minScale="100000000" styleCategories="AllStyleCategories" wkbType="MultiSurface" simplifyLocal="1" labelsEnabled="0" autoRefreshTime="0" refreshOnNotifyMessage="" simplifyDrawingTol="1" legendPlaceholderImage="" simplifyMaxScale="1">
       <extent>
         <xmin>113.65449647500008723</xmin>
@@ -336,13 +539,41 @@
           <end></end>
         </fixedRange>
       </temporal>
-      <renderer-v2 enableorderby="0" symbollevels="0" referencescale="-1" type="invertedPolygonRenderer" preprocessing="0" forceraster="0">
-        <renderer-v2 enableorderby="0" symbollevels="0" referencescale="-1" type="RuleRenderer" forceraster="0">
-          <rules key="{d7ba6fd2-a7aa-497b-aaa4-680ad7962f7d}">
-            <rule symbol="0" key="{2e4502c4-9098-4359-a228-36ea5a686c08}" filter="attribute('burnid') = string_to_array(@atlas_pagename)[0]"/>
-          </rules>
-          <symbols>
-            <symbol name="0" clip_to_extent="1" type="fill" alpha="1" force_rhr="0">
+      <renderer-v2 enableorderby="0" symbollevels="0" referencescale="-1" type="singleSymbol" forceraster="0">
+        <symbols>
+          <symbol name="0" clip_to_extent="1" type="fill" alpha="1" force_rhr="0">
+            <data_defined_properties>
+              <Option type="Map">
+                <Option value="" name="name" type="QString"/>
+                <Option name="properties"/>
+                <Option value="collection" name="type" type="QString"/>
+              </Option>
+            </data_defined_properties>
+            <layer enabled="1" locked="0" class="SimpleFill" pass="0">
+              <Option type="Map">
+                <Option value="3x:0,0,0,0,0,0" name="border_width_map_unit_scale" type="QString"/>
+                <Option value="141,90,153,255" name="color" type="QString"/>
+                <Option value="bevel" name="joinstyle" type="QString"/>
+                <Option value="0,0" name="offset" type="QString"/>
+                <Option value="3x:0,0,0,0,0,0" name="offset_map_unit_scale" type="QString"/>
+                <Option value="MM" name="offset_unit" type="QString"/>
+                <Option value="35,35,35,255" name="outline_color" type="QString"/>
+                <Option value="solid" name="outline_style" type="QString"/>
+                <Option value="0.26" name="outline_width" type="QString"/>
+                <Option value="MM" name="outline_width_unit" type="QString"/>
+                <Option value="solid" name="style" type="QString"/>
+              </Option>
+              <prop k="border_width_map_unit_scale" v="3x:0,0,0,0,0,0"/>
+              <prop k="color" v="141,90,153,255"/>
+              <prop k="joinstyle" v="bevel"/>
+              <prop k="offset" v="0,0"/>
+              <prop k="offset_map_unit_scale" v="3x:0,0,0,0,0,0"/>
+              <prop k="offset_unit" v="MM"/>
+              <prop k="outline_color" v="35,35,35,255"/>
+              <prop k="outline_style" v="solid"/>
+              <prop k="outline_width" v="0.26"/>
+              <prop k="outline_width_unit" v="MM"/>
+              <prop k="style" v="solid"/>
               <data_defined_properties>
                 <Option type="Map">
                   <Option value="" name="name" type="QString"/>
@@ -350,42 +581,11 @@
                   <Option value="collection" name="type" type="QString"/>
                 </Option>
               </data_defined_properties>
-              <layer enabled="1" locked="0" class="SimpleFill" pass="0">
-                <Option type="Map">
-                  <Option value="3x:0,0,0,0,0,0" name="border_width_map_unit_scale" type="QString"/>
-                  <Option value="0,0,0,76" name="color" type="QString"/>
-                  <Option value="bevel" name="joinstyle" type="QString"/>
-                  <Option value="0,0" name="offset" type="QString"/>
-                  <Option value="3x:0,0,0,0,0,0" name="offset_map_unit_scale" type="QString"/>
-                  <Option value="MM" name="offset_unit" type="QString"/>
-                  <Option value="35,35,35,0" name="outline_color" type="QString"/>
-                  <Option value="solid" name="outline_style" type="QString"/>
-                  <Option value="0.26" name="outline_width" type="QString"/>
-                  <Option value="MM" name="outline_width_unit" type="QString"/>
-                  <Option value="solid" name="style" type="QString"/>
-                </Option>
-                <prop k="border_width_map_unit_scale" v="3x:0,0,0,0,0,0"/>
-                <prop k="color" v="0,0,0,76"/>
-                <prop k="joinstyle" v="bevel"/>
-                <prop k="offset" v="0,0"/>
-                <prop k="offset_map_unit_scale" v="3x:0,0,0,0,0,0"/>
-                <prop k="offset_unit" v="MM"/>
-                <prop k="outline_color" v="35,35,35,0"/>
-                <prop k="outline_style" v="solid"/>
-                <prop k="outline_width" v="0.26"/>
-                <prop k="outline_width_unit" v="MM"/>
-                <prop k="style" v="solid"/>
-                <data_defined_properties>
-                  <Option type="Map">
-                    <Option value="" name="name" type="QString"/>
-                    <Option name="properties"/>
-                    <Option value="collection" name="type" type="QString"/>
-                  </Option>
-                </data_defined_properties>
-              </layer>
-            </symbol>
-          </symbols>
-        </renderer-v2>
+            </layer>
+          </symbol>
+        </symbols>
+        <rotation/>
+        <sizescale/>
       </renderer-v2>
       <customproperties>
         <Option type="Map">
@@ -585,7 +785,9 @@
       </temporal>
       <renderer-v2 enableorderby="0" symbollevels="0" referencescale="-1" type="RuleRenderer" forceraster="0">
         <rules key="{8262b030-e281-4716-be10-b001f1d5905e}">
-          <rule symbol="0" key="{0647987f-b597-40a3-88c0-862f98a3757d}" filter="string_to_array(@atlas_pagename)[1] = if( month(fih_date1) &lt;= 6, year(fih_date1), year(fih_date1)+1 )"/>
+          <rule symbol="0" key="{d2a79485-b6fd-4646-9dab-e12b6e3f9e1e}" label="Prescribed burn" filter="string_to_array(@atlas_pagename)[1] = if( month(fih_date1) &lt;= 6, year(fih_date1), year(fih_date1)+1 ) AND fih_cause = 0"/>
+          <rule symbol="1" key="{0647987f-b597-40a3-88c0-862f98a3757d}" label="Escaped prescribed burn" filter="string_to_array(@atlas_pagename)[1] = if( month(fih_date1) &lt;= 6, year(fih_date1), year(fih_date1)+1 ) AND fih_cause = 2"/>
+          <rule symbol="2" key="{f7028ca4-0719-4cbe-b721-77935fbf7bb0}" checkstate="0" label="Other fire" filter="string_to_array(@atlas_pagename)[1] = if( month(fih_date1) &lt;= 6, year(fih_date1), year(fih_date1)+1 ) AND fih_cause &lt;> 0 AND fih_cause &lt;> 2"/>
         </rules>
         <symbols>
           <symbol name="0" clip_to_extent="1" type="fill" alpha="1" force_rhr="0">
@@ -599,7 +801,7 @@
             <layer enabled="1" locked="0" class="SimpleFill" pass="0">
               <Option type="Map">
                 <Option value="3x:0,0,0,0,0,0" name="border_width_map_unit_scale" type="QString"/>
-                <Option value="145,82,45,255" name="color" type="QString"/>
+                <Option value="230,159,0,255" name="color" type="QString"/>
                 <Option value="bevel" name="joinstyle" type="QString"/>
                 <Option value="0,0" name="offset" type="QString"/>
                 <Option value="3x:0,0,0,0,0,0" name="offset_map_unit_scale" type="QString"/>
@@ -611,7 +813,91 @@
                 <Option value="solid" name="style" type="QString"/>
               </Option>
               <prop k="border_width_map_unit_scale" v="3x:0,0,0,0,0,0"/>
-              <prop k="color" v="145,82,45,255"/>
+              <prop k="color" v="230,159,0,255"/>
+              <prop k="joinstyle" v="bevel"/>
+              <prop k="offset" v="0,0"/>
+              <prop k="offset_map_unit_scale" v="3x:0,0,0,0,0,0"/>
+              <prop k="offset_unit" v="MM"/>
+              <prop k="outline_color" v="35,35,35,255"/>
+              <prop k="outline_style" v="solid"/>
+              <prop k="outline_width" v="0.26"/>
+              <prop k="outline_width_unit" v="MM"/>
+              <prop k="style" v="solid"/>
+              <data_defined_properties>
+                <Option type="Map">
+                  <Option value="" name="name" type="QString"/>
+                  <Option name="properties"/>
+                  <Option value="collection" name="type" type="QString"/>
+                </Option>
+              </data_defined_properties>
+            </layer>
+          </symbol>
+          <symbol name="1" clip_to_extent="1" type="fill" alpha="1" force_rhr="0">
+            <data_defined_properties>
+              <Option type="Map">
+                <Option value="" name="name" type="QString"/>
+                <Option name="properties"/>
+                <Option value="collection" name="type" type="QString"/>
+              </Option>
+            </data_defined_properties>
+            <layer enabled="1" locked="0" class="SimpleFill" pass="0">
+              <Option type="Map">
+                <Option value="3x:0,0,0,0,0,0" name="border_width_map_unit_scale" type="QString"/>
+                <Option value="213,94,0,255" name="color" type="QString"/>
+                <Option value="bevel" name="joinstyle" type="QString"/>
+                <Option value="0,0" name="offset" type="QString"/>
+                <Option value="3x:0,0,0,0,0,0" name="offset_map_unit_scale" type="QString"/>
+                <Option value="MM" name="offset_unit" type="QString"/>
+                <Option value="35,35,35,255" name="outline_color" type="QString"/>
+                <Option value="solid" name="outline_style" type="QString"/>
+                <Option value="0.26" name="outline_width" type="QString"/>
+                <Option value="MM" name="outline_width_unit" type="QString"/>
+                <Option value="solid" name="style" type="QString"/>
+              </Option>
+              <prop k="border_width_map_unit_scale" v="3x:0,0,0,0,0,0"/>
+              <prop k="color" v="213,94,0,255"/>
+              <prop k="joinstyle" v="bevel"/>
+              <prop k="offset" v="0,0"/>
+              <prop k="offset_map_unit_scale" v="3x:0,0,0,0,0,0"/>
+              <prop k="offset_unit" v="MM"/>
+              <prop k="outline_color" v="35,35,35,255"/>
+              <prop k="outline_style" v="solid"/>
+              <prop k="outline_width" v="0.26"/>
+              <prop k="outline_width_unit" v="MM"/>
+              <prop k="style" v="solid"/>
+              <data_defined_properties>
+                <Option type="Map">
+                  <Option value="" name="name" type="QString"/>
+                  <Option name="properties"/>
+                  <Option value="collection" name="type" type="QString"/>
+                </Option>
+              </data_defined_properties>
+            </layer>
+          </symbol>
+          <symbol name="2" clip_to_extent="1" type="fill" alpha="1" force_rhr="0">
+            <data_defined_properties>
+              <Option type="Map">
+                <Option value="" name="name" type="QString"/>
+                <Option name="properties"/>
+                <Option value="collection" name="type" type="QString"/>
+              </Option>
+            </data_defined_properties>
+            <layer enabled="1" locked="0" class="SimpleFill" pass="0">
+              <Option type="Map">
+                <Option value="3x:0,0,0,0,0,0" name="border_width_map_unit_scale" type="QString"/>
+                <Option value="204,121,167,255" name="color" type="QString"/>
+                <Option value="bevel" name="joinstyle" type="QString"/>
+                <Option value="0,0" name="offset" type="QString"/>
+                <Option value="3x:0,0,0,0,0,0" name="offset_map_unit_scale" type="QString"/>
+                <Option value="MM" name="offset_unit" type="QString"/>
+                <Option value="35,35,35,255" name="outline_color" type="QString"/>
+                <Option value="solid" name="outline_style" type="QString"/>
+                <Option value="0.26" name="outline_width" type="QString"/>
+                <Option value="MM" name="outline_width_unit" type="QString"/>
+                <Option value="solid" name="style" type="QString"/>
+              </Option>
+              <prop k="border_width_map_unit_scale" v="3x:0,0,0,0,0,0"/>
+              <prop k="color" v="204,121,167,255"/>
               <prop k="joinstyle" v="bevel"/>
               <prop k="offset" v="0,0"/>
               <prop k="offset_map_unit_scale" v="3x:0,0,0,0,0,0"/>
@@ -637,7 +923,7 @@
       </customproperties>
       <blendMode>0</blendMode>
       <featureBlendMode>0</featureBlendMode>
-      <layerOpacity>1</layerOpacity>
+      <layerOpacity>0.75</layerOpacity>
       <geometryOptions removeDuplicateNodes="0" geometryPrecision="0">
         <activeChecks type="StringList">
           <Option value="" type="QString"/>
@@ -952,6 +1238,7 @@
     <layer id="Custom_a5b2bd81_d6e1_4971_bde4_5cbe6e13de82"/>
     <layer id="dbca_fire_history_dbca_060_089b27af_928d_4058_837b_7c3bf188bf05"/>
     <layer id="burn_previous_fires_eef2fe47_4338_4a19_af2c_eb368e9f9bdb"/>
+    <layer id="Mask_c93eb6ec_36bb_4183_80da_e7960895f802"/>
   </layerorder>
   <properties>
     <Digitizing>
@@ -967,11 +1254,15 @@
       <SelectionColorRedPart type="int">255</SelectionColorRedPart>
     </Gui>
     <Layouts>
-      <lastLayoutExportDir type="QString">/home/jschultz/Transfer/FRK_074.pdf</lastLayoutExportDir>
+      <lastLayoutExportDir type="QString">/home/jschultz/Transfer/output_4.pdf</lastLayoutExportDir>
     </Layouts>
     <Legend>
       <filterByMap type="bool">false</filterByMap>
     </Legend>
+    <Mask>
+      <layer_id type="QString">Mask_c93eb6ec_36bb_4183_80da_e7960895f802</layer_id>
+      <parameters type="QString">KGxwMApJMDAKYUYxLjAKYUk1CmFJMDEKYUYxLjAKYUkwMAphVgpwMQphVkVTUkkgU2hhcGVmaWxlCnAyCmEobHAzCmFjc2lwCl91bnBpY2tsZV90eXBlCnA0CihWUHlRdDUuUXRDb3JlCnA1ClZRQnl0ZUFycmF5CnA2CihjX2NvZGVjcwplbmNvZGUKcDcKKFY8IURPQ1RZUEUgcWdpcyBQVUJMSUMgJ2h0dHA6Ly9tcmNjLmNvbS9xZ2lzLmR0ZCcgJ1NZU1RFTSc+XHUwMDBhPHFnaXMgc2ltcGxpZnlNYXhTY2FsZT0iMSIgcmVhZE9ubHk9IjAiIHN0eWxlQ2F0ZWdvcmllcz0iQWxsU3R5bGVDYXRlZ29yaWVzIiBoYXNTY2FsZUJhc2VkVmlzaWJpbGl0eUZsYWc9IjAiIHNpbXBsaWZ5TG9jYWw9IjEiIGxhYmVsc0VuYWJsZWQ9IjEiIHNpbXBsaWZ5RHJhd2luZ1RvbD0iMSIgc3ltYm9sb2d5UmVmZXJlbmNlU2NhbGU9Ii0xIiBtYXhTY2FsZT0iMCIgbWluU2NhbGU9IjAiIHNpbXBsaWZ5RHJhd2luZ0hpbnRzPSIxIiBzaW1wbGlmeUFsZ29yaXRobT0iMCI+XHUwMDBhIDxmbGFncz5cdTAwMGEgIDxJZGVudGlmaWFibGU+MTwvSWRlbnRpZmlhYmxlPlx1MDAwYSAgPFJlbW92YWJsZT4xPC9SZW1vdmFibGU+XHUwMDBhICA8U2VhcmNoYWJsZT4xPC9TZWFyY2hhYmxlPlx1MDAwYSAgPFByaXZhdGU+MDwvUHJpdmF0ZT5cdTAwMGEgPC9mbGFncz5cdTAwMGEgPHRlbXBvcmFsIGVuYWJsZWQ9IjAiIGVuZEZpZWxkPSIiIGR1cmF0aW9uRmllbGQ9IiIgc3RhcnRGaWVsZD0iIiBmaXhlZER1cmF0aW9uPSIwIiBkdXJhdGlvblVuaXQ9Im1pbiIgYWNjdW11bGF0ZT0iMCIgbGltaXRNb2RlPSIwIiBzdGFydEV4cHJlc3Npb249IiIgbW9kZT0iMCIgZW5kRXhwcmVzc2lvbj0iIj5cdTAwMGEgIDxmaXhlZFJhbmdlPlx1MDAwYSAgIDxzdGFydD48L3N0YXJ0Plx1MDAwYSAgIDxlbmQ+PC9lbmQ+XHUwMDBhICA8L2ZpeGVkUmFuZ2U+XHUwMDBhIDwvdGVtcG9yYWw+XHUwMDBhIDxyZW5kZXJlci12MiBlbmFibGVvcmRlcmJ5PSIwIiBzeW1ib2xsZXZlbHM9IjAiIHJlZmVyZW5jZXNjYWxlPSItMSIgdHlwZT0iaW52ZXJ0ZWRQb2x5Z29uUmVuZGVyZXIiIHByZXByb2Nlc3Npbmc9IjAiIGZvcmNlcmFzdGVyPSIwIj5cdTAwMGEgIDxyZW5kZXJlci12MiBlbmFibGVvcmRlcmJ5PSIwIiBzeW1ib2xsZXZlbHM9IjAiIHJlZmVyZW5jZXNjYWxlPSItMSIgdHlwZT0ic2luZ2xlU3ltYm9sIiBmb3JjZXJhc3Rlcj0iMCI+XHUwMDBhICAgPHN5bWJvbHM+XHUwMDBhICAgIDxzeW1ib2wgbmFtZT0iMCIgY2xpcF90b19leHRlbnQ9IjEiIHR5cGU9ImZpbGwiIGFscGhhPSIxIiBmb3JjZV9yaHI9IjAiPlx1MDAwYSAgICAgPGRhdGFfZGVmaW5lZF9wcm9wZXJ0aWVzPlx1MDAwYSAgICAgIDxPcHRpb24gdHlwZT0iTWFwIj5cdTAwMGEgICAgICAgPE9wdGlvbiB2YWx1ZT0iIiBuYW1lPSJuYW1lIiB0eXBlPSJRU3RyaW5nIi8+XHUwMDBhICAgICAgIDxPcHRpb24gbmFtZT0icHJvcGVydGllcyIvPlx1MDAwYSAgICAgICA8T3B0aW9uIHZhbHVlPSJjb2xsZWN0aW9uIiBuYW1lPSJ0eXBlIiB0eXBlPSJRU3RyaW5nIi8+XHUwMDBhICAgICAgPC9PcHRpb24+XHUwMDBhICAgICA8L2RhdGFfZGVmaW5lZF9wcm9wZXJ0aWVzPlx1MDAwYSAgICAgPGxheWVyIGVuYWJsZWQ9IjEiIGxvY2tlZD0iMCIgY2xhc3M9IlNoYXBlYnVyc3RGaWxsIiBwYXNzPSIwIj5cdTAwMGEgICAgICA8T3B0aW9uIHR5cGU9Ik1hcCI+XHUwMDBhICAgICAgIDxPcHRpb24gdmFsdWU9IjE1IiBuYW1lPSJibHVyX3JhZGl1cyIgdHlwZT0iUVN0cmluZyIvPlx1MDAwYSAgICAgICA8T3B0aW9uIHZhbHVlPSI3Myw5NCwxMjMsMTY0IiBuYW1lPSJjb2xvciIgdHlwZT0iUVN0cmluZyIvPlx1MDAwYSAgICAgICA8T3B0aW9uIHZhbHVlPSIwLDAsMjU1LDI1NSIgbmFtZT0iY29sb3IxIiB0eXBlPSJRU3RyaW5nIi8+XHUwMDBhICAgICAgIDxPcHRpb24gdmFsdWU9IjAsMjU1LDAsMjU1IiBuYW1lPSJjb2xvcjIiIHR5cGU9IlFTdHJpbmciLz5cdTAwMGEgICAgICAgPE9wdGlvbiB2YWx1ZT0iMCIgbmFtZT0iY29sb3JfdHlwZSIgdHlwZT0iUVN0cmluZyIvPlx1MDAwYSAgICAgICA8T3B0aW9uIHZhbHVlPSJjY3ciIG5hbWU9ImRpcmVjdGlvbiIgdHlwZT0iUVN0cmluZyIvPlx1MDAwYSAgICAgICA8T3B0aW9uIHZhbHVlPSIwIiBuYW1lPSJkaXNjcmV0ZSIgdHlwZT0iUVN0cmluZyIvPlx1MDAwYSAgICAgICA8T3B0aW9uIHZhbHVlPSIzeDowLDAsMCwwLDAsMCIgbmFtZT0iZGlzdGFuY2VfbWFwX3VuaXRfc2NhbGUiIHR5cGU9IlFTdHJpbmciLz5cdTAwMGEgICAgICAgPE9wdGlvbiB2YWx1ZT0iTU0iIG5hbWU9ImRpc3RhbmNlX3VuaXQiIHR5cGU9IlFTdHJpbmciLz5cdTAwMGEgICAgICAgPE9wdGlvbiB2YWx1ZT0iMjU1LDI1NSwyNTUsMjMwIiBuYW1lPSJncmFkaWVudF9jb2xvcjIiIHR5cGU9IlFTdHJpbmciLz5cdTAwMGEgICAgICAgPE9wdGlvbiB2YWx1ZT0iMCIgbmFtZT0iaWdub3JlX3JpbmdzIiB0eXBlPSJRU3RyaW5nIi8+XHUwMDBhICAgICAgIDxPcHRpb24gdmFsdWU9IjYiIG5hbWU9Im1heF9kaXN0YW5jZSIgdHlwZT0iUVN0cmluZyIvPlx1MDAwYSAgICAgICA8T3B0aW9uIHZhbHVlPSIwLDAiIG5hbWU9Im9mZnNldCIgdHlwZT0iUVN0cmluZyIvPlx1MDAwYSAgICAgICA8T3B0aW9uIHZhbHVlPSIzeDowLDAsMCwwLDAsMCIgbmFtZT0ib2Zmc2V0X21hcF91bml0X3NjYWxlIiB0eXBlPSJRU3RyaW5nIi8+XHUwMDBhICAgICAgIDxPcHRpb24gdmFsdWU9Ik1NIiBuYW1lPSJvZmZzZXRfdW5pdCIgdHlwZT0iUVN0cmluZyIvPlx1MDAwYSAgICAgICA8T3B0aW9uIHZhbHVlPSJncmFkaWVudCIgbmFtZT0icmFtcFR5cGUiIHR5cGU9IlFTdHJpbmciLz5cdTAwMGEgICAgICAgPE9wdGlvbiB2YWx1ZT0icmdiIiBuYW1lPSJzcGVjIiB0eXBlPSJRU3RyaW5nIi8+XHUwMDBhICAgICAgIDxPcHRpb24gdmFsdWU9IjAiIG5hbWU9InVzZV93aG9sZV9zaGFwZSIgdHlwZT0iUVN0cmluZyIvPlx1MDAwYSAgICAgIDwvT3B0aW9uPlx1MDAwYSAgICAgIDxwcm9wIGs9ImJsdXJfcmFkaXVzIiB2PSIxNSIvPlx1MDAwYSAgICAgIDxwcm9wIGs9ImNvbG9yIiB2PSI3Myw5NCwxMjMsMTY0Ii8+XHUwMDBhICAgICAgPHByb3Agaz0iY29sb3IxIiB2PSIwLDAsMjU1LDI1NSIvPlx1MDAwYSAgICAgIDxwcm9wIGs9ImNvbG9yMiIgdj0iMCwyNTUsMCwyNTUiLz5cdTAwMGEgICAgICA8cHJvcCBrPSJjb2xvcl90eXBlIiB2PSIwIi8+XHUwMDBhICAgICAgPHByb3Agaz0iZGlyZWN0aW9uIiB2PSJjY3ciLz5cdTAwMGEgICAgICA8cHJvcCBrPSJkaXNjcmV0ZSIgdj0iMCIvPlx1MDAwYSAgICAgIDxwcm9wIGs9ImRpc3RhbmNlX21hcF91bml0X3NjYWxlIiB2PSIzeDowLDAsMCwwLDAsMCIvPlx1MDAwYSAgICAgIDxwcm9wIGs9ImRpc3RhbmNlX3VuaXQiIHY9Ik1NIi8+XHUwMDBhICAgICAgPHByb3Agaz0iZ3JhZGllbnRfY29sb3IyIiB2PSIyNTUsMjU1LDI1NSwyMzAiLz5cdTAwMGEgICAgICA8cHJvcCBrPSJpZ25vcmVfcmluZ3MiIHY9IjAiLz5cdTAwMGEgICAgICA8cHJvcCBrPSJtYXhfZGlzdGFuY2UiIHY9IjYiLz5cdTAwMGEgICAgICA8cHJvcCBrPSJvZmZzZXQiIHY9IjAsMCIvPlx1MDAwYSAgICAgIDxwcm9wIGs9Im9mZnNldF9tYXBfdW5pdF9zY2FsZSIgdj0iM3g6MCwwLDAsMCwwLDAiLz5cdTAwMGEgICAgICA8cHJvcCBrPSJvZmZzZXRfdW5pdCIgdj0iTU0iLz5cdTAwMGEgICAgICA8cHJvcCBrPSJyYW1wVHlwZSIgdj0iZ3JhZGllbnQiLz5cdTAwMGEgICAgICA8cHJvcCBrPSJzcGVjIiB2PSJyZ2IiLz5cdTAwMGEgICAgICA8cHJvcCBrPSJ1c2Vfd2hvbGVfc2hhcGUiIHY9IjAiLz5cdTAwMGEgICAgICA8ZGF0YV9kZWZpbmVkX3Byb3BlcnRpZXM+XHUwMDBhICAgICAgIDxPcHRpb24gdHlwZT0iTWFwIj5cdTAwMGEgICAgICAgIDxPcHRpb24gdmFsdWU9IiIgbmFtZT0ibmFtZSIgdHlwZT0iUVN0cmluZyIvPlx1MDAwYSAgICAgICAgPE9wdGlvbiBuYW1lPSJwcm9wZXJ0aWVzIi8+XHUwMDBhICAgICAgICA8T3B0aW9uIHZhbHVlPSJjb2xsZWN0aW9uIiBuYW1lPSJ0eXBlIiB0eXBlPSJRU3RyaW5nIi8+XHUwMDBhICAgICAgIDwvT3B0aW9uPlx1MDAwYSAgICAgIDwvZGF0YV9kZWZpbmVkX3Byb3BlcnRpZXM+XHUwMDBhICAgICA8L2xheWVyPlx1MDAwYSAgICA8L3N5bWJvbD5cdTAwMGEgICA8L3N5bWJvbHM+XHUwMDBhICAgPHJvdGF0aW9uLz5cdTAwMGEgICA8c2l6ZXNjYWxlLz5cdTAwMGEgIDwvcmVuZGVyZXItdjI+XHUwMDBhIDwvcmVuZGVyZXItdjI+XHUwMDBhIDxjdXN0b21wcm9wZXJ0aWVzPlx1MDAwYSAgPE9wdGlvbi8+XHUwMDBhIDwvY3VzdG9tcHJvcGVydGllcz5cdTAwMGEgPGJsZW5kTW9kZT4wPC9ibGVuZE1vZGU+XHUwMDBhIDxmZWF0dXJlQmxlbmRNb2RlPjA8L2ZlYXR1cmVCbGVuZE1vZGU+XHUwMDBhIDxsYXllck9wYWNpdHk+MTwvbGF5ZXJPcGFjaXR5Plx1MDAwYSA8Z2VvbWV0cnlPcHRpb25zIHJlbW92ZUR1cGxpY2F0ZU5vZGVzPSIwIiBnZW9tZXRyeVByZWNpc2lvbj0iMCI+XHUwMDBhICA8YWN0aXZlQ2hlY2tzLz5cdTAwMGEgIDxjaGVja0NvbmZpZ3VyYXRpb24vPlx1MDAwYSA8L2dlb21ldHJ5T3B0aW9ucz5cdTAwMGEgPGxlZ2VuZCB0eXBlPSJkZWZhdWx0LXZlY3RvciIgc2hvd0xhYmVsTGVnZW5kPSIwIi8+XHUwMDBhIDxyZWZlcmVuY2VkTGF5ZXJzLz5cdTAwMGEgPGZpZWxkQ29uZmlndXJhdGlvbi8+XHUwMDBhIDxhbGlhc2VzLz5cdTAwMGEgPGRlZmF1bHRzLz5cdTAwMGEgPGNvbnN0cmFpbnRzLz5cdTAwMGEgPGNvbnN0cmFpbnRFeHByZXNzaW9ucy8+XHUwMDBhIDxleHByZXNzaW9uZmllbGRzLz5cdTAwMGEgPGF0dHJpYnV0ZWFjdGlvbnMvPlx1MDAwYSA8YXR0cmlidXRldGFibGVjb25maWcgYWN0aW9uV2lkZ2V0U3R5bGU9ImRyb3BEb3duIiBzb3J0T3JkZXI9IjAiIHNvcnRFeHByZXNzaW9uPSIiPlx1MDAwYSAgPGNvbHVtbnMvPlx1MDAwYSA8L2F0dHJpYnV0ZXRhYmxlY29uZmlnPlx1MDAwYSA8Y29uZGl0aW9uYWxzdHlsZXM+XHUwMDBhICA8cm93c3R5bGVzLz5cdTAwMGEgIDxmaWVsZHN0eWxlcy8+XHUwMDBhIDwvY29uZGl0aW9uYWxzdHlsZXM+XHUwMDBhIDxzdG9yZWRleHByZXNzaW9ucy8+XHUwMDBhIDxlZGl0Zm9ybSB0b2xlcmFudD0iMSI+PC9lZGl0Zm9ybT5cdTAwMGEgPGVkaXRmb3JtaW5pdC8+XHUwMDBhIDxlZGl0Zm9ybWluaXRjb2Rlc291cmNlPjA8L2VkaXRmb3JtaW5pdGNvZGVzb3VyY2U+XHUwMDBhIDxlZGl0Zm9ybWluaXRmaWxlcGF0aD48L2VkaXRmb3JtaW5pdGZpbGVwYXRoPlx1MDAwYSA8ZWRpdGZvcm1pbml0Y29kZT48IVtDREFUQVtdXT48L2VkaXRmb3JtaW5pdGNvZGU+XHUwMDBhIDxmZWF0Zm9ybXN1cHByZXNzPjA8L2ZlYXRmb3Jtc3VwcHJlc3M+XHUwMDBhIDxlZGl0b3JsYXlvdXQ+Z2VuZXJhdGVkbGF5b3V0PC9lZGl0b3JsYXlvdXQ+XHUwMDBh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</parameters>
+    </Mask>
     <Measure>
       <Ellipsoid type="QString">EPSG:7030</Ellipsoid>
     </Measure>
@@ -1321,7 +1612,7 @@
             <Option/>
           </customproperties>
         </LayoutObject>
-        <Extent xmin="12997639.6890837773680687" xmax="13001537.7791435495018959" ymin="-4162471.73003378976136446" ymax="-4158739.34825591091066599"/>
+        <Extent xmin="12996524.6221651304513216" xmax="13002574.14743654988706112" ymin="-4159300.894141033757478" ymax="-4153508.53492366289719939"/>
         <LayerSet/>
         <AtlasMap margin="0.10000000000000001" atlasDriven="1" scalingMode="2"/>
         <labelBlockingItems/>
@@ -1339,7 +1630,7 @@
           <Option value="0" name="pdfDisableRasterTiles" type="int"/>
           <Option value="" name="pdfExportThemes" type="QString"/>
           <Option value="1" name="pdfIncludeMetadata" type="int"/>
-          <Option value="dbca_fire_history_dbca_060_089b27af_928d_4058_837b_7c3bf188bf05~~~previous_burns_d0ae3501_0001_4cea_bfb4_5e9fbc84079c~~~Custom_a5b2bd81_d6e1_4971_bde4_5cbe6e13de82" name="pdfLayerOrder" type="QString"/>
+          <Option value="dbca_fire_history_dbca_060_089b27af_928d_4058_837b_7c3bf188bf05~~~Custom_a5b2bd81_d6e1_4971_bde4_5cbe6e13de82~~~burn_previous_fires_eef2fe47_4338_4a19_af2c_eb368e9f9bdb~~~Mask_c93eb6ec_36bb_4183_80da_e7960895f802" name="pdfLayerOrder" type="QString"/>
           <Option value="0" name="pdfLosslessImages" type="int"/>
           <Option value="0" name="pdfOgcBestPracticeFormat" type="int"/>
           <Option value="1" name="pdfSimplify" type="int"/>
@@ -1347,14 +1638,14 @@
           <Option value="true" name="singleFile" type="bool"/>
         </Option>
       </customproperties>
-      <Atlas enabled="1" pageNameExpression="array_to_string(array(attribute('burnid'), attribute('fireseason')))" coverageLayerName="burn_previous_fires" coverageLayer="burn_previous_fires_eef2fe47_4338_4a19_af2c_eb368e9f9bdb" sortKey="-&quot;fireseason&quot;" coverageLayerProvider="postgres" filterFeatures="1" coverageLayerSource="dbname='fire' port=5432 user='qgis' sslmode=disable key='tid' srid=4283 type=MultiSurface checkPrimaryKeyUnicity='0' table=&quot;public&quot;.&quot;burn_previous_fires&quot; (geom)" featureFilter="burnid='FRK_058'" hideCoverage="0" sortFeatures="1" sortAscending="1" filenamePattern="'output_'||@atlas_featurenumber"/>
+      <Atlas enabled="1" pageNameExpression="array_to_string(array(attribute('burnid'), attribute('fireseason')))" coverageLayerName="burn_previous_fires" coverageLayer="burn_previous_fires_eef2fe47_4338_4a19_af2c_eb368e9f9bdb" sortKey="-&quot;fireseason&quot;" coverageLayerProvider="postgres" filterFeatures="1" coverageLayerSource="dbname='fire' port=5432 user='qgis' sslmode=disable key='tid' srid=4283 type=MultiSurface checkPrimaryKeyUnicity='0' table=&quot;public&quot;.&quot;burn_previous_fires&quot; (geom)" featureFilter="burnid='FRK_073'" hideCoverage="0" sortFeatures="1" sortAscending="1" filenamePattern="'output_'||@atlas_featurenumber"/>
     </Layout>
   </Layouts>
   <mapViewDocks3D/>
   <Bookmarks/>
   <ProjectViewSettings UseProjectScales="0">
     <Scales/>
-    <DefaultViewExtent xmin="12976779.92884956300258636" xmax="13017148.25746738910675049" ymin="-4185330.1926629850640893" ymax="-4142533.69390273373574018">
+    <DefaultViewExtent xmin="12996662.11128665134310722" xmax="13002436.65833946689963341" ymin="-4158887.06562266498804092" ymax="-4153922.36358335427939892">
       <spatialrefsys nativeFormat="Wkt">
         <wkt>PROJCRS["WGS 84 / Pseudo-Mercator",BASEGEOGCRS["WGS 84",ENSEMBLE["World Geodetic System 1984 ensemble",MEMBER["World Geodetic System 1984 (Transit)"],MEMBER["World Geodetic System 1984 (G730)"],MEMBER["World Geodetic System 1984 (G873)"],MEMBER["World Geodetic System 1984 (G1150)"],MEMBER["World Geodetic System 1984 (G1674)"],MEMBER["World Geodetic System 1984 (G1762)"],MEMBER["World Geodetic System 1984 (G2139)"],ELLIPSOID["WGS 84",6378137,298.257223563,LENGTHUNIT["metre",1]],ENSEMBLEACCURACY[2.0]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433]],ID["EPSG",4326]],CONVERSION["Popular Visualisation Pseudo-Mercator",METHOD["Popular Visualisation Pseudo Mercator",ID["EPSG",1024]],PARAMETER["Latitude of natural origin",0,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8801]],PARAMETER["Longitude of natural origin",0,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8802]],PARAMETER["False easting",0,LENGTHUNIT["metre",1],ID["EPSG",8806]],PARAMETER["False northing",0,LENGTHUNIT["metre",1],ID["EPSG",8807]]],CS[Cartesian,2],AXIS["easting (X)",east,ORDER[1],LENGTHUNIT["metre",1]],AXIS["northing (Y)",north,ORDER[2],LENGTHUNIT["metre",1]],USAGE[SCOPE["Web mapping and visualisation."],AREA["World between 85.06°S and 85.06°N."],BBOX[-85.06,-180,85.06,180]],ID["EPSG",3857]]</wkt>
         <proj4>+proj=merc +a=6378137 +b=6378137 +lat_ts=0 +lon_0=0 +x_0=0 +y_0=0 +k=1 +units=m +nadgrids=@null +wktext +no_defs</proj4>

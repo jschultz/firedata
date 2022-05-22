@@ -73,8 +73,8 @@ def exportburnAtlas(arglist=None):
     exporter = QgsLayoutExporter(atlas.layout())
     if args.pdffile:
         pdfsettings = QgsLayoutExporter.PdfExportSettings()
-        pdfsettings.simplifyGeometries = False
-        pdfsettings.forceVectorOutput = True
+        #pdfsettings.simplifyGeometries = False
+        #pdfsettings.forceVectorOutput = True
         exporter.exportToPdf(atlas, args.pdffile, pdfsettings)
     if args.imagefile:
         imagesettings = QgsLayoutExporter.ImageExportSettings()

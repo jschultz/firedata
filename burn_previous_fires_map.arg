@@ -5,5 +5,5 @@
 #    --layout "Layout 1"
 ##    --imagefile "Burn previous fires/${burn} previous fires map.jpg"
 #    --pdffile "Burn previous fires/${burn} previous fires map.pdf"
-#     "/home/jschultz/src/firecheck-gis/burn_previous_fires_map.qgs"
+#     "/home/jschultz/src/firecheck-gis/burn_previous_fires_map_v2.qgs"
 ################################################################################
