@@ -4,12 +4,24 @@
 #    "fire"
 #    --command "
 CREATE OR REPLACE FUNCTION fireseason(dt timestamp with time zone)
-RETURNS int
+RETURNS integer
 LANGUAGE plpgsql
 AS
 $$
     begin
         return (CASE WHEN EXTRACT(MONTH FROM dt) <= 6 THEN EXTRACT(YEAR FROM dt) ELSE EXTRACT(YEAR FROM dt) + 1 END);
+    end;
+$$"
+#    --command "
+CREATE OR REPLACE FUNCTION firetype(cause int)
+RETURNS text
+LANGUAGE plpgsql
+AS
+$$
+    begin
+        return (CASE WHEN cause = 0 THEN 'Prescribed burn'
+                     WHEN cause = 2 THEN 'Escaped prescribed burn'
+                     ELSE 'Other fire' END);
     end;
 $$"
 #    --command "

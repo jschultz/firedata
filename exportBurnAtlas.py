@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# Copyright 2021 Jonathan Schultz
+# Copyright 2022 Jonathan Schultz
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from argrecord import ArgumentHelper, ArgumentRecorder
-from qgis.core import *
+from qgis.core import QgsLayoutExporter
 from qgis.gui import QgsMapCanvas, QgsLayerTreeMapCanvasBridge
 from qgis.PyQt import QtGui
 from PyQt5.QtGui import QColor, QFont
@@ -28,12 +28,15 @@ import sys
 import csv
 import os
 
+from headlessMask import *
+
 def exportburnAtlas(arglist=None):
 
     parser = ArgumentRecorder(description='Exports an atlas from a QGIS file.',
                               fromfile_prefix_chars='@')
 
     parser.add_argument('-B', '--burn',   type=str, required=True, help="ID of burn to export")
+    parser.add_argument('-f', '--filter', type=str, help="Additional criteria for producing a page")
     parser.add_argument('-l', '--layout', type=str, required=True, help="Print layout to export")
     parser.add_argument('-p', '--pdffile', type=str, help="Name of PDF file to export")
     parser.add_argument('-i', '--imagefile', type=str, help="Name of image file to export")
@@ -57,19 +60,22 @@ def exportburnAtlas(arglist=None):
         parser.write_comments(args, logfile, incomments=ArgumentHelper.separator())
         logfile.close()
 
-    QgsApplication.setPrefixPath("/usr", True)
-    qgs = QgsApplication([], True)
+    qgs = QgsApplication([b"exportBurnAtlas"], True)
     qgs.initQgis()
 
     project = QgsProject.instance()
     project.read(args.qgisfile[0])
     
-    manager = QgsProject.instance().layoutManager()
+    manager = project.layoutManager()
     layout = manager.layoutByName(args.layout)
     
     atlas = layout.atlas()
     atlas.setFilterFeatures(True)
-    atlas.setFilterExpression('"burnid"=\'{}\''.format(args.burn))
+    filterExpression = '"burnid"=\'{}\''.format(args.burn)
+    if args.filter:
+        filterExpression += ' AND ' + args.filter
+    atlas.setFilterExpression(filterExpression)
+      
     exporter = QgsLayoutExporter(atlas.layout())
     if args.pdffile:
         pdfsettings = QgsLayoutExporter.PdfExportSettings()

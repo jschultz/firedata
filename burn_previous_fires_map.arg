@@ -2,8 +2,9 @@
 # exportBurnAtlas.py
 #    --nologfile
 #    --burn "${burn}"
+#    --filter "fire_in_burn_area / ($area/10000) >= 0.1"
 #    --layout "Layout 1"
 ##    --imagefile "Burn previous fires/${burn} previous fires map.jpg"
 #    --pdffile "Burn previous fires/${burn} previous fires map.pdf"
-#     "/home/jschultz/src/firecheck-gis/burn_previous_fires_map_v2.qgs"
+#     "/home/jschultz/src/firecheck-gis/burn_previous_fires_map.qgs"
 ################################################################################
