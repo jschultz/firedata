@@ -1,0 +1,21 @@
+################################################################################
+# load_file.sh
+#    --nologfile
+#    --user "qgis"
+#    --database "fire"
+#    --geometry "geom"
+#    --srid "4283"
+#    --table "Cadastre_Polygon_LGATE_217"
+#<   "Cadastre_Polygon_LGATE_217_WA_GDA94_Subscription.gpkg"
+################################################################################
+# unzip
+#    "Cadastre_Polygon_LGATE_217_WA_GDA94_Subscription_Geopackage.zip"
+#    "Cadastre_Polygon_LGATE_217_WA_GDA94_Subscription.gpkg"
+################################################################################
+# download-data-wa-gov
+#    --nologfile
+#    --folder "LGATE_Subscription"
+#    --filename "Cadastre_Polygon_LGATE_217_WA_GDA94_Subscription_Geopackage.zip"
+#    --outfile "Cadastre_Polygon_LGATE_217_WA_GDA94_Subscription_Geopackage.zip"
+#    --user "${user}"
+#    --password "${password}"
