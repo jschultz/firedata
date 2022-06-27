@@ -56,8 +56,7 @@ def exportLMUAtlas(arglist=None):
         parser.write_comments(args, logfile, incomments=ArgumentHelper.separator())
         logfile.close()
 
-    QgsApplication.setPrefixPath("/usr", True)
-    qgs = QgsApplication([], True)
+    qgs = QgsApplication([b"exportLMUAtlas"], True)
     qgs.initQgis()
 
     project = QgsProject.instance()
