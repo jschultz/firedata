@@ -6,7 +6,7 @@
 #    --height 200
 #    --blocks 1
 #    --title "Year of last burn: ${lmu}"
-#>   --outfile "lmu fire histories/${lmu} YOLB.pdf"
+#>   --outfile "LMU YOLB/${lmu} YOLB.pdf"
 ################################################################################
 #> event_history.sh
 #    --nologfile

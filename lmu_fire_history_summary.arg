@@ -7,13 +7,13 @@
 #    --blocks 3
 #    --title "Fire History Summary of ${lmu} LMU covered by Forest Management Plan"
 #    --ylabel "Percent burned"
-#>   --outfile "lmu fire histories/${lmu} Fire History Summary.pdf"
+#>   --outfile "LMU fire histories/${lmu} Fire History Summary.pdf"
 ################################################################################
 #> mlr
 #    --csv
 #    join
 #    -j year
-#<   -f "lmu fire histories/${lmu} history.csv"
+#<   -f "LMU fire histories/${lmu} history.csv"
 #    --ul
 #    --ur
 #    then
@@ -22,7 +22,7 @@
 #    then
 #    sort
 #    -n "Year ending June"
-#<   "lmu fire histories/${lmu} fuel age.csv"
+#<   "LMU fire histories/${lmu} fuel age.csv"
 ################################################################################
 # event_history.sh
 #    --nologfile
@@ -33,7 +33,7 @@
 #    --eventcolumns "year; ST_Area(ST_Intersection(ST_Union((CASE WHEN fih_cause = 0 THEN event.geom ELSE ST_GeomFromText('POLYGON EMPTY', ST_Srid(event.geom)) END)), (SELECT geom FROM area))::geography) / ST_Area((SELECT geom FROM area)::geography)*100; ST_Area(ST_Intersection(ST_Union((CASE WHEN fih_cause = 2 THEN event.geom ELSE ST_GeomFromText('POLYGON EMPTY', ST_Srid(event.geom)) END)), (SELECT geom FROM area))::geography) / ST_Area((SELECT geom FROM area)::geography)*100; ST_Area(ST_Intersection(ST_Union((CASE WHEN fih_cause <> 0 AND fih_cause <> 2 THEN event.geom ELSE ST_GeomFromText('POLYGON EMPTY', ST_Srid(event.geom)) END)), (SELECT geom FROM area))::geography) / ST_Area((SELECT geom FROM area)::geography)*100"
 #    --eventgroups year
 #    --eventaliases "Year ending June;Historic prescribed burns;Historic escape from prescribed burn;Historic other burns"
-#>   --csvfile "lmu fire histories/${lmu} history.csv"
+#>   --csvfile "LMU fire histories/${lmu} history.csv"
 ################################################################################
 # event_history.sh
 #    --nologfile
@@ -44,4 +44,4 @@
 #    --eventcolumns "year; ST_Area(ST_Intersection(ST_Union((CASE WHEN fih_cause = 0 THEN event.geom ELSE ST_GeomFromText('POLYGON EMPTY', ST_Srid(event.geom)) END)), (SELECT geom FROM area))::geography) / ST_Area((SELECT geom FROM area)::geography)*100; ST_Area(ST_Intersection(ST_Union((CASE WHEN fih_cause = 2 THEN event.geom ELSE ST_GeomFromText('POLYGON EMPTY', ST_Srid(event.geom)) END)), (SELECT geom FROM area))::geography) / ST_Area((SELECT geom FROM area)::geography)*100; ST_Area(ST_Intersection(ST_Union((CASE WHEN fih_cause <> 0 AND fih_cause <> 2 THEN event.geom ELSE ST_GeomFromText('POLYGON EMPTY', ST_Srid(event.geom)) END)), (SELECT geom FROM area))::geography) / ST_Area((SELECT geom FROM area)::geography)*100"
 #    --eventgroups year
 #    --eventaliases "Year ending June;Last burned prescribed burns;Last burned escape from prescribed burn;Last burned other burns"
-#>   --csvfile "lmu fire histories/${lmu} fuel age.csv"
+#>   --csvfile "LMU fire histories/${lmu} fuel age.csv"

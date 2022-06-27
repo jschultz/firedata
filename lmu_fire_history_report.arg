@@ -1,14 +1,14 @@
 ################################################################################
 #  pdftk
-#     "lmu fire histories/${lmu} Cover Page.pdf"
-#     "lmu fire histories/${lmu} Fire History Summary.pdf"
-#     "lmu fire histories/${lmu} Fire History tiled.pdf"
+#     "LMU fire histories/${lmu} Cover Page.pdf"
+#     "LMU fire histories/${lmu} Fire History Summary.pdf"
+#     "LMU fire histories/${lmu} Fire History tiled.pdf"
 #     cat
 #     output
-#     "lmu fire histories/${lmu}.pdf"
+#     "LMU fire histories/${lmu}.pdf"
 ################################################################################
 #  pdfjam
-#     "lmu fire histories/${lmu} Fire History.pdf"
+#     "LMU fire histories/${lmu} Fire History.pdf"
 #     --nup 2x2
-#     --outfile "lmu fire histories/${lmu} Fire History tiled.pdf"
+#     --outfile "LMU fire histories/${lmu} Fire History tiled.pdf"
 ################################################################################

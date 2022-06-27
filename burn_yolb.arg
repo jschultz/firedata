@@ -7,7 +7,7 @@
 #    --blocks 2
 #    --title "Year of last burn: ${burn}"
 #    --ylabel "Percentage of burn area"
-#>   --outfile "Burn fire histories/${burn} YOLB.${image}"
+#>   --outfile "Burn YOLB/${burn} YOLB.${image}"
 ################################################################################
 #> event_history.sh
 #    --nologfile

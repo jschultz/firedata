@@ -7,7 +7,7 @@
 #    --blocks 2
 #    --title "Year of last burn by legislated tenure category: ${lmu}"
 #    --ylabel "Percentage of legislated tenure category"
-#>   --outfile "lmu fire histories/${lmu} YOLB by leg category.pdf"
+#>   --outfile "LMU YOLB/${lmu} YOLB by leg category.pdf"
 ################################################################################
 #> event_history.sh
 #    --nologfile
