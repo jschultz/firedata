@@ -31,34 +31,44 @@ LANGUAGE plpgsql
 AS
 $$
     DECLARE
-      event_idx integer := 1;
-      date_idx  integer := 1;
-      result    date;
-      dates     date[]  := '{}';
+        event_idx integer := 1;
+        date_idx  integer := 1;
+        result    date;
+        dates     date[]  := '{}';
     BEGIN
-      --RAISE NOTICE 'date_array';
-      IF programtable IS NOT NULL THEN
-        EXECUTE format('SELECT (''20'' || substring(fin_yr from 6 for 2) || ''-01-01'')::date FROM %s WHERE ST_Contains(%s.geom, $1.geom)', programtable, programtable)
-        USING history
-        INTO result;
-      ELSE
-        result := NULL;
-      END IF;
-      LOOP
-        IF result IS NOT NULL THEN
-        --RAISE NOTICE 'Event date: (%)', result;
-          dates[date_idx] := result;
-          date_idx := date_idx + 1;
-          EXIT WHEN result < since;
+        --RAISE NOTICE 'date_array';
+        IF programtable IS NOT NULL THEN
+            EXECUTE format('SELECT (''20'' || substring(fin_yr from 6 for 2) || ''-01-01'')::date FROM %s WHERE ST_Contains(%s.geom, $1.geom)', programtable, programtable)
+            USING history
+            INTO result;
+        ELSE
+            result := NULL;
         END IF;
-        EXECUTE format('SELECT %s FROM %s WHERE id = $1.id[%s]', datefield, eventtable, event_idx)
-        USING history
-        INTO result;
-        EXIT WHEN result IS NULL;
-        event_idx := event_idx + 1;
-      END LOOP;
-      --RAISE NOTICE '   Returns %', dates;
-      RETURN dates;
+        LOOP
+            IF result IS NOT NULL THEN
+                --RAISE NOTICE 'Event date: (%)', result;
+                dates[date_idx] := result;
+                date_idx := date_idx + 1;
+                EXIT WHEN result < since;
+            END IF;
+            EXECUTE format('SELECT %s FROM %s WHERE id = $1.id[%s]', datefield, eventtable, event_idx)
+            USING history
+            INTO result;
+            EXIT WHEN result IS NULL;
+            event_idx := event_idx + 1;
+        END LOOP;
+        --RAISE NOTICE '   Returns %', dates;
+        RETURN dates;
+    END;
+$$"
+#    --command "
+CREATE OR REPLACE FUNCTION conservation_estate(leg_category character varying(40))
+RETURNS  boolean
+LANGUAGE plpgsql
+AS
+$$
+    BEGIN
+        RETURN (leg_category = 'National Park' OR leg_category = 'Conservation Park' OR leg_category = 'Nature Reserve');
     END;
 $$"
 #    --command "
@@ -68,42 +78,42 @@ LANGUAGE plpgsql
 AS
 $$
     DECLARE
-      date_idx      integer  := 1;
-      interval_idx  integer  := 1;
-      last_date     date     := NULL;
-      average       interval := NULL;
-      intervals     interval[] := '{}';
-      this_interval interval;
-      open_interval interval;
+        date_idx      integer  := 1;
+        interval_idx  integer  := 1;
+        last_date     date     := NULL;
+        average       interval := NULL;
+        intervals     interval[] := '{}';
+        this_interval interval;
+        open_interval interval;
     BEGIN
-      --RAISE NOTICE 'modified_average';
-      IF array_length(dates, 1) >= 1 THEN
-        open_interval := reference_date::timestamp - dates[1]::timestamp;
-        LOOP
-          EXIT WHEN date_idx > array_length(dates, 1);
-          IF last_date IS NOT NULL THEN
-            IF fireseason(last_date) - fireseason(dates[date_idx]) >= min_seasongap THEN
-              this_interval := last_date::timestamp - dates[date_idx]::timestamp;
-              intervals[interval_idx] := this_interval;
-              --RAISE NOTICE 'Interval: (%)', event_interval[interval_idx];
-              interval_idx := interval_idx + 1;
+        --RAISE NOTICE 'modified_average';
+        IF array_length(dates, 1) >= 1 THEN
+            open_interval := reference_date::timestamp - dates[1]::timestamp;
+            LOOP
+                EXIT WHEN date_idx > array_length(dates, 1);
+                IF last_date IS NOT NULL THEN
+                    IF fireseason(last_date) - fireseason(dates[date_idx]) >= min_seasongap THEN
+                        this_interval := last_date::timestamp - dates[date_idx]::timestamp;
+                        intervals[interval_idx] := this_interval;
+                        --RAISE NOTICE 'Interval: (%)', event_interval[interval_idx];
+                        interval_idx := interval_idx + 1;
+                    END IF;
+                END IF;
+                last_date := dates[date_idx];
+                date_idx := date_idx + 1;
+            END LOOP;
+              
+            IF array_length(intervals, 1) >= 1 THEN
+                average := (SELECT AVG(interval_unnest) FROM unnest(intervals) AS interval_unnest);
             END IF;
-          END IF;
-          last_date := dates[date_idx];
-          date_idx := date_idx + 1;
-        END LOOP;
-          
-        IF array_length(intervals, 1) >= 1 THEN
-          average := (SELECT AVG(interval_unnest) FROM unnest(intervals) AS interval_unnest);
+            IF average IS NULL OR open_interval > average THEN
+                --RAISE NOTICE '   Average is %', average;
+                --RAISE NOTICE '   Prepending open interval %', open_interval;
+                intervals := open_interval || intervals;
+                average := (SELECT AVG(interval_unnest) FROM unnest(intervals) AS interval_unnest);
+            END IF;
         END IF;
-        IF average IS NULL OR open_interval > average THEN
-          --RAISE NOTICE '   Average is %', average;
-          --RAISE NOTICE '   Prepending open interval %', open_interval;
-          intervals := open_interval || intervals;
-          average := (SELECT AVG(interval_unnest) FROM unnest(intervals) AS interval_unnest);
-        END IF;
-      END IF;
-      --RAISE NOTICE '   Returns %', average;
-      RETURN average;
+        --RAISE NOTICE '   Returns %', average;
+        RETURN average;
     END;
 $$"
