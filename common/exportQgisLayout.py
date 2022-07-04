@@ -57,7 +57,7 @@ def exportQgisLayout(arglist=None):
         logfile.close()
 
     QgsApplication.setPrefixPath("/usr", True)
-    qgs = QgsApplication([], True)
+    qgs = QgsApplication([b"exportQgisLayout"], True)
     qgs.initQgis()
 
     project = QgsProject.instance()
