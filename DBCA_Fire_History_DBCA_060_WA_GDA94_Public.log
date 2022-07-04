@@ -1,26 +1,26 @@
 ################################################################################
 # psql
-#    --username "qgis"
-#    "fire"
 #    --command "CREATE UNIQUE INDEX ON dbca_fire_history_dbca_060 (id)"
 ################################################################################
 # load_file.sh
 #    --nologfile
-#    --user "qgis"
-#    --database "fire"
 #    --geometry "geom"
 #    --srid "4283"
 #    --table "DBCA_Fire_History_DBCA_060"
 #<   "DBCA_Fire_History_DBCA_060_WA_GDA94_Public.gpkg"
 ################################################################################
-# unzip
-#    "DBCA_Fire_History_DBCA_060_WA_GDA94_Public_Geopackage.2021-08-20.zip"
+#< xargs
+#    --verbose
+#    --replace
+#    unzip
+#    -o
+#    {}
 #    "DBCA_Fire_History_DBCA_060_WA_GDA94_Public.gpkg"
 ################################################################################
-# download-data-wa-gov
+#> download-data-wa-gov
 #    --nologfile
 #    --folder "Environment"
 #    --filename "DBCA_Fire_History_DBCA_060_WA_GDA94_Public_Geopackage.zip"
-#    --outfile "DBCA_Fire_History_DBCA_060_WA_GDA94_Public_Geopackage.2021-08-20.zip"
+#>   --outfile "DBCA_Fire_History_DBCA_060_WA_GDA94_Public_Geopackage.%Y-%m-%d.zip"
 #    --user "${user}"
 #    --password "${password}"

@@ -1,7 +1,5 @@
 ################################################################################
 # psql
-#    --username "qgis"
-#    "fire"
 #    --command "
 CREATE OR REPLACE FUNCTION fireseason(dt timestamp with time zone)
 RETURNS integer

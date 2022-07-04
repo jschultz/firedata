@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Copyright 2021 Jonathan Schultz
+# Copyright 2022 Jonathan Schultz
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,8 +20,6 @@ set -e
 help='Load a file into a PostGIS table. The file may be of any kind supported by ogr2ogr'
 args=(
 # "-short:--long:variable:default:description:flags"
-  "-u:--user:::PostgreSQL username:required"
-  "-d:--database:::PostgreSQL database:required"
   "-t:--table:::Name of table to create, defaults to file name without extension"
   "-g:--geometry::geom:Name of column to hold geometry data"
   "-s:--srid::geom:SRID to re-project geometry"
@@ -48,4 +46,4 @@ if [[ -n "${srid}" ]]; then
     srid="-t_srs EPSG:${srid}"
 fi
 
-ogr2ogr -overwrite -f PostgreSQL "PG:dbname=${database} user=${user}" -lco geometry_name=${geometry} ${srid} -nln "${table}" "${filename}" ${layer}
+ogr2ogr -overwrite -f PostgreSQL "PG:dbname=$PGDATABASE user=$PGUSER" -lco geometry_name=${geometry} ${srid} -nln "${table}" "${filename}" ${layer}

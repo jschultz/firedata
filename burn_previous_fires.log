@@ -1,19 +1,18 @@
 ################################################################################
 # psql
-#    --username "qgis"
-#    "fire"
 #    --command "DROP TABLE IF EXISTS burn_previous_fires"
-#    --command "CREATE TABLE burn_previous_fires AS (
-SELECT 
-  domain.burnid, 
-  domain.location, 
-  domain.geom, 
-  fireseason(history.fih_date1) AS fireseason,
-  ST_Area(ST_Intersection(ST_Union(history.geom),domain.geom)::geography)/10000 AS fire_in_burn_area,
-  ST_Area(ST_Union(history.geom)::geography)/10000 AS fire_area
-FROM 
-  annual_ind_burn_prog_dbca_007 AS domain, dbca_fire_history_dbca_060 AS history 
-WHERE 
-  ST_Intersects(domain.geom, history.geom)
-GROUP BY 
-  domain.burnid, domain.location, domain.geom, fireseason(fih_date1))"
+#    --command "
+CREATE TABLE burn_previous_fires AS (
+    SELECT 
+        domain.burnid, 
+        domain.location, 
+        domain.geom, 
+        fireseason(history.fih_date1) AS fireseason,
+        ST_Area(ST_Intersection(ST_Union(history.geom),domain.geom)::geography)/10000 AS fire_in_burn_area,
+        ST_Area(ST_Union(history.geom)::geography)/10000 AS fire_area
+    FROM 
+        annual_ind_burn_prog_dbca_007 AS domain, dbca_fire_history_dbca_060 AS history 
+    WHERE 
+        ST_Intersects(domain.geom, history.geom)
+    GROUP BY 
+        domain.burnid, domain.location, domain.geom, fireseason(fih_date1))"

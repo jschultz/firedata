@@ -20,8 +20,6 @@ set -e
 help="Run argreplay substituting 'lmu' with each LMU in turn"
 args=(
 # "-short:--long:variable:default:description:flags"
-  "-u:--user:::PostgreSQL username:required"
-  "-d:--database:::PostgreSQL database:required"
   "-p:--parallel:::Use GNU parallel:private,flag"
   "-s:--script:::argreplay script to run:required"
   "-l:--logfile:::Log file to record processing, defaults to 'script'.log:private"
@@ -39,13 +37,13 @@ if [[ "${nologfile}" != "true" ]]; then
 fi
 
 if [[ "${parallel}" == "true" ]]; then
-    psql ${database} ${user} \
+    psql \
       --quiet --tuples-only --no-align \
       --command "\timing off" \
       --command "select distinct description from land_management_unit order by description" |
     parallel -u -q argreplay --substitute lmu:{} -- ${script}
 else
-    psql ${database} ${user} \
+    psql \
       --quiet --tuples-only --no-align \
       --command "\timing off" \
       --command "select distinct description from land_management_unit order by description" |

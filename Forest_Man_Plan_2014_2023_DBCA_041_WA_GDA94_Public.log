@@ -1,21 +1,23 @@
 ################################################################################
 # load_file.sh
 #    --nologfile
-#    --user "qgis"
-#    --database "fire"
 #    --geometry "geom"
 #    --srid "4283"
 #    --table "Forest_Man_Plan_2014_2023_DBCA_041"
 #<   "Forest_Man_Plan_2014_2023_DBCA_041_WA_GDA94_Public.gpkg"
 ################################################################################
-# unzip
-#    "Forest_Man_Plan_2014_2023_DBCA_041_WA_GDA94_Public_Geopackage.2021-08-24.zip"
+#< xargs
+#    --verbose
+#    --replace
+#    unzip
+#    -o
+#    {}
 #    "Forest_Man_Plan_2014_2023_DBCA_041_WA_GDA94_Public.gpkg"
 ################################################################################
-# download-data-wa-gov
+#> download-data-wa-gov
 #    --nologfile
 #    --folder "Environment"
 #    --filename "Forest_Man_Plan_2014_2023_DBCA_041_WA_GDA94_Public_Geopackage.zip"
-#>   --outfile "Forest_Man_Plan_2014_2023_DBCA_041_WA_GDA94_Public_Geopackage.2021-08-24.zip"
+#>   --outfile "Forest_Man_Plan_2014_2023_DBCA_041_WA_GDA94_Public_Geopackage.%Y-%m-%d.zip"
 #    --user "${user}"
 #    --password "${password}"

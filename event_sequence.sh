@@ -21,8 +21,6 @@ help='Creates sequence table for a junction table based on some criterion in the
 args=(
 # "-short:--long:variable:default:description:flags"
   ":--debug:::Debug execution:flag"
-  "-u:--user:::PostgreSQL username:required"
-  "-d:--database:::PostgreSQL database:required"
   "-e:--eventtable:::Name of database table containing event data"
   ":--eventid::id:Id column in event table"
   "-S:--suffix:::Suffix to append to event table name to generate junction table name":"required"
@@ -50,7 +48,7 @@ junction=${eventtable}_${suffix}_junction
 sequencetable=${eventtable}_${suffix}_${sequence}
 
 echo "Creating sequence table ${sequencetable}"
-psql ${database} ${user} \
+psql \
     --quiet \
     --command="DROP TABLE IF EXISTS ${sequencetable}" CASCADE \
     --command="CREATE TABLE ${sequencetable} AS

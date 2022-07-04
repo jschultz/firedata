@@ -20,8 +20,6 @@ set -e
 help='Calculate statistics on mean event intervals'
 args=(
 # "-short:--long:variable:default:description:flags"
-  "-u:--user:::PostgreSQL username:required"
-  "-d:--database:::PostgreSQL database:required"
   "-e:--eventtable:::Name of table containing events:required"
   "-d:--datefield:::Field name of event date in 'eventtable'"
   "-h:--historytable:::Name of table containing unique event history:required"
@@ -43,7 +41,7 @@ if [[ "${nologfile}" != "true" ]]; then
     echo "${COMMENTS}" > ${logfile}
 fi
 
-psql ${database} ${user} \
+psql \
      --command="DROP TABLE IF EXISTS ${table}" \
      --command="CREATE TABLE ${table} AS
                   (SELECT geom, 

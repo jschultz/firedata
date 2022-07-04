@@ -1,8 +1,6 @@
 ################################################################################
 # load_file.sh
 #    --nologfile
-#    --user "qgis"
-#    --database "fire"
 #    --geometry "geom"
 #    --srid "4283"
 #    --table "Cadastre_Polygon_LGATE_217"
@@ -14,14 +12,18 @@
 #    "SELECT load_extension('mod_spatialite');
       UPDATE Cadastre_Polygon_LGATE_217 SET survey_status_date = NULL WHERE survey_status_date = '0000-00-00T00:00:00Z';"
 ################################################################################
-# unzip
-#    "Cadastre_Polygon_LGATE_217_WA_GDA94_Subscription_Geopackage.zip"
+#< xargs
+#    --verbose
+#    --replace
+#    unzip
+#    -o
+#    {}
 #    "Cadastre_Polygon_LGATE_217_WA_GDA94_Subscription.gpkg"
 ################################################################################
-# download-data-wa-gov
+#> download-data-wa-gov
 #    --nologfile
-#    --folder "LGATE_Subscription"
+#    --folder "Environment"
 #    --filename "Cadastre_Polygon_LGATE_217_WA_GDA94_Subscription_Geopackage.zip"
-#    --outfile "Cadastre_Polygon_LGATE_217_WA_GDA94_Subscription_Geopackage.zip"
+#>   --outfile "Cadastre_Polygon_LGATE_217_WA_GDA94_Subscription_Geopackage.%Y-%m-%d.zip"
 #    --user "${user}"
 #    --password "${password}"

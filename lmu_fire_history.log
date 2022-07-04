@@ -1,8 +1,6 @@
 ################################################################################
 # event_history.sh
 #    --nologfile
-#    --user "qgis"
-#    --database "fire"
 #    --eventtable "(SELECT lmu.description, lmu.fmp_geom AS lmu_fmp_geom, fireseason(fih_date1) AS year, fih_cause, history.geom AS history_geom FROM land_management_unit AS lmu, lmu_fire_history_junction, dbca_fire_history_dbca_060 AS history WHERE lmu_fire_history_junction.lmu_extcode = lmu.extcode AND history.id = lmu_fire_history_junction.history_id)"
 #    --eventcolumns "description;year;fih_cause;ST_Area(ST_Intersection(ST_Union(lmu_fmp_geom),ST_Union(history_geom))::geography)/10000;ST_Area(ST_Union(history_geom)::geography)/10000"
 #    --eventaliases "description;year;fih_cause;lmu_area;total_area"
@@ -10,8 +8,6 @@
 #    --table "lmu_fire_history"
 ################################################################################
 # psql
-#    --username "qgis"
-#    "fire"
 #    --command "DROP TABLE IF EXISTS lmu_fire_history_junction"
 #    --command "CREATE TABLE lmu_fire_history_junction AS SELECT extcode AS lmu_extcode, history.id AS history_id FROM dbca_fire_history_dbca_060 AS history, land_management_unit AS lmu WHERE ST_Intersects(history.geom, lmu.fmp_geom)"
 #    --command "CREATE INDEX ON lmu_fire_history_junction (lmu_extcode)"

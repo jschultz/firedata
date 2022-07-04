@@ -1,6 +1,18 @@
 ################################################################################
 # psql
-#    --username "qgis"
-#    "fire"
 #    --command "DROP TABLE IF EXISTS lmu_fire_history_atlas"
-#    --command "CREATE TABLE lmu_fire_history_atlas AS (SELECT DISTINCT land_management_unit.description, year, land_management_unit.full_geom, Round(ST_Area(land_management_unit.full_geom::geography)/10000) AS full_area, Round(ST_Area(land_management_unit.fmp_geom::geography)/10000) AS fmp_area FROM lmu_fire_history, land_management_unit WHERE land_management_unit.description=lmu_fire_history.description ORDER BY land_management_unit.description, year)"
+#    --command "
+CREATE TABLE lmu_fire_history_atlas AS (
+    SELECT DISTINCT 
+        land_management_unit.description, 
+        year, 
+        land_management_unit.full_geom, 
+        Round(ST_Area(land_management_unit.full_geom::geography)/10000) AS full_area,
+        Round(ST_Area(land_management_unit.fmp_geom::geography)/10000) AS fmp_area 
+    FROM 
+        lmu_fire_history, 
+        land_management_unit 
+    WHERE 
+        land_management_unit.description=lmu_fire_history.description 
+    ORDER BY 
+        land_management_unit.description, year)"

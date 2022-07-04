@@ -21,8 +21,6 @@ help='Creates an overlay of non-intersecting polygons from a collection of shape
 args=(
 # "-short:--long:variable:default:description:flags"
   ":--debug:::Debug execution:flag"
-  "-u:--user:::PostgreSQL username:required"
-  "-d:--database:::PostgreSQL database:required"
   "-e:--eventtable:::Name of database table containing event data"
   ":--eventid::id:Id column in event table"
   "-S:--suffix:::Suffix to append to event table name to generate dump, polygon, point-in-polygon and junction table names":"required"
@@ -51,7 +49,7 @@ poly=${eventtable}_${suffix}_poly
 point=${eventtable}_${suffix}_point
 junction=${eventtable}_${suffix}_junction
 
-SRID_COUNT=$(psql ${database} ${user} \
+SRID_COUNT=$(psql \
               --quiet --tuples-only --no-align \
               --command="\timing off" \
               --command "SELECT count(DISTINCT srid) FROM
@@ -60,7 +58,7 @@ if [[ $SRID_COUNT -gt 1 ]]; then
     echo "ERROR: Multiple SRIDs in shape table geometries"
     return 1
 else
-    SRID=$(psql ${database} ${user} \
+    SRID=$(psql \
               --quiet --tuples-only --no-align \
               --command="\timing off" \
               --command "SELECT srid FROM
@@ -76,30 +74,30 @@ echo "Creating dump table ${dump}"
 if [[ ! -n "${where}" ]]; then
     where="TRUE"
 fi
-psql ${database} ${user} \
+psql \
     --command="DROP TABLE IF EXISTS ${dump}" \
     --command="CREATE TABLE ${dump} AS
                   SELECT ${eventid} AS id, (ST_Dump(${geometry})).geom AS ${geometry} FROM ${eventtable} WHERE ${where}"
 
 echo "Creating polygon table ${poly}"
-psql ${database} ${user} \
+psql \
     --quiet \
     --command="\timing off" \
     --command="DROP TABLE IF EXISTS ${poly} CASCADE" \
     --command="CREATE TABLE ${poly} (id SERIAL PRIMARY KEY, ${geometry} geometry(Polygon));"
-psql ${database} ${user} \
+psql \
     --quiet --tuples-only --no-align \
     --command="\timing off" \
     --command="SELECT ST_ExteriorRing((ST_DumpRings(${geometry})).geom) FROM ${dump}" | \
 jtsop.sh -a stdin -b "POLYGON (EMPTY)" -f wkb -explode OverlayNG.union 100000000 | \
 jtsop.sh -a stdin -f wkb -srid ${SRID} -explode Polygonize.polygonize | \
-psql ${database} ${user} \
+psql \
     --quiet \
     --command="\timing off" \
     --command="\copy ${poly} (${geometry}) FROM stdin"
 
 echo "Creating point in polygon table ${point}"
-psql ${database} ${user} \
+psql \
     --quiet \
     --command="DROP TABLE IF EXISTS ${point}" \
     --command="CREATE TABLE ${point} (id INTEGER, point geometry(Point))" \
@@ -108,7 +106,7 @@ psql ${database} ${user} \
                 FROM ${poly}"
 
 echo "Creating junction table ${junction}"
-psql ${database} ${user} \
+psql \
     --quiet \
     --command="DROP TABLE IF EXISTS ${junction}" CASCADE \
     --command="CREATE TABLE ${junction} (poly_id INTEGER, event_id INTEGER)" \
@@ -120,13 +118,13 @@ psql ${database} ${user} \
                 GROUP BY poly.id, dump.id"
 
 echo "Dropping point in polygon table ${point}"
-psql ${database} ${user} \
+psql \
     --quiet \
     --command="DROP TABLE IF EXISTS ${point}"
 
 if [[ "${keepdump}" != "true" ]]; then
     echo "Dropping shape dump table ${dump}"
-    psql ${database} ${user} \
+    psql \
         --quiet \
         --command="DROP TABLE IF EXISTS ${dump}"
 fi

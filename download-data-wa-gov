@@ -20,6 +20,8 @@
 
 from argrecord import ArgumentHelper, ArgumentRecorder
 import requests, json, getpass
+import dateparser, datetime
+import sys
 
 def download_data_wa_gov(arglist=None):
 
@@ -64,16 +66,25 @@ def download_data_wa_gov(arglist=None):
     accessToken=json.loads(tokenResponse.text)["access_token"]
     if tokenResponse.status_code == 200:
         dataDownloadRequestUrl = "https://direct-download.slip.wa.gov.au/datadownload/{0}/{1}".format(args.folder, args.filename)
-        print("Downloading file from URL: " + dataDownloadRequestUrl)
+        print("Downloading file from URL: " + dataDownloadRequestUrl, file=sys.stderr)
         dataDownloadRequestHeaders = { 'Authorization' : 'Bearer ' + accessToken}
         dataDownloadResponse = requests.get(dataDownloadRequestUrl, headers=dataDownloadRequestHeaders)
+        datadatetime = dateparser.parse(dataDownloadResponse.headers['Last-Modified'], )
         if dataDownloadResponse.status_code == 200:
-            with open(args.outfile or args.filename, 'wb') as f:
+            if args.outfile:
+                outfile = datadatetime.strftime(args.outfile)
+            else:
+                outfile = args.filename
+                
+            print("Saving file to: " + outfile, file=sys.stderr)
+            with open(outfile, 'wb') as f:
                 f.write(dataDownloadResponse.content)
+
+            print(outfile)  # So filename can be piped
         else:
-            print("Error download file with error " + str(dataDownloadResponse.status_code) + "-" + dataDownloadResponse.text)
+            print("Error download file with error " + str(dataDownloadResponse.status_code) + "-" + dataDownloadResponse.text, file=sys.stderr)
     else:
-        print("Error getting token: " + str(tokenResponse.status_code) + "-" + tokenResponse.text)
+        print("Error getting token: " + str(tokenResponse.status_code) + "-" + tokenResponse.text, file=sys.stderr)
 
 if __name__ == '__main__':
     download_data_wa_gov(None)

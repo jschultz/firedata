@@ -1,21 +1,23 @@
 ################################################################################
 # load_file.sh
 #    --nologfile
-#    --user "qgis"
-#    --database "fire"
 #    --geometry "geom"
 #    --srid "4283"
 #    --table "DBCA_3_Year_Ind_Burn_Prog_DBCA_009"
 #<   "DBCA_3_Year_Ind_Burn_Prog_DBCA_009_WA_GDA94_Public.gpkg"
 ################################################################################
-# unzip
-#    "DBCA_3_Year_Ind_Burn_Prog_DBCA_009_WA_GDA94_Public_Geopackage.2021-08-20.zip"
+#< xargs
+#    --verbose
+#    --replace
+#    unzip
+#    -o
+#    {}
 #    "DBCA_3_Year_Ind_Burn_Prog_DBCA_009_WA_GDA94_Public.gpkg"
 ################################################################################
-# download-data-wa-gov
+#> download-data-wa-gov
 #    --nologfile
 #    --folder "Environment"
 #    --filename "DBCA_3_Year_Ind_Burn_Prog_DBCA_009_WA_GDA94_Public_Geopackage.zip"
-#>   --outfile "DBCA_3_Year_Ind_Burn_Prog_DBCA_009_WA_GDA94_Public_Geopackage.2021-08-20.zip"
+#>   --outfile "DBCA_3_Year_Ind_Burn_Prog_DBCA_009_WA_GDA94_Public_Geopackage.%Y-%m-%d.zip"
 #    --user "${user}"
 #    --password "${password}"

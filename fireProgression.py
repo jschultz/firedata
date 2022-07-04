@@ -34,8 +34,6 @@ def fireProgression(arglist=None):
 
     parser.add_argument('-v', '--verbosity',  type=int, default=1, private=True)
 
-    parser.add_argument('-u', '--user',       type=str, required=True, help="PostgreSQL username")
-    parser.add_argument('-d', '--database',   type=str, required=True, help="PostgreSQL database")
     parser.add_argument('-t', '--table',      type=str, required=True, help="PostgreSQL table with hotspot datas")
 
     parser.add_argument('-q', '--qgisfile',   type=str, required=True, help='QGIS base file')
@@ -77,7 +75,7 @@ def fireProgression(arglist=None):
     manager = QgsProject.instance().layoutManager()
     layout = manager.layoutByName(args.layout)
 
-    psqlin = subprocess.Popen(['psql', args.database, args.user,
+    psqlin = subprocess.Popen(['psql',
                                '--quiet',
                                '--command', r'\timing off',
                                '--command', r'\copy (SELECT satellite, instrument, acq_date + acq_time AS datetime FROM ' + args.table +

@@ -20,8 +20,6 @@ set -e
 help='Produce a table or file containing the optionally cumulative union of hotspots at times taken froma hotspot table.'
 args=(
 # "-short:--long:variable:default:description:flags"
-  "-u:--user:::PostgreSQL username:required"
-  "-d:--database:::PostgreSQL database:required"
   "-H:--hotspots:::Hotspot table name:required"
   "-t:--table:::Table to generate"
   "-o:--outfile:::Output file to generate; extension specifies format:output"
@@ -66,10 +64,10 @@ QUERY="SELECT datetime,
 
 if [[ -n "${outfile}" ]]; then
     echo "Creating file ${outfile}"
-    ogr2ogr "${outfile}" "PG:dbname=${database} user=${user}" -sql "${QUERY}"
+    ogr2ogr "${outfile}" "PG:dbname=$PGDATABASE user=PGUSER" -sql "${QUERY}"
 else
     echo "Creating table ${table}"
-    psql ${database} ${user} \
+    psql \
         --quiet \
         --command="DROP TABLE IF EXISTS ${table}" \
         --command="CREATE TABLE ${table} AS ${QUERY}"

@@ -21,13 +21,12 @@ help='Produces a list of events that intersect a specified area'
 args=(
 # "-short:--long:variable:default:description:flags"
   ":--debug:::Debug execution:flag"
-  "-u:--user:::PostgreSQL username:required"
-  "-d:--database:::PostgreSQL database:required"
   "-e:--eventtable:::Name of table containing event history:required"
   "-a:--area:::Specification of area of which history will be extracted"
   "-c:--eventcolumns::objectid:Semicolon-separated list of columns to retrieve from event data"
   "-g:--eventgroups:::Semicolon-separated list of columns to group event data"
   ":--eventaliases:::Semicolon-separated list of aliases for columns retrieved from event data; empty value for no alias"
+  "-o:--order:::Comma-separated expression(s) to sort retrieved data"
   "-f:--filter:::Condition applied after query execution"
   "-w:--with:::Common table expression (CTE) for database query"
   "-t:--table:::Database table to generate"
@@ -90,9 +89,8 @@ if [[ -n "${area}" ]]; then
     HISTORY_QUERY+=", area
     WHERE
         ST_Intersects(event.geom, area.geom)
-    GROUP BY
-        area.geom"
-    separator=","
+    GROUP BY"
+    separator=""
 else
     HISTORY_QUERY+="
     GROUP BY"
@@ -104,22 +102,30 @@ if [[ ${#eventgrouparray[@]} -gt 0 ]]; then
         separator=","
     done
 fi
+if [[ -n "${order}" ]]; then
+    HISTORY_QUERY+="
+    ORDER BY ${order}"
+fi
 HISTORY_QUERY+=") AS prefilter_query"
 if [[ -n "${filter}" ]]; then
     HISTORY_QUERY+=" WHERE (${filter})"
 fi
 
-# echo "$HISTORY_QUERY"
+if [[ "${debug}" == "true" ]]; then
+    echo "---------------------------------------------" > /dev/stderr
+    echo "$HISTORY_QUERY"                                > /dev/stderr  
+    echo "---------------------------------------------" > /dev/stderr
+fi
 
 if [[ -n "${shapefile}" ]]; then
     echo "Creating shapefile ${shapefile}"
-     pgsql2shp -f ${shapefile} -u qgis fire "${HISTORY_QUERY}"
+     pgsql2shp -f ${shapefile}  -u $PGUSER $PGDATABASE "${HISTORY_QUERY}"
 #    Work-around for pgsql2shp bug: https://trac.osgeo.org/postgis/ticket/5018
-#    pgsql2shp -f "${shapefile}" -u ${user} ${database} "SELECT * FROM (${HISTORY_QUERY}) AS query"
+#    pgsql2shp -f "${shapefile}" -u $PGUSER $PGDATABASE "SELECT * FROM (${HISTORY_QUERY}) AS query"
     zip --move --junk-paths "${shapefile}".zip "${shapefile}".{cpg,dbf,prj,shp,shx}
 elif [[ -n "${table}" ]]; then
     echo "Creating table ${table}"
-    psql ${database} ${user} \
+    psql \
         --quiet \
         --command="DROP TABLE IF EXISTS \"${table}\"" \
         --command="CREATE TABLE \"${table}\" AS ${HISTORY_QUERY}"
@@ -128,12 +134,12 @@ else
         echo "################################################################################" >> "${logfile}"
     fi
     if [[ -n "${csvfile}" ]]; then
-        psql ${database} ${user} \
+        psql \
             --quiet --csv \
             --command="\timing off" \
             --command="${HISTORY_QUERY}" > "${csvfile}"
     else
-        psql ${database} ${user} \
+        psql \
             --quiet --csv \
             --command="\timing off" \
             --command="${HISTORY_QUERY}"

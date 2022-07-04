@@ -43,6 +43,7 @@ def csv2barGraph(arglist=None):
     parser.add_argument('-t', '--title',      type=str,              help='Title of plot')
     parser.add_argument('-y', '--ylabel',     type=str,              help='Label for Y axis')
     #parser.add_argument('-s', '--subtitle',   type=str,              help='Subtitle of plot')
+    parser.add_argument('-c', '--cumulative',  action='store_true', help='Cumulate Y data')
     
     parser.add_argument('-o', '--outfile',    type=str, help='Output file, otherwise plot on screen.', output=True)
     parser.add_argument('--logfile',          type=str, help="Logfile", private=True)
@@ -89,10 +90,16 @@ def csv2barGraph(arglist=None):
     Ydata = [[] for i in range(len(csvfieldnames) - 1)]
     linecount = 0    
 
+    if args.cumulative:
+        Y = [0] * (len(csvfieldnames) - 1)
+
     for csvline in csvreader:
         #X = datetime(int(csvline[csvfieldnames[0]]), 1, 1)
         X = int(csvline[csvfieldnames[0]])
-        Y = [float(csvline[csvfieldnames[idx]] or 0) for idx in range(1, len(csvfieldnames))]
+        if args.cumulative:
+            Y = [Y[idx-1] + float(csvline[csvfieldnames[idx]] or 0) for idx in range(1, len(csvfieldnames))]
+        else:
+            Y = [float(csvline[csvfieldnames[idx]] or 0) for idx in range(1, len(csvfieldnames))]
         if since and X < since:
             continue
         if until and X > until:

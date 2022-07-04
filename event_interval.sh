@@ -21,8 +21,6 @@ help='Produces a list of events that intersect a specified area'
 args=(
 # "-short:--long:variable:default:description:flags"
   ":--debug:::Debug execution:flag"
-  "-u:--user:::PostgreSQL username:required"
-  "-d:--database:::PostgreSQL database:required"
   "-e:--eventtable:::Name of database table containing event data"
   "-a:--area:::Specification of area over which event rotation will be calculated"
   ":--eventid::id:Id column in event table"
@@ -70,12 +68,12 @@ if [[ -n "${area}" ]]; then
 fi
 
 if [[ -n "${csvfile}" ]]; then
-    psql ${database} ${user} \
+    psql \
         --quiet --csv \
         --command="\timing off" \
         --command="${INTERVAL_QUERY}" > "${csvfile}"
 else
-    psql ${database} ${user} \
+    psql \
         --quiet --csv \
         --command="\timing off" \
         --command="${INTERVAL_QUERY}"
