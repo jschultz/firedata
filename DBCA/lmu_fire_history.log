@@ -1,4 +1,21 @@
 ################################################################################
+##
+## Copyright 2022 Jonathan Schultz
+##
+## This program is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+##
+## This program is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with this program.  If not, see <http://www.gnu.org/licenses/>.
+##
+################################################################################
 # event_history.sh
 #    --nologfile
 #    --eventtable "(SELECT lmu.description, lmu.fmp_geom AS lmu_fmp_geom, fireseason(fih_date1) AS year, fih_cause, history.geom AS history_geom FROM land_management_unit AS lmu, lmu_fire_history_junction, dbca_fire_history_dbca_060 AS history WHERE lmu_fire_history_junction.lmu_extcode = lmu.extcode AND history.id = lmu_fire_history_junction.history_id)"
