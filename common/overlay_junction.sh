@@ -35,7 +35,7 @@ source $(dirname "$0")/argparse.sh
 
 if [[ "${nologfile}" != "true" ]]; then
     if [[ ! -n ${logfile} ]]; then
-        logfile="${eventtable}_${suffix}_${sequence}.log"
+        logfile="${eventtable}_${suffix}.log"
     fi
     echo "${COMMENTS}" > ${logfile}
 fi

@@ -17,6 +17,7 @@
 ##
 ################################################################################
 # overlay_view.sh
+#    --nologfile
 #    --eventtable "dbca_fire_history_dbca_060"
 #    --suffix "lmu"
 #    --polycolumns "geom,id"
@@ -26,6 +27,7 @@
 #    --viewtable "dbca_fire_history_dbca_060_lmu_history"
 ################################################################################
 # overlay_junction.sh
+#    --nologfile
 #    --eventtable "dbca_fire_history_dbca_060"
 #    --suffix "lmu"
 #    --where "ST_Intersects(geom, ST_Transform((select ST_Union(full_geom) from land_management_unit), ST_srid(geom)))"
