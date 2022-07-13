@@ -33,18 +33,19 @@ def csv2barGraph(arglist=None):
     parser.add_argument('-v', '--verbosity',  type=int, default=1, private=True)
     
     parser.add_argument('-b', '--blocks',     type=int, default=1, help='Number of blocks in each bar column')
+    parser.add_argument('-w', '--whitespace', type=int, default=10, help='Percentage of width to leave as white space between columns')
 
     parser.add_argument('-l', '--limit',      type=int, help='Limit number of rows to process')
     parser.add_argument(      '--since',      type=str, help='X axis lower bound')
     parser.add_argument(      '--until',      type=str, help='X axis upper bound')
+    parser.add_argument('-C', '--cumulative',  action='store_true', help='Cumulate Y data')
     
     parser.add_argument('-W', '--width',      type=int, default=400, help='Plot width in millimetres')
     parser.add_argument('-H', '--height',     type=int, default=200,  help='Plot height in millimetres')
     parser.add_argument('-t', '--title',      type=str,              help='Title of plot')
     parser.add_argument('-y', '--ylabel',     type=str,              help='Label for Y axis')
     #parser.add_argument('-s', '--subtitle',   type=str,              help='Subtitle of plot')
-    parser.add_argument('-c', '--cumulative',  action='store_true', help='Cumulate Y data')
-    
+    parser.add_argument('-c', '--colors',     type=str, nargs='+', help='Bar colors')
     parser.add_argument('-o', '--outfile',    type=str, help='Output file, otherwise plot on screen.', output=True)
     parser.add_argument('--logfile',          type=str, help="Logfile", private=True)
     parser.add_argument('--nologfile',        action='store_true', help='Do not output descriptive comments')
@@ -94,7 +95,6 @@ def csv2barGraph(arglist=None):
         Y = [0] * (len(csvfieldnames) - 1)
 
     for csvline in csvreader:
-        #X = datetime(int(csvline[csvfieldnames[0]]), 1, 1)
         X = int(csvline[csvfieldnames[0]])
         if args.cumulative:
             Y = [Y[idx-1] + float(csvline[csvfieldnames[idx]] or 0) for idx in range(1, len(csvfieldnames))]
@@ -129,17 +129,17 @@ def csv2barGraph(arglist=None):
     ax = fig.add_subplot(111)
        
     Ybars = (len(csvfieldnames) - 1 + args.blocks - 1) // args.blocks
-    Ybarwidth = 0.9 / Ybars
+    Ybarwidth = (1 - args.whitespace / 100) / Ybars
     Ybaridx = 0
     Ybarnum = 0
     while Ybaridx < len(csvfieldnames):
         for Yblockidx in range(args.blocks):
             if Ybaridx >= len(csvfieldnames) - 1:
                 break
-            ax.bar(numpy.array(Xdata)+0.45-(Ybarnum+0.5)*Ybarwidth, 
+            ax.bar(numpy.array(Xdata) + Ybarwidth/2 - (Ybarnum+0.5)*Ybarwidth, 
                    Ydata[Ybaridx+Yblockidx], width=Ybarwidth, 
-                   bottom=([sum(Ydata[Ybaridx+Yblockidx-1-Yidx][idx] for Yidx in range(Yblockidx)) for idx in range(len(Xdata))] if Yblockidx > 0 else None)
-#                   bottom=(Ydata[Ybaridx+Yblockidx-1] if Yblockidx > 0 else None))
+                   bottom=([sum(Ydata[Ybaridx+Yblockidx-1-Yidx][idx] for Yidx in range(Yblockidx)) for idx in range(len(Xdata))] if Yblockidx > 0 else None),
+                   color = args.colors[Ybaridx+Yblockidx] if args.colors else None
                    )
         Ybaridx += args.blocks
         Ybarnum += 1

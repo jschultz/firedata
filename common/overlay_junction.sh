@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Copyright 2021 Jonathan Schultz
+# Copyright 2022 Jonathan Schultz
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -55,7 +55,7 @@ SRID_COUNT=$(psql \
               --command "SELECT count(DISTINCT srid) FROM
                             (SELECT ST_SRID(${geometry}) AS srid FROM ${eventtable} ) AS foo" )
 if [[ $SRID_COUNT -gt 1 ]]; then
-    echo "ERROR: Multiple SRIDs in shape table geometries"
+    echo "ERROR: Multiple SRIDs in shape table geometries" > /dev/stderr
     return 1
 else
     SRID=$(psql \
@@ -65,12 +65,12 @@ else
                             (SELECT ST_SRID(${geometry}) AS srid FROM ${eventtable} ) AS foo
                             LIMIT 1" )
     if [[ $SRID -eq 0 ]]; then
-        echo "ERROR: No SRID in shape table geometries"
+        echo "ERROR: No SRID in shape table geometries" > /dev/stderr
         return 1
     fi
 fi
         
-echo "Creating dump table ${dump}"
+echo "Creating dump table ${dump}" > /dev/stderr
 if [[ ! -n "${where}" ]]; then
     where="TRUE"
 fi
@@ -79,7 +79,7 @@ psql \
     --command="CREATE TABLE ${dump} AS
                   SELECT ${eventid} AS id, (ST_Dump(${geometry})).geom AS ${geometry} FROM ${eventtable} WHERE ${where}"
 
-echo "Creating polygon table ${poly}"
+echo "Creating polygon table ${poly}" > /dev/stderr
 psql \
     --quiet \
     --command="\timing off" \
@@ -96,34 +96,32 @@ psql \
     --command="\timing off" \
     --command="\copy ${poly} (${geometry}) FROM stdin"
 
-echo "Creating point in polygon table ${point}"
+echo "Creating point in polygon table ${point}" > /dev/stderr
 psql \
     --quiet \
     --command="DROP TABLE IF EXISTS ${point}" \
-    --command="CREATE TABLE ${point} (id INTEGER, point geometry(Point))" \
-    --command="INSERT INTO ${point}
-                SELECT id, ST_PointOnSurface(${geometry}) AS point
-                FROM ${poly}"
+    --command="CREATE TABLE ${point} AS 
+                   SELECT id, ST_PointOnSurface(${geometry}) AS point
+                   FROM ${poly}"
 
-echo "Creating junction table ${junction}"
+echo "Creating junction table ${junction}" > /dev/stderr
 psql \
     --quiet \
-    --command="DROP TABLE IF EXISTS ${junction}" CASCADE \
-    --command="CREATE TABLE ${junction} (poly_id INTEGER, event_id INTEGER)" \
-    --command="INSERT INTO ${junction}  (poly_id, event_id)
-                SELECT poly.id, dump.id
-                FROM ${dump} dump
-                  JOIN ${point} poly
-                  ON ST_Contains(dump.${geometry}, poly.point)
-                GROUP BY poly.id, dump.id"
+    --command="DROP TABLE IF EXISTS ${junction} CASCADE" \
+    --command="CREATE TABLE ${junction} AS 
+                   SELECT point.id AS poly_id, dump.id AS event_id
+                   FROM ${dump} dump
+                       JOIN ${point} point
+                       ON ST_Contains(dump.${geometry}, point.point)
+                   GROUP BY point.id, dump.id"
 
-echo "Dropping point in polygon table ${point}"
+echo "Dropping point in polygon table ${point}" > /dev/stderr
 psql \
     --quiet \
     --command="DROP TABLE IF EXISTS ${point}"
 
 if [[ "${keepdump}" != "true" ]]; then
-    echo "Dropping shape dump table ${dump}"
+    echo "Dropping shape dump table ${dump}" > /dev/stderr
     psql \
         --quiet \
         --command="DROP TABLE IF EXISTS ${dump}"

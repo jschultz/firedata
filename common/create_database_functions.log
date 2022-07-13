@@ -83,7 +83,7 @@ LANGUAGE plpgsql
 AS
 $$
     BEGIN
-        RETURN (leg_category = 'National Park' OR leg_category = 'Conservation Park' OR leg_category = 'Nature Reserve');
+        RETURN leg_category IN ('National Park', 'Conservation Park', 'Nature Reserve');
     END;
 $$"
 #    --command "

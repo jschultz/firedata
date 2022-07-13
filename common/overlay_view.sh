@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Copyright 2021 Jonathan Schultz
+# Copyright 2022 Jonathan Schultz
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -28,11 +28,15 @@ args=(
   "-j:--junction:::Junction table"
   ":--polycolumns:::Comma-separated list of columns to retrieve from polygon table"
   ":--polyaliases:::Comma-separated list of aliases for columns retrieved from polygon table"
-  "-c:--eventcolumns::objectid:Comma-separated list of columns to retrieve from event data"
+  "-c:--eventcolumns::id:Comma-separated list of columns to retrieve from event data"
   ":--eventaliases:::Comma-separated list of aliases for columns retrieved from burn data; empty value means use column name as alias"
-#   "-n:--number:::Number of links to copy; default is minimum required to hold all links in the junction table"
   "-g:--geometry::geom:Column name for geometry in tables"
   "-w:--where:::WHERE clause for selecting from polygon table"
+  "-a:--append:::Append output to existing table:flag"
+  ":--bytable:::Table to join to query to subdivide outbut"
+  ":--bycondition:::Condition for joining 'bytable'"
+  ":--bycolumn:::Column to subdivide results; this column will appear in output"
+  ":--byalias:::Alias for 'bycolumn' in output"
   "-v:--viewtable:::Table to generate, defaults to \$eventtable + \$suffix + '_view'"
   "-S:--viewfile:::Shapefile to generate:output"
   "-l:--logfile:::Log file to record processing, defaults to \$shapefile with extension replaced by '.log', or \$table.log, or \$eventtable + \$suffix' + '.log' if neither shapefile nor table is defined:private"
@@ -40,6 +44,21 @@ args=(
 )
 
 source $(dirname "$0")/argparse.sh
+
+if [[ -n "${bytable}" ]]; then
+    if [[ ! -n "${bycondition}" || ! -n "${bycolumn}" ]]; then
+        echo "If 'bytable' is specified then 'bycondition' and 'bycolumn' must also be specified" > /dev/stderr
+        return 1
+    fi
+    if [[ ! -n "${byalias}" ]]; then
+        byalias=${bycolumn}
+    fi
+fi
+
+if [[ "${append}" == "true" && -n "${viewfile}" ]]; then
+    echo "'append' option cannot be used when producing a shapefile" > /dev/stderr
+    return 1
+fi
 
 if [[ ! -n "${polygon}" ]]; then
     base=${eventtable}
@@ -103,6 +122,10 @@ for ((colidx=0; colidx<${#eventaliasarray[@]}; colidx++)) do
     VIEW_QUERY+="${separator} agg.${eventaliasarray[colidx]} AS ${eventaliasarray[colidx]}"
     separator=","
 done
+if [[ -n "${bytable}" ]]; then
+    VIEW_QUERY+="${separator} ${bycolumn}"
+    separator=","
+fi
 VIEW_QUERY+=" FROM (SELECT"
 separator=""
 for ((colidx=0; colidx<${#polycolumnarray[@]}; colidx++)) do
@@ -113,9 +136,16 @@ for ((colidx=0; colidx<${#eventcolumnarray[@]}; colidx++)) do
     VIEW_QUERY+="${separator} array_agg(event.${eventcolumnarray[colidx]} ORDER BY fih_date1 DESC, event.${eventid} DESC) AS ${eventaliasarray[colidx]}"
     separator=","
 done
+if [[ -n "${bytable}" ]]; then
+    VIEW_QUERY+="${separator} by.${bycolumn}"
+    separator=","
+fi
 VIEW_QUERY+=" FROM ${junction} AS junction
                JOIN ${polygon} AS poly ON poly.id = junction.poly_id
                JOIN ${eventtable} AS event ON event.${eventid} = event_id"
+if [[ -n "${bytable}" ]]; then
+    VIEW_QUERY+="  JOIN ${bytable} AS by ON ${bycondition}"
+fi
 if [[ -n "${where}" ]]; then
     VIEW_QUERY+=" WHERE ${where}"
 fi
@@ -126,16 +156,34 @@ if [[ ${#polycolumnarray[@]} -gt 0 ]]; then
         VIEW_QUERY+="${separator} poly.${polycolumnarray[colidx]}"
         separator=","
     done
+    if [[ -n "${bytable}" ]]; then
+        VIEW_QUERY+="${separator} by.${bycolumn}"
+        separator=","
+    fi
 fi
 VIEW_QUERY+=") agg"
-# echo $VIEW_QUERY
+
+if [[ "${debug}" == "true" ]]; then
+    echo "---------------------------------------------" > /dev/stderr
+    echo "$VIEW_QUERY"                                > /dev/stderr  
+    echo "---------------------------------------------" > /dev/stderr
+fi
+
 if [[ -n "${viewfile}" ]]; then
     echo "Creating shapefile ${viewfile}"
     pgsql2shp -f ${viewfile} -u $PGUSER $PGDATABASE "${VIEW_QUERY}"
 else
-    echo "Creating table ${viewtable}"
-    psql \
-        --quiet \
-        --command="DROP TABLE IF EXISTS ${viewtable}" \
-        --command="CREATE TABLE ${viewtable} AS ${VIEW_QUERY}"
+    if [[ "${append}" != "true" ]]; then
+        echo "Creating table ${viewtable}"
+        psql \
+            --quiet \
+            --command="DROP TABLE IF EXISTS ${viewtable}" \
+            --command="CREATE TABLE ${viewtable} AS ${VIEW_QUERY}"
+    else
+        echo "Appending to table ${viewtable}"
+        psql \
+            --quiet \
+            --command="CREATE TEMP TABLE ${viewtable}_append AS ${VIEW_QUERY}" \
+            --command="INSERT INTO ${viewtable} SELECT * FROM ${viewtable}_append"
+    fi
 fi

@@ -1,0 +1,44 @@
+################################################################################
+##
+## Copyright 2022 Jonathan Schultz
+##
+## This program is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+##
+## This program is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with this program.  If not, see <http://www.gnu.org/licenses/>.
+##
+################################################################################
+# overlay_view.sh
+#    --nologfile
+#    --eventtable "dbca_fire_history_dbca_060"
+#    --suffix "lmu"
+#    --polycolumns "geom,id"
+#    --polyaliases "geom,poly_id"
+#    --eventcolumns "id"
+#    --append
+#    --bytable "(SELECT ST_Union(geom) AS geom, NULL as leg_category FROM legislated_lands_and_waters_dbca_011)"
+#    --bycolumn "leg_category"
+#    --bycondition "NOT ST_Intersects(poly.geom, by.geom)"
+#    --where "ST_Area(poly.geom::geography) > 1000"
+#    --viewtable "dbca_fire_history_dbca_060_lmu_history_by_leg_category"
+################################################################################
+# overlay_view.sh
+#    --nologfile
+#    --eventtable "dbca_fire_history_dbca_060"
+#    --suffix "lmu"
+#    --polycolumns "geom,id"
+#    --polyaliases "geom,poly_id"
+#    --eventcolumns "id"
+#    --bytable "legislated_lands_and_waters_dbca_011"
+#    --bycolumn "leg_category"
+#    --bycondition "ST_Intersects(poly.geom, by.geom)"
+#    --where "ST_Area(poly.geom::geography) > 1000"
+#    --viewtable "dbca_fire_history_dbca_060_lmu_history_by_leg_category"

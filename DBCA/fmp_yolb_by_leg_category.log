@@ -22,11 +22,16 @@
 #    --width 400
 #    --height 200
 #    --blocks 2
+#    --whitespace 20
+#    --colors #00af00
+#             #00ff00
+#             #00007f
+#             #0000ff
 #    --cumulative
 #    --title "Year of last burn by legislated tenure category over 2014-23 FMP"
 #    --ylabel "Percentage of legislated tenure category"
 #>   --outfile "FMP YOLB/FMP YOLB by leg category cumulative.pdf"
-#<   fmp_yolb_by_let_category.csv
+#<   fmp_yolb_by_leg_category.csv
 ################################################################################
 # event_history.sh
 #    --nologfile
@@ -35,5 +40,6 @@
 #    --area "(SELECT ST_Union(geom) FROM forest_man_plan_2014_2023_dbca_041)"
 #    --eventcolumns "year;ST_Area(ST_Intersection(ST_Union(event.geom) FILTER(WHERE fih_cause = 0), (SELECT geom FROM conservation_estate)))/ST_Area((SELECT geom FROM conservation_estate))*100; ST_Area(ST_Intersection(ST_Union(event.geom) FILTER(WHERE fih_cause <> 0), (SELECT geom FROM conservation_estate)))/ST_Area((SELECT geom FROM conservation_estate))*100;ST_Area(ST_Intersection(ST_Union(event.geom) FILTER(WHERE fih_cause = 0), (SELECT geom FROM non_conservation)))/ST_Area((SELECT geom FROM non_conservation))*100;ST_Area(ST_Intersection(ST_Union(event.geom) FILTER(WHERE fih_cause <> 0), (SELECT geom FROM non_conservation)))/ST_Area((SELECT geom FROM non_conservation))*100"
 #    --eventgroups year
+#    --order "0-year"
 #    --eventaliases "Year ending June;Conservation estate prescribed burn;Conservation estate other fire;Non-conservation estate prescribed burn;Non-conservation estate other fire"
-#>   --csvfile fmp_yolb_by_let_category.csv
+#>   --csvfile fmp_yolb_by_leg_category.csv
