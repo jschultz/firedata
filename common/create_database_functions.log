@@ -83,7 +83,7 @@ LANGUAGE plpgsql
 AS
 $$
     BEGIN
-        RETURN leg_category IN ('National Park', 'Conservation Park', 'Nature Reserve');
+        RETURN leg_category IS NOT NULL AND leg_category IN ('National Park', 'Conservation Park', 'Nature Reserve');
     END;
 $$"
 #    --command "

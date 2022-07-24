@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# Copyright 2021 Jonathan Schultz
+# Copyright 2022 Jonathan Schultz
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -46,6 +46,8 @@ def csv2barGraph(arglist=None):
     parser.add_argument('-y', '--ylabel',     type=str,              help='Label for Y axis')
     #parser.add_argument('-s', '--subtitle',   type=str,              help='Subtitle of plot')
     parser.add_argument('-c', '--colors',     type=str, nargs='+', help='Bar colors')
+    parser.add_argument('-e', '--exec',       type=str, help='Arbitrary Python code to execute before rendering the graph')
+    
     parser.add_argument('-o', '--outfile',    type=str, help='Output file, otherwise plot on screen.', output=True)
     parser.add_argument('--logfile',          type=str, help="Logfile", private=True)
     parser.add_argument('--nologfile',        action='store_true', help='Do not output descriptive comments')
@@ -136,14 +138,15 @@ def csv2barGraph(arglist=None):
         for Yblockidx in range(args.blocks):
             if Ybaridx >= len(csvfieldnames) - 1:
                 break
-            ax.bar(numpy.array(Xdata) + Ybarwidth/2 - (Ybarnum+0.5)*Ybarwidth, 
+            ax.bar(numpy.array(Xdata) - Ybarwidth/2 + Ybarnum * Ybarwidth, 
                    Ydata[Ybaridx+Yblockidx], width=Ybarwidth, 
                    bottom=([sum(Ydata[Ybaridx+Yblockidx-1-Yidx][idx] for Yidx in range(Yblockidx)) for idx in range(len(Xdata))] if Yblockidx > 0 else None),
-                   color = args.colors[Ybaridx+Yblockidx] if args.colors else None
+                   color = args.colors[Ybaridx+Yblockidx] if args.colors else None,
+                   align='center'
                    )
         Ybaridx += args.blocks
         Ybarnum += 1
-  
+        
     ax.set_xlabel(csvfieldnames[0], **labelfont)
     if args.ylabel:
         ax.set_ylabel(args.ylabel, **labelfont)
@@ -151,15 +154,19 @@ def csv2barGraph(arglist=None):
         ax.set_ylabel(csvfieldnames[1], **labelfont)
     if args.title:
         ax.set_title(args.title, **titlefont)
-    ax.xaxis.set_minor_locator(ticker.AutoMinorLocator(10))
     ax.xaxis.set_major_locator(ticker.AutoLocator())
-    ax.set_xlim([int(args.since) if args.since else None,
+    # I just want a tick at each interval value. 9999 is just a big number.
+    ax.xaxis.set_minor_locator(ticker.MaxNLocator(9999,integer=True))
+    ax.set_xlim([int(args.since)-0.5 if args.since else None,
                  int(args.until)+0.5 if args.until else None])
-    pyplot.gca().invert_xaxis()
+    #pyplot.gca().invert_xaxis()
     pyplot.grid(axis='y', color='black')
     if args.blocks > 1 or Ybars > 1:
         ax.legend(csvfieldnames[1:], prop=legendfont, framealpha=1)
     
+    if args.exec:
+        exec(args.exec)
+
     if args.outfile:
         pyplot.savefig(args.outfile, transparent=True)
     else:

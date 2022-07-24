@@ -20,9 +20,10 @@
 #    --nologfile
 #    --eventtable "dbca_fire_history_dbca_060"
 #    --suffix "lmu"
-#    --polycolumns "geom,id"
-#    --polyaliases "geom,poly_id"
-#    --eventcolumns "id"
+#    --polycolumns "poly.geom;poly.id"
+#    --polyaliases "geom;poly_id"
+#    --eventcolumns "event.id"
+#    --eventaliases "id"
 #    --where "ST_Area(poly.geom::geography) > 1000"
 #    --viewtable "dbca_fire_history_dbca_060_lmu_history"
 ################################################################################
@@ -30,4 +31,4 @@
 #    --nologfile
 #    --eventtable "dbca_fire_history_dbca_060"
 #    --suffix "lmu"
-#    --where "ST_Intersects(geom, ST_Transform((select ST_Union(full_geom) from land_management_unit), ST_srid(geom)))"
+#    --where "ST_Intersects(geom, ST_Union((select ST_Union(full_geom) from land_management_unit), (select ST_Union(geom) FROM forest_man_plan_2014_2023_dbca_041)))"

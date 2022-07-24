@@ -26,14 +26,16 @@ args=(
   "-s:--suffix:::Suffix to append to event table name to generate other table names:required"
   "-p:--polygon:::Polygon table"
   "-j:--junction:::Junction table"
-  ":--polycolumns:::Comma-separated list of columns to retrieve from polygon table"
-  ":--polyaliases:::Comma-separated list of aliases for columns retrieved from polygon table"
-  "-c:--eventcolumns::id:Comma-separated list of columns to retrieve from event data"
-  ":--eventaliases:::Comma-separated list of aliases for columns retrieved from burn data; empty value means use column name as alias"
+  ":--polycolumns:::Semicolon-separated list of columns to retrieve from polygon table"
+  ":--polyaliases:::Semicolon-separated list of aliases for columns retrieved from polygon table"
+  ":--polygroup:::Semicolon-separated list of items to group by; default is 'polycolumns'"
+  "-c:--eventcolumns::id:Semicolon-separated list of columns to retrieve from event data"
+  ":--eventaliases:::Semicolon-separated list of aliases for columns retrieved from burn data; empty value means use column name as alias"
   "-g:--geometry::geom:Column name for geometry in tables"
   "-w:--where:::WHERE clause for selecting from polygon table"
   "-a:--append:::Append output to existing table:flag"
   ":--bytable:::Table to join to query to subdivide outbut"
+  ":--byquery:::Secondary query to join to query to subdivide outbut"
   ":--bycondition:::Condition for joining 'bytable'"
   ":--bycolumn:::Column to subdivide results; this column will appear in output"
   ":--byalias:::Alias for 'bycolumn' in output"
@@ -53,6 +55,14 @@ if [[ -n "${bytable}" ]]; then
     if [[ ! -n "${byalias}" ]]; then
         byalias=${bycolumn}
     fi
+    if [[ -n "${byquery}" ]]; then
+        echo "Only one of 'byquery' and 'bytable' may be specified" > /dev/stderr
+        return 1
+    fi
+fi
+
+if [[ -n "${byquery}" ]]; then
+    bytable=by
 fi
 
 if [[ "${append}" == "true" && -n "${viewfile}" ]]; then
@@ -96,16 +106,21 @@ if [[ "${debug}" == "true" ]]; then
     set -x
 fi
 
-IFS=',' read -r -a polycolumnarray <<< "${polycolumns}"
-IFS=',' read -r -a polyaliasarray <<< "${polyaliases}"
+IFS=';' read -r -a polycolumnarray <<< "${polycolumns}"
+IFS=';' read -r -a polyaliasarray <<< "${polyaliases}"
 for ((colidx=0; colidx<${#polycolumnarray[@]}; colidx++)) do
     if [[ ! -n "${polyaliasarray[colidx]}" ]]; then
         polyaliasarray[colidx]="${polycolumnarray[colidx]}"
     fi
 done
 
-IFS=',' read -r -a eventcolumnarray <<< "${eventcolumns}"
-IFS=',' read -r -a eventaliasarray <<< "${eventaliases}"
+if [[ ! -n "${polygroup}" ]]; then
+    polygroup=${polycolumns}
+fi
+IFS=';' read -r -a polygrouparray <<< "${polygroup}"
+
+IFS=';' read -r -a eventcolumnarray <<< "${eventcolumns}"
+IFS=';' read -r -a eventaliasarray <<< "${eventaliases}"
 for ((colidx=0; colidx<${#eventcolumnarray[@]}; colidx++)) do
     if [[ ! -n "${eventaliasarray[colidx]}" ]]; then
         eventaliasarray[colidx]="${eventcolumnarray[colidx]}"
@@ -129,11 +144,11 @@ fi
 VIEW_QUERY+=" FROM (SELECT"
 separator=""
 for ((colidx=0; colidx<${#polycolumnarray[@]}; colidx++)) do
-    VIEW_QUERY+="${separator} poly.${polycolumnarray[colidx]} AS ${polyaliasarray[colidx]}"
+    VIEW_QUERY+="${separator} ${polycolumnarray[colidx]} AS ${polyaliasarray[colidx]}"
     separator=","
 done
 for ((colidx=0; colidx<${#eventcolumnarray[@]}; colidx++)) do
-    VIEW_QUERY+="${separator} array_agg(event.${eventcolumnarray[colidx]} ORDER BY fih_date1 DESC, event.${eventid} DESC) AS ${eventaliasarray[colidx]}"
+    VIEW_QUERY+="${separator} array_agg(${eventcolumnarray[colidx]} ORDER BY fih_date1 DESC, event.${eventid} DESC) AS ${eventaliasarray[colidx]}"
     separator=","
 done
 if [[ -n "${bytable}" ]]; then
@@ -152,8 +167,8 @@ fi
 if [[ ${#polycolumnarray[@]} -gt 0 ]]; then
     VIEW_QUERY+=" GROUP BY"
     separator=""
-    for ((colidx=0; colidx<${#polycolumnarray[@]}; colidx++)) do
-        VIEW_QUERY+="${separator} poly.${polycolumnarray[colidx]}"
+    for ((colidx=0; colidx<${#polygrouparray[@]}; colidx++)) do
+        VIEW_QUERY+="${separator} ${polygrouparray[colidx]}"
         separator=","
     done
     if [[ -n "${bytable}" ]]; then
@@ -165,7 +180,7 @@ VIEW_QUERY+=") agg"
 
 if [[ "${debug}" == "true" ]]; then
     echo "---------------------------------------------" > /dev/stderr
-    echo "$VIEW_QUERY"                                > /dev/stderr  
+    echo "$VIEW_QUERY"                                   > /dev/stderr  
     echo "---------------------------------------------" > /dev/stderr
 fi
 
@@ -173,16 +188,21 @@ if [[ -n "${viewfile}" ]]; then
     echo "Creating shapefile ${viewfile}"
     pgsql2shp -f ${viewfile} -u $PGUSER $PGDATABASE "${VIEW_QUERY}"
 else
+    if [[ -n "${byquery}" ]]; then
+        bycommand="CREATE TEMP TABLE ${bytable} AS ${byquery}"
+    fi
     if [[ "${append}" != "true" ]]; then
         echo "Creating table ${viewtable}"
         psql \
             --quiet \
+            --command="${bycommand}" \
             --command="DROP TABLE IF EXISTS ${viewtable}" \
             --command="CREATE TABLE ${viewtable} AS ${VIEW_QUERY}"
     else
         echo "Appending to table ${viewtable}"
         psql \
             --quiet \
+            --command="${bycommand}" \
             --command="CREATE TEMP TABLE ${viewtable}_append AS ${VIEW_QUERY}" \
             --command="INSERT INTO ${viewtable} SELECT * FROM ${viewtable}_append"
     fi

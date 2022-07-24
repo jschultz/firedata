@@ -20,23 +20,28 @@
 #    --nologfile
 #    --eventtable "dbca_fire_history_dbca_060"
 #    --suffix "lmu"
-#    --polycolumns "geom,id"
-#    --polyaliases "geom,poly_id"
-#    --eventcolumns "id"
-#    --append
-#    --bytable "(SELECT ST_Union(geom) AS geom, NULL as leg_category FROM legislated_lands_and_waters_dbca_011)"
+#    --polycolumns "ST_Difference(poly.geom, by.geom);ST_Area(ST_Difference(poly.geom, by.geom)::geography)/10000;poly.id"
+#    --polyaliases "geom;area;poly_id"
+#    --polygroup "poly.geom,poly.id,by.geom"
+#    --eventcolumns "event.id"
+#    --eventaliases "id"
+## Optimise query by filtering legislated_lands_and_waters_dbca_011
+#    --byquery "SELECT ST_Union(geom) AS geom, NULL AS leg_category FROM legislated_lands_and_waters_dbca_011 WHERE ST_Intersects(geom, (SELECT ST_Union(geom) FROM dbca_fire_history_dbca_060_lmu_poly))"
 #    --bycolumn "leg_category"
-#    --bycondition "NOT ST_Intersects(poly.geom, by.geom)"
+#    --bycondition "NOT ST_Contains(by.geom, poly.geom)"
 #    --where "ST_Area(poly.geom::geography) > 1000"
+#    --append
 #    --viewtable "dbca_fire_history_dbca_060_lmu_history_by_leg_category"
 ################################################################################
 # overlay_view.sh
 #    --nologfile
 #    --eventtable "dbca_fire_history_dbca_060"
 #    --suffix "lmu"
-#    --polycolumns "geom,id"
-#    --polyaliases "geom,poly_id"
-#    --eventcolumns "id"
+#    --polycolumns "ST_Intersection(poly.geom, by.geom);ST_Area(ST_Intersection(poly.geom, by.geom)::geography)/10000;poly.id"
+#    --polyaliases "geom;area;poly_id"
+#    --polygroup "poly.geom,poly.id,by.geom"
+#    --eventcolumns "event.id"
+#    --eventaliases "id"
 #    --bytable "legislated_lands_and_waters_dbca_011"
 #    --bycolumn "leg_category"
 #    --bycondition "ST_Intersects(poly.geom, by.geom)"

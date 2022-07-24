@@ -56,9 +56,9 @@ if [[ "${debug}" == "true" ]]; then
     set -x
 fi
 
-IFS=';' read -r -a eventcolumnarray <<< "${eventcolumns}"
-IFS=';' read -r -a eventaliasarray <<< "${eventaliases}"
-IFS=';' read -r -a eventgrouparray <<< "${eventgroups}"
+IFS=';' read -r -a eventcolumnarray <<< "${eventcolumns//[$'\r\n']}"
+IFS=';' read -r -a eventaliasarray <<< "${eventaliases//[$'\r\n']}"
+IFS=';' read -r -a eventgrouparray <<< "${eventgroups//[$'\r\n']}"
 
 HISTORY_QUERY=""
 

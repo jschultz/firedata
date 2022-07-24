@@ -22,11 +22,12 @@ args=(
 # "-short:--long:variable:default:description:flags"
   "-p:--parallel:::Use GNU parallel:private,flag"
   "-s:--script:::argreplay script to run:required"
+  "-S:--substitute:::Substitutions to add to script invocation:"
   "-l:--logfile:::Log file to record processing, defaults to 'script'.log:private"
   ":--nologfile:::Don't write a log file:private,flag"
 )
 
-source $(dirname "$0")/argparse.sh
+source $(dirname "$0")/../common/argparse.sh
 
 if [[ "${nologfile}" != "true" ]]; then
     if [[ ! -n "${logfile}" ]]; then
@@ -41,11 +42,11 @@ if [[ "${parallel}" == "true" ]]; then
       --quiet --tuples-only --no-align \
       --command "\timing off" \
       --command "select distinct description from land_management_unit order by description" |
-    parallel -u -q argreplay --substitute lmu:{} -- ${script}
+    parallel -u -q argreplay --substitute lmu:{} ${substitute} -- ${script}
 else
     psql \
       --quiet --tuples-only --no-align \
       --command "\timing off" \
       --command "select distinct description from land_management_unit order by description" |
-    while read -r lmu; do argreplay --substitute lmu:"${lmu}" -- ${script}; done
+    while read -r lmu; do argreplay --substitute lmu:"${lmu}" ${substitute} -- ${script}; done
 fi
