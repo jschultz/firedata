@@ -1,0 +1,36 @@
+################################################################################
+##
+## Copyright 2022 Jonathan Schultz
+##
+## This program is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+##
+## This program is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with this program.  If not, see <http://www.gnu.org/licenses/>.
+##
+################################################################################
+# exportQgisLayout.py
+#    --nologfile
+#    --layout "Layout 1"
+#    --simplify
+#    --outfile "FMP YSLB/FMP YSLB map by leg category.pdf"
+#     "/home/jschultz/src/firedata/DBCA/fmp_yolb_map_by_leg_category.qgs"
+################################################################################
+# psql
+#    --command "DROP TABLE IF EXISTS YOLB_by_leg_category"
+#    --command "
+CREATE TABLE YOLB_by_leg_category AS (
+    SELECT 
+        history.geom AS geom, 
+        fireseason(fih_date1) AS year, 
+        conservation_estate(leg_category) FROM dbca_fire_history_dbca_060_lmu_history_by_leg_category AS history 
+      JOIN dbca_fire_history_dbca_060 AS event 
+      ON event.id = history.id[1] 
+      GROUP BY history.geom, fireseason(fih_date1), conservation_estate(leg_category));"
