@@ -18,13 +18,12 @@
 ################################################################################
 # psql
 #    --command "DROP TABLE IF EXISTS land_management_unit"
-#    --command "CREATE TABLE land_management_unit AS (SELECT extcode, description, ST_Multi(ST_Union(geom)) AS full_geom, ST_Multi(ST_Intersection(ST_Union(geom), (SELECT ST_Union(geom) FROM forest_man_plan_2014_2023_dbca_041_wa_gda94_public))) AS fmp_geom FROM land_management_unit_raw GROUP BY extcode, description)"
+#    --command "CREATE TABLE land_management_unit AS (SELECT extcode, description, ST_Multi(ST_Union(geom)) AS full_geom, ST_Multi(ST_Intersection(ST_Union(geom), (SELECT ST_Union(geom) FROM forest_man_plan_2014_2023_dbca_041))) AS fmp_geom FROM land_management_unit_raw GROUP BY extcode, description)"
 #    --command "CREATE UNIQUE INDEX ON land_management_unit (extcode)"
 #    --command "CREATE UNIQUE INDEX ON land_management_unit (description)"
 #    --command "DROP TABLE land_management_unit_raw"
 ################################################################################
 # load_file.sh
-#    --database "fire"
 #    --table "land_management_unit_raw"
 #    --geometry "geom"
 #    --srid "4283"

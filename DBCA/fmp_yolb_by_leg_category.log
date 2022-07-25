@@ -31,8 +31,9 @@
 #             #0000af
 #             #0000cf
 #    --cumulative
-#    --title "Years since last burnt by legislated tenure category over 2014-23 FMP Area"
-#    --ylabel "Percentage of legislated tenure category"
+#    --title "Cumulative burns by legislated tenure category and fire type over 2014-23 FMP Area"
+#    --ylabel "Percentage of legislated tenure category burned"
+#    --xlabel "Years"
 #    --exec "
 ticks, labels = pyplot.yticks()
 ticks = ticks.tolist()

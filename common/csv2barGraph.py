@@ -44,6 +44,7 @@ def csv2barGraph(arglist=None):
     parser.add_argument('-H', '--height',     type=int, default=200,  help='Plot height in millimetres')
     parser.add_argument('-t', '--title',      type=str,              help='Title of plot')
     parser.add_argument('-y', '--ylabel',     type=str,              help='Label for Y axis')
+    parser.add_argument('-x', '--xlabel',     type=str,              help='Label for Y axis')
     #parser.add_argument('-s', '--subtitle',   type=str,              help='Subtitle of plot')
     parser.add_argument('-c', '--colors',     type=str, nargs='+', help='Bar colors')
     parser.add_argument('-e', '--exec',       type=str, help='Arbitrary Python code to execute before rendering the graph')
@@ -138,7 +139,7 @@ def csv2barGraph(arglist=None):
         for Yblockidx in range(args.blocks):
             if Ybaridx >= len(csvfieldnames) - 1:
                 break
-            ax.bar(numpy.array(Xdata) - Ybarwidth/2 + Ybarnum * Ybarwidth, 
+            ax.bar(numpy.array(Xdata) - (Ybars - 1) / 2 * Ybarwidth + Ybarnum * Ybarwidth, 
                    Ydata[Ybaridx+Yblockidx], width=Ybarwidth, 
                    bottom=([sum(Ydata[Ybaridx+Yblockidx-1-Yidx][idx] for Yidx in range(Yblockidx)) for idx in range(len(Xdata))] if Yblockidx > 0 else None),
                    color = args.colors[Ybaridx+Yblockidx] if args.colors else None,
@@ -150,6 +151,8 @@ def csv2barGraph(arglist=None):
     ax.set_xlabel(csvfieldnames[0], **labelfont)
     if args.ylabel:
         ax.set_ylabel(args.ylabel, **labelfont)
+    if args.xlabel:
+        ax.set_xlabel(args.xlabel, **labelfont)
     elif args.blocks == 1:
         ax.set_ylabel(csvfieldnames[1], **labelfont)
     if args.title:
