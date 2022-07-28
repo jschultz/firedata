@@ -24,6 +24,7 @@
 #    --command "DROP TABLE land_management_unit_raw"
 ################################################################################
 # load_file.sh
+#    --nologfile
 #    --table "land_management_unit_raw"
 #    --geometry "geom"
 #    --srid "4283"

@@ -69,9 +69,10 @@ def download_data_wa_gov(arglist=None):
         print("Downloading file from URL: " + dataDownloadRequestUrl, file=sys.stderr)
         dataDownloadRequestHeaders = { 'Authorization' : 'Bearer ' + accessToken}
         dataDownloadResponse = requests.get(dataDownloadRequestUrl, headers=dataDownloadRequestHeaders)
-        datadatetime = dateparser.parse(dataDownloadResponse.headers['Last-Modified'], )
+        datadatetimestr = dataDownloadResponse.headers.get('Last-Modified', None)
+        datadatetime = dateparser.parse(datadatetimestr) if datadatetimestr else None
         if dataDownloadResponse.status_code == 200:
-            if args.outfile:
+            if datadatetime and args.outfile:
                 outfile = datadatetime.strftime(args.outfile)
             else:
                 outfile = args.filename

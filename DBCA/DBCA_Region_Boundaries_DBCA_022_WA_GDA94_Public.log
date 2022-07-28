@@ -33,7 +33,7 @@
 ################################################################################
 #> download-data-wa-gov
 #    --nologfile
-#    --folder "Environment"
+#    --folder "Boundaries"
 #    --filename "DBCA_Region_Boundaries_DBCA_022_WA_GDA94_Public_Geopackage.zip"
 #>   --outfile "DBCA_Region_Boundaries_DBCA_022_WA_GDA94_Public_Geopackage.%Y-%m-%d.zip"
 #    --user "${user}"

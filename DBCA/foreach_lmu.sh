@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Copyright 2021 Jonathan Schultz
+# Copyright 2022 Jonathan Schultz
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -21,10 +21,10 @@ help="Run argreplay substituting 'lmu' with each LMU in turn"
 args=(
 # "-short:--long:variable:default:description:flags"
   "-p:--parallel:::Use GNU parallel:private,flag"
-  "-s:--script:::argreplay script to run:required"
   "-S:--substitute:::Substitutions to add to script invocation:"
   "-l:--logfile:::Log file to record processing, defaults to 'script'.log:private"
   ":--nologfile:::Don't write a log file:private,flag"
+  ":script:::argreplay script to run:required"
 )
 
 source $(dirname "$0")/../common/argparse.sh

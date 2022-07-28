@@ -1,0 +1,15 @@
+################################################################################
+# psql
+#    --command "
+DELETE
+  FROM WWA_FERA_Corporate
+  WHERE ST_NumPoints(geom) = 2"
+################################################################################
+# load_file.sh
+#    --nologfile
+#    --table "WWA_FERA_Corporate"
+#    --geometry "geom"
+#    --srid "4283"
+#    --layer "Layers_WWA_FERA_Corporate"
+#<   "WWA_FERA_2020_MapA3.pdf"
+

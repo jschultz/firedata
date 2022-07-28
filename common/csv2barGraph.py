@@ -45,7 +45,7 @@ def csv2barGraph(arglist=None):
     parser.add_argument('-t', '--title',      type=str,              help='Title of plot')
     parser.add_argument('-y', '--ylabel',     type=str,              help='Label for Y axis')
     parser.add_argument('-x', '--xlabel',     type=str,              help='Label for Y axis')
-    #parser.add_argument('-s', '--subtitle',   type=str,              help='Subtitle of plot')
+    parser.add_argument('-s', '--subtitle',   type=str,              help='Subtitle of plot')
     parser.add_argument('-c', '--colors',     type=str, nargs='+', help='Bar colors')
     parser.add_argument('-e', '--exec',       type=str, help='Arbitrary Python code to execute before rendering the graph')
     
@@ -99,14 +99,15 @@ def csv2barGraph(arglist=None):
 
     for csvline in csvreader:
         X = int(csvline[csvfieldnames[0]])
+        if since and X < since:
+            continue
+        if until and X > until:
+            break
+
         if args.cumulative:
             Y = [Y[idx-1] + float(csvline[csvfieldnames[idx]] or 0) for idx in range(1, len(csvfieldnames))]
         else:
             Y = [float(csvline[csvfieldnames[idx]] or 0) for idx in range(1, len(csvfieldnames))]
-        if since and X < since:
-            continue
-        if until and X > until:
-            continue
           
         if not start or X < start:
             start = X
@@ -122,12 +123,15 @@ def csv2barGraph(arglist=None):
 
     pyplot.style.use('tableau-colorblind10')
     
-    fig = pyplot.figure()
-    fig.set_size_inches(args.width / 25.4, args.height / 25.4)
-
-    titlefont = {'fontname':'Linux Biolinum G', 'weight':'bold'}
+    titlefont = {'fontname':'Linux Biolinum G', 'weight':'bold', 'size':32}
+    subtitlefont = {'fontname':'Linux Biolinum G', 'weight':'normal'}
     labelfont = {'fontname':'Linux Biolinum G', 'weight':'normal'}
     legendfont = {'family':'Linux Biolinum G', 'weight':'normal'}
+
+    fig = pyplot.figure()
+    fig.set_size_inches(args.width / 25.4, args.height / 25.4)
+    if args.title:
+        fig.suptitle(args.title, **titlefont)
 
     ax = fig.add_subplot(111)
        
@@ -149,14 +153,14 @@ def csv2barGraph(arglist=None):
         Ybarnum += 1
         
     ax.set_xlabel(csvfieldnames[0], **labelfont)
+    if args.subtitle:
+        ax.set_title(args.subtitle, **subtitlefont)
     if args.ylabel:
         ax.set_ylabel(args.ylabel, **labelfont)
     if args.xlabel:
         ax.set_xlabel(args.xlabel, **labelfont)
     elif args.blocks == 1:
         ax.set_ylabel(csvfieldnames[1], **labelfont)
-    if args.title:
-        ax.set_title(args.title, **titlefont)
     ax.xaxis.set_major_locator(ticker.AutoLocator())
     # I just want a tick at each interval value. 9999 is just a big number.
     ax.xaxis.set_minor_locator(ticker.MaxNLocator(9999,integer=True))

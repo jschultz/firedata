@@ -132,3 +132,17 @@ $$
         RETURN average;
     END;
 $$"
+#    --command "
+CREATE OR REPLACE FUNCTION modified_timestamp(tablename text)
+RETURNS timestamp
+LANGUAGE plpgsql
+AS
+$$
+    DECLARE
+        result timestamp ;
+    BEGIN
+        EXECUTE format('SELECT pg_xact_commit_timestamp(t.xmin) AS modified_ts FROM %s AS t ORDER  BY modified_ts DESC NULLS LAST LIMIT  1', tablename)
+        INTO result;
+        RETURN result;
+    END;
+$$"

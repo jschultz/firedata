@@ -27,7 +27,8 @@
 #             #00af00
 #             #00cf00
 #    --cumulative
-#    --title "Cumulative burns by fire type: ${lmu}"
+#    --title "Cumulative area burned by fire type: ${lmu}"
+#    --subtitle "Reference date: 1 July ${baseyear}"
 #    --ylabel "Percentage of LMU burned"
 #    --xlabel "Years"
 #    --exec "
