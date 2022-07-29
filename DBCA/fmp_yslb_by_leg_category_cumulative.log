@@ -33,7 +33,7 @@
 #    --cumulative
 #    --title "Cumulative area burned by tenure category and fire type: 2014-23 FMP Area"
 #    --subtitle "Reference date: 1 July ${baseyear}"
-#    --ylabel "Percentage of legislated tenure category burned"
+#    --ylabel "Percentage of legislated tenure category"
 #    --xlabel "Years"
 #    --exec "
 ticks, labels = pyplot.yticks()

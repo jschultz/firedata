@@ -43,6 +43,7 @@ args=(
   "-S:--viewfile:::Shapefile to generate:output"
   "-l:--logfile:::Log file to record processing, defaults to \$shapefile with extension replaced by '.log', or \$table.log, or \$eventtable + \$suffix' + '.log' if neither shapefile nor table is defined:private"
   ":--nologfile:::Don't write a log file:private,flag"
+  ":--nobackup:::Don't back up existing database table:private,flag"
 )
 
 source $(dirname "$0")/argparse.sh
@@ -190,20 +191,44 @@ if [[ -n "${viewfile}" ]]; then
 else
     if [[ -n "${byquery}" ]]; then
         bycommand="CREATE TEMP TABLE ${bytable} AS ${byquery}"
+    else
+        bycommand=
     fi
     if [[ "${append}" != "true" ]]; then
         echo "Creating table ${viewtable}"
-        psql \
-            --quiet \
-            --command="${bycommand}" \
-            --command="DROP TABLE IF EXISTS ${viewtable}" \
-            --command="CREATE TABLE ${viewtable} AS ${VIEW_QUERY}"
+        if [[ "${nobackup}" != "true" ]]; then
+            backupcommand="CALL backup_table('${table}'"
+        else
+            backupcommand=
+        fi
+        if [[ "${nocomments}" != "true" ]]; then
+            commentcommand="COMMENT ON TABLE \"${table}\" IS \"${COMMENTS}\""
+        else
+            commentcommand=
+        fi
+        psql --quiet \
+             --command="${backupcommand}" \
+             --command="${bycommand}" \
+             --command="DROP TABLE IF EXISTS ${viewtable}" \
+             --command="CREATE TABLE ${viewtable} AS ${VIEW_QUERY}" \
+             --command="${commentcommand}"
     else
         echo "Appending to table ${viewtable}"
-        psql \
-            --quiet \
-            --command="${bycommand}" \
-            --command="CREATE TEMP TABLE ${viewtable}_append AS ${VIEW_QUERY}" \
-            --command="INSERT INTO ${viewtable} SELECT * FROM ${viewtable}_append"
+        if [[ "${nocomments}" != "true" ]]; then
+            OLDCOMMENTS=$(psql --csv --tuples-only --no-align --quiet --command="\timing off" --command "SELECT obj_description('${viewtable}'::regclass, 'pg_class')")
+            NEWCOMMENTS="${OLDCOMMENTS}
+${COMMENTS}"
+            commentcommand="COMMENT ON TABLE \"${table}\" IS \"${NEWCOMMENTS}\n\""
+        else
+            commentcommand=
+        fi
+        
+select obj_description('temp_backup'::regclass, 'pg_class');
+        
+        psql --quiet \
+             --command="${bycommand}" \
+             --command="CREATE TEMP TABLE ${viewtable}_append AS ${VIEW_QUERY}" \
+             --command="INSERT INTO ${viewtable} SELECT * FROM ${viewtable}_append" \
+             --command="${commentcommand}"
     fi
 fi

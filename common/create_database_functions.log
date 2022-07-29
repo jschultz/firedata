@@ -133,7 +133,7 @@ $$
     END;
 $$"
 #    --command "
-CREATE OR REPLACE FUNCTION modified_timestamp(tablename text)
+CREATE OR REPLACE FUNCTION modified_timestamp(name text)
 RETURNS timestamp
 LANGUAGE plpgsql
 AS
@@ -141,8 +141,23 @@ $$
     DECLARE
         result timestamp ;
     BEGIN
-        EXECUTE format('SELECT pg_xact_commit_timestamp(t.xmin) AS modified_ts FROM %s AS t ORDER  BY modified_ts DESC NULLS LAST LIMIT  1', tablename)
+        EXECUTE format('SELECT pg_xact_commit_timestamp(t.xmin) AS modified_ts FROM %s AS t ORDER  BY modified_ts DESC NULLS LAST LIMIT  1', name)
         INTO result;
         RETURN result;
+    END;
+$$"
+#    --command "
+CREATE OR REPLACE FUNCTION backup_table(name text)
+RETURNS void
+LANGUAGE plpgsql
+AS
+$$
+    BEGIN
+        IF EXISTS (SELECT 1 FROM pg_tables WHERE tablename = name) THEN
+            IF EXISTS (SELECT 1 FROM pg_tables WHERE tablename = name || '_backup') THEN  
+                EXECUTE 'DROP TABLE ' || name || '_backup';
+            END IF;
+            EXECUTE 'ALTER TABLE ' || name || ' RENAME TO ' || name || '_backup';
+        END IF;
     END;
 $$"

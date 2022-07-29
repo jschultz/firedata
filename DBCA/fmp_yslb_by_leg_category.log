@@ -32,14 +32,9 @@
 #             #0000cf
 #    --title "Area burned by tenure category and fire type: 2014-23 FMP Area"
 #    --subtitle "Reference date: 1 July ${baseyear}"
-#    --ylabel "Percentage of legislated tenure category burned"
+#    --ylabel "Percentage of legislated tenure category"
 #    --xlabel "Years since last burned"
-#    --exec "
-ticks, labels = pyplot.yticks()
-ticks = ticks.tolist()
-ticks += [45]
-pyplot.yticks(ticks)"
-#>   --outfile "FMP YSLB/FMP YSLB by leg category cumulative.pdf"
+#>   --outfile "FMP YSLB/FMP YSLB by leg category.pdf"
 #<   fmp_yslb_by_leg_category.csv
 ################################################################################
 # event_history.sh

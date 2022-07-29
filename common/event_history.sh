@@ -34,6 +34,8 @@ args=(
   "-S:--shapefile:::Shapefile to generate:output"
   "-l:--logfile:::Log file to record processing, defaults to out file name with extension replaced by '.log' or stderr:private"
   ":--nologfile:::Don't write a log file:private,flag"
+  ":--nocomments:::Don't write log as comments to database table or CSV file:private,flag"
+  ":--nobackup:::Don't back up existing output file or database table:private,flag"
 )
 
 source $(dirname "$0")/argparse.sh
@@ -118,30 +120,41 @@ if [[ "${debug}" == "true" ]]; then
 fi
 
 if [[ -n "${shapefile}" ]]; then
-    echo "Creating shapefile ${shapefile}"
-     pgsql2shp -f ${shapefile}  -u $PGUSER $PGDATABASE "${HISTORY_QUERY}"
+    echo "Creating shapefile ${shapefile}" > /dev/stderr
+    if [[ -f "${shapefile}" && "${nobackup}" != "true" ]]; then
+        mv "${shapefile}" "${shapefile}.bak"
+    fi
+    
+    pgsql2shp -f ${shapefile}  -u $PGUSER $PGDATABASE "${HISTORY_QUERY}"
 #    Work-around for pgsql2shp bug: https://trac.osgeo.org/postgis/ticket/5018
 #    pgsql2shp -f "${shapefile}" -u $PGUSER $PGDATABASE "SELECT * FROM (${HISTORY_QUERY}) AS query"
     zip --move --junk-paths "${shapefile}".zip "${shapefile}".{cpg,dbf,prj,shp,shx}
 elif [[ -n "${table}" ]]; then
-    echo "Creating table ${table}"
-    psql \
-        --quiet \
-        --command="DROP TABLE IF EXISTS \"${table}\"" \
-        --command="CREATE TABLE \"${table}\" AS ${HISTORY_QUERY}"
-else
-    if [[ "${nologfile}" != "true" ]]; then
-        echo "################################################################################" >> "${logfile}"
-    fi
-    if [[ -n "${csvfile}" ]]; then
-        psql \
-            --quiet --csv \
-            --command="\timing off" \
-            --command="${HISTORY_QUERY}" > "${csvfile}"
+    echo "Creating table ${table}" > /dev/stderr
+    if [[ "${nobackup}" != "true" ]]; then
+        backupcommand="CALL backup_table('${table}'"
     else
-        psql \
-            --quiet --csv \
-            --command="\timing off" \
-            --command="${HISTORY_QUERY}"
+        backupcommand=
     fi
+    if [[ "${nocomments}" != "true" ]]; then
+        commentcommand="COMMENT ON TABLE \"${table}\" IS \"${COMMENTS}\""
+    else
+        commentcommand=
+    fi
+    psql --quiet \
+         --command="${backupcommand}" \
+         --command="CREATE TABLE \"${table}\" AS ${HISTORY_QUERY}" \
+         --command="${commentcommand}"
+else
+    if [[ -n "${csvfile}" ]]; then
+        echo "Creating CSV file ${csvfile}" > /dev/stderr
+        if [[ -f "${csvfile}" && "${nobackup}" != "true" ]]; then
+            mv "${csvfile}" "${csvfile}.bak"
+        fi
+    else
+        csvfile=/dev/stdout
+    fi
+    psql --quiet --csv \
+         --command="\timing off" \
+         --command="${HISTORY_QUERY}" > "${csvfile}"
 fi
