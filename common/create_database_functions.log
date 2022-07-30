@@ -147,8 +147,7 @@ $$
     END;
 $$"
 #    --command "
-CREATE OR REPLACE FUNCTION backup_table(name text)
-RETURNS void
+CREATE OR REPLACE PROCEDURE backup_table(name text)
 LANGUAGE plpgsql
 AS
 $$
