@@ -196,13 +196,14 @@ else
     fi
     if [[ "${append}" != "true" ]]; then
         echo "Creating table ${viewtable}"
-        if [[ "${nobackup}" != "true" ]]; then
-            backupcommand="CALL backup_table('${table}'"
+        if [[ "${nobackup}" != "true" ]]; then  
+            backupcommand="CALL backup_table('${viewtable}')"
         else
             backupcommand=
         fi
         if [[ "${nocomments}" != "true" ]]; then
-            commentcommand="COMMENT ON TABLE \"${table}\" IS \"${COMMENTS}\""
+            commentcommand="COMMENT ON TABLE \"${viewtable}\" IS '${COMMENTS}'"
+            echo [$commentcommand]
         else
             commentcommand=
         fi
@@ -218,12 +219,10 @@ else
             OLDCOMMENTS=$(psql --csv --tuples-only --no-align --quiet --command="\timing off" --command "SELECT obj_description('${viewtable}'::regclass, 'pg_class')")
             NEWCOMMENTS="${OLDCOMMENTS}
 ${COMMENTS}"
-            commentcommand="COMMENT ON TABLE \"${table}\" IS \"${NEWCOMMENTS}\n\""
+            commentcommand="COMMENT ON TABLE \"${viewtable}\" IS \"${NEWCOMMENTS}\n\""
         else
             commentcommand=
         fi
-        
-select obj_description('temp_backup'::regclass, 'pg_class');
         
         psql --quiet \
              --command="${bycommand}" \

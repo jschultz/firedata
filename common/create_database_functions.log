@@ -139,7 +139,7 @@ LANGUAGE plpgsql
 AS
 $$
     DECLARE
-        result timestamp ;
+        result timestamp;
     BEGIN
         EXECUTE format('SELECT pg_xact_commit_timestamp(t.xmin) AS modified_ts FROM %s AS t ORDER  BY modified_ts DESC NULLS LAST LIMIT  1', name)
         INTO result;
@@ -147,7 +147,7 @@ $$
     END;
 $$"
 #    --command "
-CREATE OR REPLACE PROCEDURE backup_table(name text)
+CREATE OR REPLACE PROCEDURE cycle_table(name text)
 LANGUAGE plpgsql
 AS
 $$
@@ -157,6 +157,26 @@ $$
                 EXECUTE 'DROP TABLE ' || name || '_backup';
             END IF;
             EXECUTE 'ALTER TABLE ' || name || ' RENAME TO ' || name || '_backup';
+        END IF;
+    END;
+$$"
+#    --command "
+CREATE OR REPLACE PROCEDURE backup_table(name text)
+LANGUAGE plpgsql
+AS
+$$
+    DECLARE comment text;
+    test text;
+    BEGIN
+        IF EXISTS (SELECT 1 FROM pg_tables WHERE tablename = name) THEN
+            IF EXISTS (SELECT 1 FROM pg_tables WHERE tablename = name || '_backup') THEN  
+                EXECUTE 'DROP TABLE ' || name || '_backup';
+            END IF;
+            EXECUTE 'CREATE TABLE ' || name || '_backup AS TABLE ' || name;
+            comment := obj_description(name::regclass);
+            IF comment IS NOT NULL THEN
+                EXECUTE 'COMMENT ON TABLE ' || name || ' IS ''' || comment || '''';
+            END IF;
         END IF;
     END;
 $$"
