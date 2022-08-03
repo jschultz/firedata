@@ -53,7 +53,7 @@ $$
     BEGIN
         --RAISE NOTICE 'date_array';
         IF programtable IS NOT NULL THEN
-            EXECUTE format('SELECT (''20'' || substring(fin_yr from 6 for 2) || ''-01-01'')::date FROM %s WHERE ST_Contains(%s.geom, $1.geom)', programtable, programtable)
+            EXECUTE 'SELECT (''20'' || substring(fin_yr from 6 for 2) || ''-01-01'')::date FROM ' || programtable || ' WHERE ST_Contains(' || programtable || '.geom, $1.geom)'
             USING history
             INTO result;
         ELSE
@@ -66,7 +66,7 @@ $$
                 date_idx := date_idx + 1;
                 EXIT WHEN result < since;
             END IF;
-            EXECUTE format('SELECT %s FROM %s WHERE id = $1.id[%s]', datefield, eventtable, event_idx)
+            EXECUTE 'SELECT ' || datefield || ' FROM ' || eventtable || ' WHERE id = $1.id[' || event_idx || ']'
             USING history
             INTO result;
             EXIT WHEN result IS NULL;
@@ -77,17 +77,7 @@ $$
     END;
 $$"
 #    --command "
-CREATE OR REPLACE FUNCTION conservation_estate(leg_category character varying(40))
-RETURNS  boolean
-LANGUAGE plpgsql
-AS
-$$
-    BEGIN
-        RETURN leg_category IS NOT NULL AND leg_category IN ('National Park', 'Conservation Park', 'Nature Reserve');
-    END;
-$$"
-#    --command "
-CREATE OR REPLACE FUNCTION modified_average(dates date[], reference_date date, min_seasongap integer)
+CREATE OR REPLACE FUNCTION modified_average(dates date[], reference_date date, since timestamp without time zone, min_seasongap integer)
 RETURNS interval
 LANGUAGE plpgsql
 AS
@@ -117,19 +107,31 @@ $$
                 last_date := dates[date_idx];
                 date_idx := date_idx + 1;
             END LOOP;
-              
-            IF array_length(intervals, 1) >= 1 THEN
-                average := (SELECT AVG(interval_unnest) FROM unnest(intervals) AS interval_unnest);
-            END IF;
-            IF average IS NULL OR open_interval > average THEN
-                --RAISE NOTICE '   Average is %', average;
-                --RAISE NOTICE '   Prepending open interval %', open_interval;
-                intervals := open_interval || intervals;
-                average := (SELECT AVG(interval_unnest) FROM unnest(intervals) AS interval_unnest);
+
+            IF last_date <= since THEN
+                IF array_length(intervals, 1) >= 1 THEN
+                    average := (SELECT AVG(interval_unnest) FROM unnest(intervals) AS interval_unnest);
+                END IF;
+                IF average IS NULL OR open_interval > average THEN
+                    --RAISE NOTICE '   Average is %', average;
+                    --RAISE NOTICE '   Prepending open interval %', open_interval;
+                    intervals := open_interval || intervals;
+                    average := (SELECT AVG(interval_unnest) FROM unnest(intervals) AS interval_unnest);
+                END IF;
             END IF;
         END IF;
         --RAISE NOTICE '   Returns %', average;
         RETURN average;
+    END;
+$$"
+#    --command "
+CREATE OR REPLACE FUNCTION conservation_estate(leg_category character varying(40))
+RETURNS  boolean
+LANGUAGE plpgsql
+AS
+$$
+    BEGIN
+        RETURN leg_category IS NOT NULL AND leg_category IN ('National Park', 'Conservation Park', 'Nature Reserve');
     END;
 $$"
 #    --command "
@@ -141,7 +143,7 @@ $$
     DECLARE
         result timestamp;
     BEGIN
-        EXECUTE format('SELECT pg_xact_commit_timestamp(t.xmin) AS modified_ts FROM %s AS t ORDER  BY modified_ts DESC NULLS LAST LIMIT  1', name)
+        EXECUTE 'SELECT pg_xact_commit_timestamp(t.xmin) AS modified_ts FROM ' || name || ' AS t ORDER BY modified_ts DESC NULLS LAST LIMIT  1'
         INTO result;
         RETURN result;
     END;

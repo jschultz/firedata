@@ -29,6 +29,7 @@ args=(
   "-l:--logfile:::Log file to record processing, defaults to 'event' + 'suffix' + .log"
   ":--nologfile:::Don't write a log file:private,flag"
   ":--keepdump:::Keep intermediate dump table:flag"
+  ":--nobackup:::Don't back up existing database tables:private,flag"
 )
 
 source $(dirname "$0")/argparse.sh
@@ -74,16 +75,27 @@ echo "Creating dump table ${dump}" > /dev/stderr
 if [[ ! -n "${where}" ]]; then
     where="TRUE"
 fi
+if [[ "${nobackup}" != "true" ]]; then  
+    backupcommand="CALL backup_table('${dump}')"
+else
+    backupcommand=
+fi
+
 psql \
-    --command="DROP TABLE IF EXISTS ${dump}" \
+    --command="${backupcommand}" \
     --command="CREATE TABLE ${dump} AS
                   SELECT ${eventid} AS id, (ST_Dump(${geometry})).geom AS ${geometry} FROM ${eventtable} WHERE ${where}"
 
 echo "Creating polygon table ${poly}" > /dev/stderr
+if [[ "${nobackup}" != "true" ]]; then  
+    backupcommand="CALL backup_table('${poly}')"
+else
+    backupcommand=
+fi
 psql \
     --quiet \
     --command="\timing off" \
-    --command="DROP TABLE IF EXISTS ${poly} CASCADE" \
+    --command="${backupcommand}" \
     --command="CREATE TABLE ${poly} (id SERIAL PRIMARY KEY, ${geometry} geometry(Polygon));"
 psql \
     --quiet --tuples-only --no-align \
@@ -97,17 +109,27 @@ psql \
     --command="\copy ${poly} (${geometry}) FROM stdin"
 
 echo "Creating point in polygon table ${point}" > /dev/stderr
+if [[ "${nobackup}" != "true" ]]; then  
+    backupcommand="CALL backup_table('${point}')"
+else
+    backupcommand=
+fi
 psql \
     --quiet \
-    --command="DROP TABLE IF EXISTS ${point}" \
+    --command="${backupcommand}" \
     --command="CREATE TABLE ${point} AS 
                    SELECT id, ST_PointOnSurface(${geometry}) AS point
                    FROM ${poly}"
 
 echo "Creating junction table ${junction}" > /dev/stderr
+if [[ "${nobackup}" != "true" ]]; then  
+    backupcommand="CALL backup_table('${junction}')"
+else
+    backupcommand=
+fi
 psql \
     --quiet \
-    --command="DROP TABLE IF EXISTS ${junction} CASCADE" \
+    --command="${backupcommand}" \
     --command="CREATE TABLE ${junction} AS 
                    SELECT point.id AS poly_id, dump.id AS event_id
                    FROM ${dump} dump
@@ -118,11 +140,11 @@ psql \
 echo "Dropping point in polygon table ${point}" > /dev/stderr
 psql \
     --quiet \
-    --command="DROP TABLE IF EXISTS ${point}"
+    --command="DROP TABLE ${point}"
 
 if [[ "${keepdump}" != "true" ]]; then
     echo "Dropping shape dump table ${dump}" > /dev/stderr
     psql \
         --quiet \
-        --command="DROP TABLE IF EXISTS ${dump}"
+        --command="DROP TABLE ${dump}"
 fi

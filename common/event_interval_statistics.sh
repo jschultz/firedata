@@ -23,7 +23,7 @@ args=(
   "-e:--eventtable:::Name of table containing events:required"
   "-d:--datefield:::Field name of event date in 'eventtable'"
   "-h:--historytable:::Name of table containing unique event history:required"
-  "-p:--programtable:::Name of table programmed future events:"
+  "-p:--programtable:::Name of table of programmed future events:"
   "-s:--since:::Only consider events since this date"
   "-r:--referencedate:::Reference date for open interval"
   "-g:--seasongap::1:Minimum number of seasons between events"
@@ -45,5 +45,5 @@ psql \
      --command="DROP TABLE IF EXISTS ${table}" \
      --command="CREATE TABLE ${table} AS
                   (SELECT geom, 
-                          (SELECT modified_average(date_array(${historytable}, '${datefield}', '${eventtable}', '${programtable}', '${since}'::timestamp), '${referencedate}'::date, ${seasongap}::integer) AS mean_interval)
+                          (SELECT modified_average(date_array(${historytable}, '${datefield}', '${eventtable}', '${programtable}', '${since}'::timestamp), '${referencedate}'::date, '${since}'::timestamp, ${seasongap}::integer) AS mean_interval)
                     FROM ${historytable})"
