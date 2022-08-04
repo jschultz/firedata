@@ -44,6 +44,7 @@ fi
 psql \
      --command="DROP TABLE IF EXISTS ${table}" \
      --command="CREATE TABLE ${table} AS
-                  (SELECT geom, 
+                  (SELECT ST_Union(geom), 
                           (SELECT modified_average(date_array(${historytable}, '${datefield}', '${eventtable}', '${programtable}', '${since}'::timestamp), '${referencedate}'::date, '${since}'::timestamp, ${seasongap}::integer) AS mean_interval)
-                    FROM ${historytable})"
+                    FROM ${historytable}
+                    GROUP BY mean_interval)"
