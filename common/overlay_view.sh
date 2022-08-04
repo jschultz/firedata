@@ -41,7 +41,7 @@ args=(
   ":--byalias:::Alias for 'bycolumn' in output"
   "-v:--viewtable:::Table to generate, defaults to \$eventtable + \$suffix + '_view'"
   "-S:--viewfile:::Shapefile to generate:output"
-  "-l:--logfile:::Log file to record processing, defaults to \$shapefile with extension replaced by '.log', or \$table.log, or \$eventtable + \$suffix' + '.log' if neither shapefile nor table is defined:private"
+  "-l:--logfile:::Log file to record processing, defaults to \$viewtable or \$viewfile with extension replaced by '.log', or \$eventtable + \$suffix' + '.log' if neither \$viewtable nor \$viewfile is defined:private"
   ":--nologfile:::Don't write a log file:private,flag"
   ":--nobackup:::Don't back up existing database table:private,flag"
 )
@@ -210,7 +210,6 @@ else
         psql --quiet \
              --command="${backupcommand}" \
              --command="${bycommand}" \
-             --command="DROP TABLE IF EXISTS ${viewtable}" \
              --command="CREATE TABLE ${viewtable} AS ${VIEW_QUERY}" \
              --command="${commentcommand}"
     else
