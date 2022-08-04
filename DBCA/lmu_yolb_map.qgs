@@ -43,7 +43,7 @@
         </Option>
       </customproperties>
     </layer-tree-layer>
-    <layer-tree-layer source="dbname='fire' port=5432 user='qgis' sslmode=disable key='_uid0_' checkPrimaryKeyUnicity='0' table=&quot;(SELECT row_number() over () AS _uid0_, * FROM (SELECT &#xa;&#x9;\&quot;dbca_fire_history_dbca_060_lmu_history\&quot;.geom, &#xa;&#x9;(CASE WHEN EXTRACT(MONTH FROM fih_date1) &lt;= 6 THEN EXTRACT(YEAR FROM fih_date1) ELSE EXTRACT(YEAR FROM fih_date1) + 1 END) AS year&#xa;FROM \&quot;public\&quot;.\&quot;dbca_fire_history_dbca_060_lmu_history\&quot;, \&quot;public\&quot;.\&quot;dbca_fire_history_dbca_060\&quot; &#xa;WHERE \&quot;dbca_fire_history_dbca_060\&quot;.id = \&quot;dbca_fire_history_dbca_060_lmu_history\&quot;.id_1&#xa;) AS _subq_0_&#xa;)&quot; (geom)" providerKey="postgres" legend_split_behavior="0" legend_exp="" name="dbca_fire_history_dbca_060_lmu_yolb" expanded="0" patch_size="-1,-1" id="dbca_fire_history_dbca_060_lmu_history_ab8ce0e8_7ead_4476_a8ba_b3dcc039ccac" checked="Qt::Checked">
+    <layer-tree-layer source="dbname='fire' port=5432 user='qgis' sslmode=disable key='_uid0_' checkPrimaryKeyUnicity='0' table=&quot;(SELECT row_number() over () AS _uid0_, * FROM (SELECT &#xa;&#x9;\&quot;dbca_fire_history_dbca_060_lmu_history\&quot;.geom, &#xa;&#x9;(CASE WHEN EXTRACT(MONTH FROM fih_date1) &lt;= 6 THEN EXTRACT(YEAR FROM fih_date1) ELSE EXTRACT(YEAR FROM fih_date1) + 1 END) AS year&#xa;FROM \&quot;public\&quot;.\&quot;dbca_fire_history_dbca_060_lmu_history\&quot;, \&quot;public\&quot;.\&quot;dbca_fire_history_dbca_060\&quot; &#xa;WHERE \&quot;dbca_fire_history_dbca_060\&quot;.id = \&quot;dbca_fire_history_dbca_060_lmu_history\&quot;.id[1]&#xa;) AS _subq_0_&#xa;)&quot; (geom)" providerKey="postgres" legend_split_behavior="0" legend_exp="" name="dbca_fire_history_dbca_060_lmu_yolb" expanded="0" patch_size="-1,-1" id="dbca_fire_history_dbca_060_lmu_history_ab8ce0e8_7ead_4476_a8ba_b3dcc039ccac" checked="Qt::Checked">
       <customproperties>
         <Option type="Map">
           <Option type="QString" value="dbca_fire_history_dbca_060_lmu_yolb" name="cached_name"/>
@@ -186,7 +186,7 @@
 	\"dbca_fire_history_dbca_060_lmu_history\".geom, 
 	(CASE WHEN EXTRACT(MONTH FROM fih_date1) &lt;= 6 THEN EXTRACT(YEAR FROM fih_date1) ELSE EXTRACT(YEAR FROM fih_date1) + 1 END) AS year
 FROM \"public\".\"dbca_fire_history_dbca_060_lmu_history\", \"public\".\"dbca_fire_history_dbca_060\" 
-WHERE \"dbca_fire_history_dbca_060\".id = \"dbca_fire_history_dbca_060_lmu_history\".id_1
+WHERE \"dbca_fire_history_dbca_060\".id = \"dbca_fire_history_dbca_060_lmu_history\".id[1]
 ) AS _subq_0_
 )" (geom)</datasource>
       <keywordList>
@@ -5706,7 +5706,7 @@ GROUP BY description, full_geom, full_area, fmp_area ORDER BY description) AS _s
           <customproperties>
             <Option/>
           </customproperties>
-          <layer-tree-layer source="dbname='fire' port=5432 user='qgis' sslmode=disable key='_uid0_' checkPrimaryKeyUnicity='0' table=&quot;(SELECT row_number() over () AS _uid0_, * FROM (SELECT &#xa;&#x9;\&quot;dbca_fire_history_dbca_060_lmu_history\&quot;.geom, &#xa;&#x9;(CASE WHEN EXTRACT(MONTH FROM fih_date1) &lt;= 6 THEN EXTRACT(YEAR FROM fih_date1) ELSE EXTRACT(YEAR FROM fih_date1) + 1 END) AS year&#xa;FROM \&quot;public\&quot;.\&quot;dbca_fire_history_dbca_060_lmu_history\&quot;, \&quot;public\&quot;.\&quot;dbca_fire_history_dbca_060\&quot; &#xa;WHERE \&quot;dbca_fire_history_dbca_060\&quot;.id = \&quot;dbca_fire_history_dbca_060_lmu_history\&quot;.id_1&#xa;) AS _subq_0_&#xa;)&quot; (geom)" providerKey="postgres" legend_split_behavior="0" legend_exp="" name="dbca_fire_history_dbca_060_lmu_yolb" expanded="1" patch_size="-1,-1" id="dbca_fire_history_dbca_060_lmu_history_ab8ce0e8_7ead_4476_a8ba_b3dcc039ccac" checked="Qt::Checked">
+          <layer-tree-layer source="dbname='fire' port=5432 user='qgis' sslmode=disable key='_uid0_' checkPrimaryKeyUnicity='0' table=&quot;(SELECT row_number() over () AS _uid0_, * FROM (SELECT &#xa;&#x9;\&quot;dbca_fire_history_dbca_060_lmu_history\&quot;.geom, &#xa;&#x9;(CASE WHEN EXTRACT(MONTH FROM fih_date1) &lt;= 6 THEN EXTRACT(YEAR FROM fih_date1) ELSE EXTRACT(YEAR FROM fih_date1) + 1 END) AS year&#xa;FROM \&quot;public\&quot;.\&quot;dbca_fire_history_dbca_060_lmu_history\&quot;, \&quot;public\&quot;.\&quot;dbca_fire_history_dbca_060\&quot; &#xa;WHERE \&quot;dbca_fire_history_dbca_060\&quot;.id = \&quot;dbca_fire_history_dbca_060_lmu_history\&quot;.id[1]&#xa;) AS _subq_0_&#xa;)&quot; (geom)" providerKey="postgres" legend_split_behavior="0" legend_exp="" name="dbca_fire_history_dbca_060_lmu_yolb" expanded="1" patch_size="-1,-1" id="dbca_fire_history_dbca_060_lmu_history_ab8ce0e8_7ead_4476_a8ba_b3dcc039ccac" checked="Qt::Checked">
             <customproperties>
               <Option type="Map">
                 <Option type="QString" value="dbca_fire_history_dbca_060_lmu_yolb" name="cached_name"/>

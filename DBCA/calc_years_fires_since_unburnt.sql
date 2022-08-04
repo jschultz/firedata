@@ -35,8 +35,7 @@ CREATE OR REPLACE FUNCTION calc_years_fires_since_unburnt(arg :table)
     return arg
   $$ LANGUAGE plpython3u;
 RESET ROLE;
-UPDATE :table AS update_table
-  SET years_since_unburnt = calc.years_since_unburnt, fires_since_unburnt = calc.fires_since_unburnt 
-  FROM (SELECT poly_id, (row).years_since_unburnt, (row).fires_since_unburnt 
+CREATE TABLE temp2 AS
+(SELECT poly_id, (row).years_since_unburnt, (row).fires_since_unburnt 
         FROM (SELECT poly_id, calc_years_fires_since_unburnt(:table) AS row 
-              FROM :table) AS foo) AS calc where calc.poly_id = update_table.poly_id;
+              FROM :table) AS foo) 
