@@ -132,7 +132,7 @@ if [[ -n "${shapefile}" ]]; then
 elif [[ -n "${table}" ]]; then
     echo "Creating table ${table}" > /dev/stderr
     if [[ "${nobackup}" != "true" ]]; then
-        backupcommand="CALL backup_table('${table}'"
+        backupcommand="CALL cycle_table('${table}'"
     else
         backupcommand=
     fi

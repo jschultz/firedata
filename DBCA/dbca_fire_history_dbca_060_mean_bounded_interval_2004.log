@@ -2,10 +2,10 @@
 # psql
 #    --command "
 INSERT
-  INTO dbca_fire_history_dbca_060_southern_mean_bounded_interval_1980
+  INTO dbca_fire_history_dbca_060_${suffix}_mean_bounded_interval_2004
   VALUES ((ST_Dump((SELECT ST_Difference(
                       (SELECT ST_Union(geom) FROM forest_man_plan_2014_2023_dbca_041), 
-                      (SELECT ST_Union(geom) FROM dbca_fire_history_dbca_060_southern_poly))))).geom,
+                      (SELECT ST_Union(geom) FROM dbca_fire_history_dbca_060_${suffix}_poly))))).geom,
           NULL)"
 ################################################################################
 # event_interval_statistics.sh
@@ -13,8 +13,8 @@ INSERT
 #    --eventtable "dbca_fire_history_dbca_060"
 #    --programtable "dbca_3_year_ind_burn_prog_dbca_009"
 #    --datefield "fih_date1"
-#    --historytable "dbca_fire_history_dbca_060_southern_history"
-#    --since "1980-01-01"
+#    --historytable "dbca_fire_history_dbca_060_${suffix}_history"
+#    --since "2004-01-01"
 #    --referencedate "2026-01-01"
 #    --seasongap "2"
-#    --table "dbca_fire_history_dbca_060_southern_mean_bounded_interval_1980"
+#    --table "dbca_fire_history_dbca_060_${suffix}_mean_bounded_interval_2004"

@@ -76,7 +76,7 @@ if [[ ! -n "${where}" ]]; then
     where="TRUE"
 fi
 if [[ "${nobackup}" != "true" ]]; then  
-    backupcommand="CALL backup_table('${dump}')"
+    backupcommand="CALL cycle_table('${dump}')"
 else
     backupcommand=
 fi
@@ -88,7 +88,7 @@ psql \
 
 echo "Creating polygon table ${poly}" > /dev/stderr
 if [[ "${nobackup}" != "true" ]]; then  
-    backupcommand="CALL backup_table('${poly}')"
+    backupcommand="CALL cycle_table('${poly}')"
 else
     backupcommand=
 fi
@@ -110,7 +110,7 @@ psql \
 
 echo "Creating point in polygon table ${point}" > /dev/stderr
 if [[ "${nobackup}" != "true" ]]; then  
-    backupcommand="CALL backup_table('${point}')"
+    backupcommand="CALL cycle_table('${point}')"
 else
     backupcommand=
 fi
@@ -123,7 +123,7 @@ psql \
 
 echo "Creating junction table ${junction}" > /dev/stderr
 if [[ "${nobackup}" != "true" ]]; then  
-    backupcommand="CALL backup_table('${junction}')"
+    backupcommand="CALL cycle_table('${junction}')"
 else
     backupcommand=
 fi
@@ -140,11 +140,11 @@ psql \
 echo "Dropping point in polygon table ${point}" > /dev/stderr
 psql \
     --quiet \
-    --command="DROP TABLE ${point}"
+    --command="DROP TABLE IF EXISTS ${point}"
 
 if [[ "${keepdump}" != "true" ]]; then
     echo "Dropping shape dump table ${dump}" > /dev/stderr
     psql \
         --quiet \
-        --command="DROP TABLE ${dump}"
+        --command="DROP TABLE IF EXISTS ${dump}"
 fi

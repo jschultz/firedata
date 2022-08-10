@@ -49,8 +49,8 @@ args=(
 source $(dirname "$0")/argparse.sh
 
 if [[ -n "${bytable}" ]]; then
-    if [[ ! -n "${bycondition}" || ! -n "${bycolumn}" ]]; then
-        echo "If 'bytable' is specified then 'bycondition' and 'bycolumn' must also be specified" > /dev/stderr
+    if [[ ! -n "${bycondition}" ]]; then
+        echo "If 'bytable' is specified then 'bycondition' must also be specified" > /dev/stderr
         return 1
     fi
     if [[ ! -n "${byalias}" ]]; then
@@ -138,7 +138,7 @@ for ((colidx=0; colidx<${#eventaliasarray[@]}; colidx++)) do
     VIEW_QUERY+="${separator} agg.${eventaliasarray[colidx]} AS ${eventaliasarray[colidx]}"
     separator=","
 done
-if [[ -n "${bytable}" ]]; then
+if [[ -n "${bycolumn}" ]]; then
     VIEW_QUERY+="${separator} ${bycolumn}"
     separator=","
 fi
@@ -152,7 +152,7 @@ for ((colidx=0; colidx<${#eventcolumnarray[@]}; colidx++)) do
     VIEW_QUERY+="${separator} array_agg(${eventcolumnarray[colidx]} ORDER BY fih_date1 DESC, event.${eventid} DESC) AS ${eventaliasarray[colidx]}"
     separator=","
 done
-if [[ -n "${bytable}" ]]; then
+if [[ -n "${bycolumn}" ]]; then
     VIEW_QUERY+="${separator} by.${bycolumn}"
     separator=","
 fi
@@ -172,7 +172,7 @@ if [[ ${#polycolumnarray[@]} -gt 0 ]]; then
         VIEW_QUERY+="${separator} ${polygrouparray[colidx]}"
         separator=","
     done
-    if [[ -n "${bytable}" ]]; then
+    if [[ -n "${bycolumn}" ]]; then
         VIEW_QUERY+="${separator} by.${bycolumn}"
         separator=","
     fi
@@ -197,13 +197,12 @@ else
     if [[ "${append}" != "true" ]]; then
         echo "Creating table ${viewtable}"
         if [[ "${nobackup}" != "true" ]]; then  
-            backupcommand="CALL backup_table('${viewtable}')"
+            backupcommand="CALL cycle_table('${viewtable}')"
         else
             backupcommand=
         fi
         if [[ "${nocomments}" != "true" ]]; then
             commentcommand="COMMENT ON TABLE \"${viewtable}\" IS '${COMMENTS}'"
-            echo [$commentcommand]
         else
             commentcommand=
         fi
