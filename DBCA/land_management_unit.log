@@ -17,8 +17,15 @@
 ##
 ################################################################################
 # psql
-#    --command "DROP TABLE IF EXISTS land_management_unit"
-#    --command "CREATE TABLE land_management_unit AS (SELECT extcode, description, ST_Multi(ST_Union(geom)) AS full_geom, ST_Multi(ST_Intersection(ST_Union(geom), (SELECT ST_Union(geom) FROM forest_man_plan_2014_2023_dbca_041))) AS fmp_geom FROM land_management_unit_raw GROUP BY extcode, description)"
+##    --command "DROP TABLE IF EXISTS land_management_unit"
+#    --command "CREATE TABLE land_management_unit AS (
+SELECT 
+    extcode, 
+    description, 
+    ST_Multi(ST_Union(geom)) AS full_geom, 
+    ST_Multi(ST_Union(ST_Intersection(geom, (SELECT ST_Union(geom) FROM forest_man_plan_2014_2023_dbca_041 WHERE ST_Intersects(forest_man_plan_2014_2023_dbca_041.geom, land_management_unit_raw.geom))))) AS fmp_geom,
+    ST_Multi(ST_Union(ST_Intersection(geom, (SELECT ST_Union(geom) FROM native_veg_extent_dpird_005_wa WHERE ST_Intersects(native_veg_extent_dpird_005_wa.geom, land_management_unit_raw.geom))))) AS native_geom 
+FROM land_management_unit_raw GROUP BY extcode, description)"
 #    --command "CREATE UNIQUE INDEX ON land_management_unit (extcode)"
 #    --command "CREATE UNIQUE INDEX ON land_management_unit (description)"
 #    --command "DROP TABLE land_management_unit_raw"
