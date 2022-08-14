@@ -19,25 +19,23 @@
 # event_history.sh
 #    --nologfile
 #    --eventtable "(
-SELECT description, full_geom, fmp_geom,
-       fireseason(fih_date1) AS year, 
-       ST_Union(history.geom) AS history_geom
+SELECT description, native_geom,
+       fireseason(fih_date1) AS year,
+       ST_Union(ST_Intersection(history.geom,lmu.native_geom)) AS history_geom
 FROM land_management_unit AS lmu,
      dbca_fire_history_dbca_060_southern_history AS history, 
      dbca_fire_history_dbca_060 
-WHERE dbca_fire_history_dbca_060.id = history.id[1]
-AND   ST_Intersects(history.geom, lmu.full_geom)
-GROUP BY description, full_geom, fmp_geom, year)"
+WHERE ST_Intersects(history.geom, lmu.native_geom)
+AND   dbca_fire_history_dbca_060.id = history.id[1]
+/* AND   description = 'Blackwood Plateau' AND fih_year1 >= 2020 */
+GROUP BY description, native_geom, year)"
 #    --eventcolumns "
 description;
-ST_Area(full_geom::geography)/10000;
-ST_Area(fmp_geom::geography)/10000;
+ST_Area(native_geom::geography)/10000;
 ${baseyear} - year;
-ST_Area(ST_Intersection(history_geom, full_geom)::geography)/10000;
-SUM(ST_Area(ST_Intersection(history_geom, full_geom)::geography)/10000) OVER (PARTITION BY description ORDER BY -year);
-ST_Area(ST_Intersection(history_geom, fmp_geom)::geography)/10000;
-SUM(ST_Area(ST_Intersection(history_geom, fmp_geom)::geography)/10000) OVER (PARTITION BY description ORDER BY -year)"
-#    --eventgroups description;year;history_geom;full_geom;fmp_geom
+ST_Area(history_geom::geography)/10000;
+SUM(ST_Area(history_geom::geography)/10000) OVER (PARTITION BY description ORDER BY -year)"
+#    --eventgroups description;year;native_geom;history_geom
 #    --order description,-year
-#    --eventaliases "LMU name;LMU full area;LMU area covered by FMP;Year;Area burned inside LMU;Area burned inside LMU cumulative;Area burned inside LMU and FMP;Area burned inside LMU and FMP cumulative"
-#>   --csvfile yslb_by_lmu.csv
+#    --eventaliases "LMU name;LMU native veg area;YSLB;Native veg area burned;Native veg area burned cumulative"
+#>   --csvfile yslb_by_lmu_native_veg.csv

@@ -136,6 +136,8 @@ psql \
                        JOIN ${point} point
                        ON ST_Contains(dump.${geometry}, point.point)
                    GROUP BY point.id, dump.id"
+    --command="CREATE INDEX ON ${junction} (poly_id)" 
+    --command="CREATE INDEX ON ${junction} (event_id)" 
 
 echo "Dropping point in polygon table ${point}" > /dev/stderr
 psql \
