@@ -28,6 +28,9 @@ SELECT
 FROM land_management_unit_raw GROUP BY extcode, description)"
 #    --command "CREATE UNIQUE INDEX ON land_management_unit (extcode)"
 #    --command "CREATE UNIQUE INDEX ON land_management_unit (description)"
+#    --command "CREATE INDEX ON land_management_unit USING gist (full_geom)"
+#    --command "CREATE INDEX ON land_management_unit USING gist (fmp_geom)"
+#    --command "CREATE INDEX ON land_management_unit USING gist (native_geom)"
 #    --command "DROP TABLE land_management_unit_raw"
 ################################################################################
 # load_file.sh

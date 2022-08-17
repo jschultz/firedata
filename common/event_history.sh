@@ -148,13 +148,22 @@ elif [[ -n "${table}" ]]; then
 else
     if [[ -n "${csvfile}" ]]; then
         echo "Creating CSV file ${csvfile}" > /dev/stderr
-        if [[ -f "${csvfile}" && "${nobackup}" != "true" ]]; then
-            mv "${csvfile}" "${csvfile}.bak"
+        if [[ -f "${csvfile}" ]]; then
+            if [[ "${nobackup}" != "true" ]]; then
+                mv "${csvfile}" "${csvfile}.bak"
+            else
+                echo "ERROR: CSV file ${csvfile} already exists".
+                exit 1
+            fi
         fi
     else
         csvfile=/dev/stdout
     fi
+    if [[ "${nocomments}" != "true" ]]; then
+#         echo "${COMMENTS//$'\n'/\\n}" > "${csvfile}"
+        echo "${COMMENTS}" > "${csvfile}"
+    fi
     psql --quiet --csv \
          --command="\timing off" \
-         --command="${HISTORY_QUERY}" > "${csvfile}"
+         --command="${HISTORY_QUERY}" >> "${csvfile}"
 fi

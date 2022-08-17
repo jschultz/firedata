@@ -21,13 +21,13 @@
 #    --eventtable "(
 SELECT description, native_geom,
        fireseason(fih_date1) AS year,
-       ST_Union(ST_Intersection(history.geom,lmu.native_geom)) AS history_geom
+       ST_Intersection(ST_Union(history.geom),lmu.native_geom) AS history_geom
 FROM land_management_unit AS lmu,
-     dbca_fire_history_dbca_060_southern_history AS history, 
+     dbca_fire_history_dbca_060_${suffix}_history AS history, 
      dbca_fire_history_dbca_060 
 WHERE ST_Intersects(history.geom, lmu.native_geom)
 AND   dbca_fire_history_dbca_060.id = history.id[1]
-/* AND   description = 'Blackwood Plateau' AND fih_year1 >= 2020 */
+/* AND   description IN ('Blackwood Plateau', 'Central Karri') AND fih_year1 >= 2000 */
 GROUP BY description, native_geom, year)"
 #    --eventcolumns "
 description;

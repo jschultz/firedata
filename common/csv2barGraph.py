@@ -123,7 +123,7 @@ def csv2barGraph(arglist=None):
 
     pyplot.style.use('tableau-colorblind10')
     
-    titlefont = {'fontname':'Linux Biolinum G', 'weight':'bold', 'size':32}
+    titlefont = {'fontname':'Linux Biolinum G', 'weight':'bold', 'size':24}
     subtitlefont = {'fontname':'Linux Biolinum G', 'weight':'normal'}
     labelfont = {'fontname':'Linux Biolinum G', 'weight':'normal'}
     legendfont = {'family':'Linux Biolinum G', 'weight':'normal'}

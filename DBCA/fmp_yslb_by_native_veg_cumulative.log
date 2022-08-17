@@ -30,25 +30,33 @@
 #             #00008f
 #             #0000af
 #             #0000cf
-#    --title "Area burned by fire type: 2014-23 FMP Area"
+#    --cumulative
+#    --title "Cumulative native vegetation area burned by fire type: 2014-23 FMP Area"
 #    --subtitle "Reference date: 1 July ${baseyear}"
-#    --ylabel "Percentage of area burned"
-#    --xlabel "Years since last burned"
-#>   --outfile "FMP YSLB/FMP YSLB.pdf"
-#<   fmp_yslb.csv
+#    --ylabel "Percentage of native vegetation area burned"
+#    --xlabel "Years"
+#    --exec "
+ticks, labels = pyplot.yticks()
+ticks = ticks.tolist()
+ticks += [45]
+pyplot.yticks(ticks)"
+#>   --outfile "FMP YSLB/FMP YSLB by native veg cumulative.pdf"
+#<   "FMP YSLB/fmp_yslb_by_native_veg.csv"
 ################################################################################
 # event_history.sh
 #    --nologfile
+#    --nocomments
 #    --eventtable "(
 SELECT fireseason(fih_date1) AS year, 
        ST_Intersection(history.geom, (SELECT geom FROM area)) AS geom, 
        ARRAY_AGG(DISTINCT fih_cause) AS fih_causes
 FROM dbca_fire_history_dbca_060_${suffix}_history AS history, 
      dbca_fire_history_dbca_060 
-WHERE dbca_fire_history_dbca_060.id = history.id[1]
-GROUP BY year,
-      history.geom)"
-#    --area "(SELECT ST_Union(geom) FROM forest_man_plan_2014_2023_dbca_041)"
+WHERE ST_Intersects(history.geom, (SELECT geom FROM area))
+AND dbca_fire_history_dbca_060.id = history.id[1]
+AND ${baseyear} - fireseason(fih_date1) <= 40
+GROUP BY year,history.geom)"
+#    --area "ST_Intersection((SELECT ST_Union(geom) FROM forest_man_plan_2014_2023_dbca_041), (SELECT ST_Union(geom) FROM native_veg_extent_dpird_005_wa))"
 #    --eventcolumns "
 ${baseyear} - year;
 ST_Area(ST_Union(event.geom) FILTER(WHERE fih_causes = '{0}'))/ST_Area((SELECT geom FROM area))*100;
@@ -56,5 +64,5 @@ ST_Area(ST_Union(event.geom) FILTER(WHERE 0 = ANY(fih_causes) AND fih_causes <> 
 ST_Area(ST_Union(event.geom) FILTER(WHERE 0 <> ANY(fih_causes)))/ST_Area((SELECT geom FROM area))*100"
 #    --eventgroups year
 #    --order -year
-#    --eventaliases "Years since last burnt;Prescribed burn;Prescribed and other fire;Other fire"
-#>   --csvfile fmp_yslb.csv
+#    --eventaliases "Years since last burnt;Prescribed burn;Multiple fire types;Other fire"
+#>   --csvfile "FMP YSLB/fmp_yslb_by_native_veg.csv"
