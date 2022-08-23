@@ -217,7 +217,7 @@ else
             OLDCOMMENTS=$(psql --csv --tuples-only --no-align --quiet --command="\timing off" --command "SELECT obj_description('${viewtable}'::regclass, 'pg_class')")
             NEWCOMMENTS="${OLDCOMMENTS}
 ${COMMENTS}"
-            commentcommand="COMMENT ON TABLE \"${viewtable}\" IS \"${NEWCOMMENTS}\n\""
+            commentcommand="COMMENT ON TABLE \"${viewtable}\" IS \"${NEWCOMMENTS//\'/\'\'/}\n\""
         else
             commentcommand=
         fi
