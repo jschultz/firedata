@@ -20,9 +20,10 @@ set -e
 help='Load a file into a PostGIS table. The file may be of any kind supported by ogr2ogr'
 args=(
 # "-short:--long:variable:default:description:flags"
+  ":--debug:::Debug execution:flag"
   "-t:--table:::Name of table to create, defaults to file name without extension"
   "-g:--geometry::geom:Name of column to hold geometry data"
-  "-s:--srid::geom:SRID to re-project geometry"
+  "-s:--srid:::SRID to re-project geometry"
   "-L:--layer:::Layer to import"
   ":filename:::Name of file to read:required,input"
   "-l:--logfile:::Log file to record processing, defaults to table name with extension '.log':private"
@@ -40,6 +41,10 @@ if [[ "${nologfile}" != "true" ]]; then
         logfile=${table}.log
     fi
     echo "${COMMENTS}" > ${logfile}
+fi
+
+if [[ "${debug}" == "true" ]]; then
+    set -x
 fi
 
 if [[ -n "${srid}" ]]; then

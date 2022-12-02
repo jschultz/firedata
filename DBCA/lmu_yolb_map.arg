@@ -21,5 +21,5 @@
 #    --lmu "${lmu}"
 #    --layout "LMU"
 #    --outfile "LMU YOLB/${lmu} YOLB map.pdf"
-#     "/home/jschultz/src/firecheck-gis/lmu_yolb_map.qgs"
+#     "/home/jschultz/src/firedata/DBCA/lmu_yolb_map.qgs"
 ################################################################################

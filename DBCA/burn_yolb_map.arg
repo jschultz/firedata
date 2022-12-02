@@ -22,5 +22,5 @@
 #    --layout "Burn"
 ##    --imagefile "Burn YOLB/${burn} YOLB map.jpg"
 #    --pdffile "Burn YOLB/${burn} YOLB map.pdf"
-#     "/home/jschultz/src/firecheck-gis/burn_yolb_map.qgs"
+#     "/home/jschultz/src/firedata/DBCA/burn_yolb_map.qgs"
 ################################################################################

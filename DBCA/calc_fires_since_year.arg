@@ -4,6 +4,7 @@
 CREATE TABLE ${table} AS (
     WITH ids AS (
         SELECT
+            history.geom,
             poly_id,
             fireseason(fih_date1) AS thisfireseason,
             fireseason(LEAD(fih_date1) OVER (PARTITION BY poly_id ORDER BY fih_date1 DESC)) AS prevfireseason
@@ -16,11 +17,15 @@ CREATE TABLE ${table} AS (
     SELECT
         poly_id, geom, numfires
     FROM (
-        SELECT 
+        SELECT
+            geom,
             poly_id, 
-            (SELECT count(DISTINCT thisfireseason) FILTER(WHERE thisfireseason >= ${refseason} AND thisfireseason - prevfireseason > 1) AS numfires)
+            (SELECT count(DISTINCT thisfireseason) 
+             FILTER(
+                WHERE thisfireseason >= ${refseason} 
+                  AND (thisfireseason - prevfireseason > 1) OR (prevfireseason IS null))
+             AS numfires)
         FROM 
             ids
-        GROUP BY poly_id
-    ) sub
-    LEFT JOIN ${poly} poly on poly.id = poly_id)"
+        GROUP BY geom, poly_id
+    ) sub)"
