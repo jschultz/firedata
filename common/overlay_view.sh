@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Copyright 2022 Jonathan Schultz
+# Copyright 2023 Jonathan Schultz
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@ args=(
   "-g:--geometry::geom:Column name for geometry in tables"
   "-w:--where:::WHERE clause for selecting from polygon table"
   "-a:--append:::Append output to existing table:flag"
-  ":--bytable:::Table to join to query to subdivide outbut"
+  ":--bytable:::Table to join to query to subdivide output"
   ":--byquery:::Secondary query to join to query to subdivide outbut"
   ":--bycondition:::Condition for joining 'bytable'"
   ":--bycolumn:::Column to subdivide results; this column will appear in output"
@@ -43,6 +43,7 @@ args=(
   "-S:--viewfile:::Shapefile to generate:output"
   "-l:--logfile:::Log file to record processing, defaults to \$viewtable or \$viewfile with extension replaced by '.log', or \$eventtable + \$suffix' + '.log' if neither \$viewtable nor \$viewfile is defined:private"
   ":--nologfile:::Don't write a log file:private,flag"
+  ":--nocomments:::Don't add comments to table:private,flag"
   ":--nobackup:::Don't back up existing database table:private,flag"
 )
 
@@ -202,7 +203,7 @@ else
             backupcommand=
         fi
         if [[ "${nocomments}" != "true" ]]; then
-            commentcommand="COMMENT ON TABLE \"${viewtable}\" IS '${COMMENTS}'"
+            commentcommand="COMMENT ON TABLE \"${viewtable}\" IS '${COMMENTS//\'/\'\'}'"
         else
             commentcommand=
         fi
@@ -214,10 +215,9 @@ else
     else
         echo "Appending to table ${viewtable}"
         if [[ "${nocomments}" != "true" ]]; then
-            OLDCOMMENTS=$(psql --csv --tuples-only --no-align --quiet --command="\timing off" --command "SELECT obj_description('${viewtable}'::regclass, 'pg_class')")
-            NEWCOMMENTS="${OLDCOMMENTS}
-${COMMENTS}"
-            commentcommand="COMMENT ON TABLE \"${viewtable}\" IS \"${NEWCOMMENTS//\'/\'\'/}\n\""
+            INCOMMENTS=$(psql --csv --tuples-only --no-align --quiet --command="\timing off" --command "SELECT obj_description('${viewtable}'::regclass, 'pg_class')")
+            NEWCOMMENTS="${COMMENTS}${INCOMMENTS}"
+            commentcommand="COMMENT ON TABLE \"${viewtable}\" IS '${NEWCOMMENTS//\'/\'\'}'"
         else
             commentcommand=
         fi

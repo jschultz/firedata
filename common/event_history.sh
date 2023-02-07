@@ -161,7 +161,7 @@ else
     fi
     if [[ "${nocomments}" != "true" ]]; then
 #         echo "${COMMENTS//$'\n'/\\n}" > "${csvfile}"
-        echo "${COMMENTS}" > "${csvfile}"
+        echo -n "${COMMENTS}" > "${csvfile}"
     fi
     psql --quiet --csv \
          --command="\timing off" \
