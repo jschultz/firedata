@@ -26,11 +26,11 @@
 #    --where "ST_GeometryType(ST_Difference(poly.geom, by.geom)) IN ('ST_Polygon', 'ST_MultiPolygon')"
 #    --eventcolumns "event.id"
 #    --eventaliases "id"
-#    --byquery "SELECT ST_Union(geom) AS geom, NULL AS leg_category FROM legislated_lands_and_waters_dbca_011 AS leg WHERE EXISTS (SELECT geom FROM dbca_fire_history_dbca_060_${suffix}_poly AS poly WHERE ST_Intersects(poly.geom, leg.geom) LIMIT 1)"
-#    --bycolumn "leg_category"
+#    --byquery "SELECT ST_Union(geom) AS geom, NULL AS native_veg_id FROM native_veg_extent_dpird_005_wa AS veg WHERE EXISTS (SELECT geom FROM dbca_fire_history_dbca_060_${suffix}_poly AS poly WHERE ST_Intersects(poly.geom, veg.geom) LIMIT 1)"
+#    --bycolumn "native_veg_id"
 #    --bycondition "NOT ST_Contains(by.geom, poly.geom)"
 #    --append
-#    --viewtable "dbca_fire_history_dbca_060_${suffix}_history_by_leg_category"
+#    --viewtable "dbca_fire_history_dbca_060_${suffix}_history_by_native_veg"
 ################################################################################
 # overlay_view.sh
 #    --nologfile
@@ -39,10 +39,10 @@
 #    --polycolumns "ST_Intersection(poly.geom, by.geom);ST_Area(ST_Intersection(poly.geom, by.geom)::geography)/10000;poly.id"
 #    --polyaliases "geom;area;poly_id"
 #    --polygroup "poly.geom,poly.id,by.geom"
-#    --where "ST_GeometryType(ST_Intersection(poly.geom, by.geom)) IN ('ST_Polygon', 'ST_MultiPolygon')"
+#    --where "ST_GeometryType(ST_Difference(poly.geom, by.geom)) IN ('ST_Polygon', 'ST_MultiPolygon')"
 #    --eventcolumns "event.id"
 #    --eventaliases "id"
-#    --bytable "legislated_lands_and_waters_dbca_011"
-#    --bycolumn "leg_category"
+#    --byquery "SELECT geom, native_veg_id FROM native_veg_extent_dpird_005_wa AS veg WHERE EXISTS (SELECT geom FROM dbca_region_boundaries_dbca_022 AS region WHERE drg_region_name IN ('SOUTH COAST', 'SOUTH WEST', 'SWAN', 'WARREN') AND ST_Intersects(region.geom, veg.geom))"
+#    --bycolumn "native_veg_id"
 #    --bycondition "ST_Intersects(poly.geom, by.geom)"
-#    --viewtable "dbca_fire_history_dbca_060_${suffix}_history_by_leg_category"
+#    --viewtable "dbca_fire_history_dbca_060_${suffix}_history_by_native_veg"

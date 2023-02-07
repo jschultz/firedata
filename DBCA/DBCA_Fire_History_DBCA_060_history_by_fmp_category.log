@@ -26,11 +26,12 @@
 #    --where "ST_GeometryType(ST_Difference(poly.geom, by.geom)) IN ('ST_Polygon', 'ST_MultiPolygon')"
 #    --eventcolumns "event.id"
 #    --eventaliases "id"
-#    --byquery "SELECT ST_Union(geom) AS geom, NULL AS leg_category FROM legislated_lands_and_waters_dbca_011 AS leg WHERE EXISTS (SELECT geom FROM dbca_fire_history_dbca_060_${suffix}_poly AS poly WHERE ST_Intersects(poly.geom, leg.geom) LIMIT 1)"
-#    --bycolumn "leg_category"
+#    --byquery "SELECT ST_Union(geom) AS geom, NULL AS fmt_current FROM forest_man_plan_2014_2023_dbca_041 AS fmp WHERE EXISTS (SELECT geom FROM dbca_fire_history_dbca_060_${suffix}_poly AS poly WHERE ST_Intersects(poly.geom, fmp.geom) LIMIT 1)"
+#    --bycolumn "fmt_current"
+#    --byalias "fmp_category"
 #    --bycondition "NOT ST_Contains(by.geom, poly.geom)"
 #    --append
-#    --viewtable "dbca_fire_history_dbca_060_${suffix}_history_by_leg_category"
+#    --viewtable "dbca_fire_history_dbca_060_${suffix}_history_by_fmp_category"
 ################################################################################
 # overlay_view.sh
 #    --nologfile
@@ -42,7 +43,8 @@
 #    --where "ST_GeometryType(ST_Intersection(poly.geom, by.geom)) IN ('ST_Polygon', 'ST_MultiPolygon')"
 #    --eventcolumns "event.id"
 #    --eventaliases "id"
-#    --bytable "legislated_lands_and_waters_dbca_011"
-#    --bycolumn "leg_category"
+#    --bytable "forest_man_plan_2014_2023_dbca_041"
+#    --bycolumn "fmt_current"
+#    --byalias "fmp_category"
 #    --bycondition "ST_Intersects(poly.geom, by.geom)"
-#    --viewtable "dbca_fire_history_dbca_060_${suffix}_history_by_leg_category"
+#    --viewtable "dbca_fire_history_dbca_060_${suffix}_history_by_fmp_category"
