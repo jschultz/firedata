@@ -16,6 +16,11 @@
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##
 ################################################################################
+#  pdfjam
+#     "Burn previous fires/${burn} previous fires map.pdf"
+#     --nup 2x2
+#     --outfile "Burn previous fires/${burn} previous fires map tiled.pdf"
+################################################################################
 # exportBurnAtlas.py
 #    --nologfile
 #    --burn "${burn}"

@@ -53,6 +53,9 @@ fi
 
 if [[ -n "${geometry}" ]]; then
     ogr2ogr -overwrite -f PostgreSQL "PG:dbname=$PGDATABASE user=$PGUSER" -lco geometry_name=${geometry} ${srid} -nln "${table}" "${filename}" ${layer}
+    psql \
+        --quiet --command="\timing off" \
+        --command="CREATE INDEX ON ${table} USING gist (${geometry})"
 else
     ogr2ogr -overwrite -f PostgreSQL "PG:dbname=$PGDATABASE user=$PGUSER" -nln "${table}" "${filename}" ${layer}
 fi

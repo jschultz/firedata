@@ -1,6 +1,6 @@
 ################################################################################
 ##
-## Copyright 2022 Jonathan Schultz
+## Copyright 2023 Jonathan Schultz
 ##
 ## This program is free software: you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
@@ -154,11 +154,11 @@ LANGUAGE plpgsql
 AS
 $$
     BEGIN
-        IF EXISTS (SELECT 1 FROM pg_tables WHERE tablename = name) THEN
-            IF EXISTS (SELECT 1 FROM pg_tables WHERE tablename = name || '_backup') THEN  
-                EXECUTE 'DROP TABLE ' || name || '_backup';
+        IF EXISTS (SELECT 1 FROM pg_tables WHERE schemaname = 'public' AND tablename = name) THEN
+            IF EXISTS (SELECT 1 FROM pg_tables WHERE schemaname = 'backup' AND tablename = name) THEN  
+                EXECUTE 'DROP TABLE backup.' || name;
             END IF;
-            EXECUTE 'ALTER TABLE ' || name || ' RENAME TO ' || name || '_backup';
+            EXECUTE 'ALTER TABLE ' || name || ' SET SCHEMA backup';
         END IF;
     END;
 $$"
@@ -170,14 +170,14 @@ $$
     DECLARE comment text;
     test text;
     BEGIN
-        IF EXISTS (SELECT 1 FROM pg_tables WHERE tablename = name) THEN
-            IF EXISTS (SELECT 1 FROM pg_tables WHERE tablename = name || '_backup') THEN  
-                EXECUTE 'DROP TABLE ' || name || '_backup';
+        IF EXISTS (SELECT 1 FROM pg_tables WHERE schemaname = 'public' AND tablename = name) THEN
+            IF EXISTS (SELECT 1 FROM pg_tables WHERE schemaname = 'backup' AND tablename = name) THEN  
+                EXECUTE 'DROP TABLE backup.' || name;
             END IF;
-            EXECUTE 'CREATE TABLE ' || name || '_backup AS TABLE ' || name;
-            comment := obj_description(name::regclass);
+            EXECUTE 'CREATE TABLE backup.' || name || ' AS TABLE public.' || name;
+            comment := obj_description(('public.' || name)::regclass);
             IF comment IS NOT NULL THEN
-                EXECUTE 'COMMENT ON TABLE ' || name || ' IS ''' || comment || '''';
+                EXECUTE 'COMMENT ON TABLE backup.' || name || ' IS ''' || comment || '''';
             END IF;
         END IF;
     END;

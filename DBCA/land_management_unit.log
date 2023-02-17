@@ -17,7 +17,7 @@
 ##
 ################################################################################
 # psql
-##    --command "DROP TABLE IF EXISTS land_management_unit"
+#    --command "DROP TABLE IF EXISTS land_management_unit"
 #    --command "CREATE TABLE land_management_unit AS (
 SELECT 
     extcode, 
@@ -27,7 +27,6 @@ SELECT
     ST_Multi(ST_Union(ST_Intersection(geom, (SELECT ST_Union(geom) FROM native_veg_extent_dpird_005_wa WHERE ST_Intersects(native_veg_extent_dpird_005_wa.geom, land_management_unit_raw.geom))))) AS native_geom 
 FROM land_management_unit_raw GROUP BY extcode, description)"
 #    --command "CREATE UNIQUE INDEX ON land_management_unit (extcode)"
-#    --command "CREATE UNIQUE INDEX ON land_management_unit (description)"
 #    --command "CREATE INDEX ON land_management_unit USING gist (full_geom)"
 #    --command "CREATE INDEX ON land_management_unit USING gist (fmp_geom)"
 #    --command "CREATE INDEX ON land_management_unit USING gist (native_geom)"
