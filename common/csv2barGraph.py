@@ -33,12 +33,13 @@ def csv2barGraph(arglist=None):
     parser.add_argument('-v', '--verbosity',  type=int, default=1, private=True)
     
     parser.add_argument('-b', '--blocks',     type=int, default=1, help='Number of blocks in each bar column')
+    parser.add_argument('-C', '--columns',    type=int, default=1, help='Number of coumns')
     parser.add_argument('-w', '--whitespace', type=int, default=10, help='Percentage of width to leave as white space between columns')
 
     parser.add_argument('-l', '--limit',      type=int, help='Limit number of rows to process')
     parser.add_argument(      '--since',      type=str, help='X axis lower bound')
     parser.add_argument(      '--until',      type=str, help='X axis upper bound')
-    parser.add_argument('-C', '--cumulative',  action='store_true', help='Cumulate Y data')
+    parser.add_argument(      '--cumulative',  action='store_true', help='Cumulate Y data')
     
     parser.add_argument('-W', '--width',      type=int, default=400, help='Plot width in millimetres')
     parser.add_argument('-H', '--height',     type=int, default=200,  help='Plot height in millimetres')
@@ -135,7 +136,8 @@ def csv2barGraph(arglist=None):
 
     ax = fig.add_subplot(111)
        
-    Ybars = (len(csvfieldnames) - 1 + args.blocks - 1) // args.blocks
+    # Ybars = (len(csvfieldnames) - 1 + args.blocks - 1) // args.blocks
+    Ybars = args.columns
     Ybarwidth = (1 - args.whitespace / 100) / Ybars
     Ybaridx = 0
     Ybarnum = 0
@@ -169,7 +171,7 @@ def csv2barGraph(arglist=None):
     #pyplot.gca().invert_xaxis()
     pyplot.grid(axis='y', color='black')
     if args.blocks > 1 or Ybars > 1:
-        ax.legend(csvfieldnames[1:], prop=legendfont, framealpha=1)
+        ax.legend(csvfieldnames[1:args.blocks*Ybars], prop=legendfont, framealpha=1)
     
     if args.exec:
         exec(args.exec)

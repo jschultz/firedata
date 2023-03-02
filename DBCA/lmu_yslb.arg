@@ -31,8 +31,8 @@
 #    --subtitle "Reference date: 1 July ${baseyear}"
 #    --ylabel "Percentage of LMU burned"
 #    --xlabel "Years since last burned"
-#>   --outfile "LMU YSLB/${lmu} YSLB.pdf"
-#<   lmu_yslb.csv
+#>   --outfile "${outdir}/${lmu} YSLB.pdf"
+#<   "lmu_yslb_${lmu}.csv"
 ################################################################################
 # event_history.sh
 #    --nologfile
@@ -42,4 +42,4 @@
 #    --eventgroups year
 #    --order -year
 #    --eventaliases "Years since last burnt;Prescribed burn;Escaped prescribed burn;Other fire;Multiple"
-#>   --csvfile lmu_yslb.csv
+#>   --csvfile "lmu_yslb_${lmu}.csv"

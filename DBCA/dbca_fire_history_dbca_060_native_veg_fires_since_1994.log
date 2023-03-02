@@ -1,6 +1,6 @@
 ################################################################################
 ##
-## Copyright 2023 Jonathan Schultz
+## Copyright 2022 Jonathan Schultz
 ##
 ## This program is free software: you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
@@ -16,23 +16,8 @@
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##
 ################################################################################
-#< load_file.sh
-#    --nologfile
-#    --geometry "geom"
-#    --srid "4283"
-#    --table "DBCA_Fire_History_DBCA_060_XXX"
-################################################################################
-#<> xargs
-#    --verbose
-#    --replace
-#    unzip
-#    -p
-#    "DBCA_Fire_History_DBCA_060_WA_GDA94_Public_Geopackage.{}.zip
-#    "DBCA_Fire_History_DBCA_060_WA_GDA94_Public.gpkg"
-################################################################################
-#> download-data-wa-gov
-#    --nologfile
-#    --folder "Environment"
-#    --filename "DBCA_Fire_History_DBCA_060_WA_GDA94_Public_Geopackage.zip"
-#    --user "${user}"
-#    --password "${password}"
+# argreplay
+#    --substitute history:dbca_fire_history_dbca_060_southern_history_by_native_veg
+#                 refseason:1994
+#                 table:dbca_fire_history_dbca_060_native_veg_fires_since_1994
+#    -- calc_fires_since_year.arg

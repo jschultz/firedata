@@ -39,9 +39,6 @@ def download_data_wa_gov(arglist=None):
     parser.add_argument('-p', '--password', type=str, required=True, private=True, 
                         help='Your password for SLIP')
 
-    parser.add_argument('-o', '--outfile', type=str,
-                        help="The name of the file to create; default is 'filename'")
-    
     parser.add_argument('--logfile',          type=str, private=True,
                         help="Logfile name, default is 'filename'.log")
     parser.add_argument('--nologfile',        action='store_true', 
@@ -72,16 +69,19 @@ def download_data_wa_gov(arglist=None):
         datadatetimestr = dataDownloadResponse.headers.get('Last-Modified', None)
         datadatetime = dateparser.parse(datadatetimestr) if datadatetimestr else None
         if dataDownloadResponse.status_code == 200:
-            if datadatetime and args.outfile:
-                outfile = datadatetime.strftime(args.outfile)
+            if datadatetime:
+                datetime = datadatetime.strftime('%Y%m%d')
+                filesplitext = os.path.splitext(args.filename)
+                outfile = file.splitext[0] + '.' + datetime + file.splitext[1]
             else:
+                datetime = ''
                 outfile = args.filename
                 
             print("Saving file to: " + outfile, file=sys.stderr)
             with open(outfile, 'wb') as f:
                 f.write(dataDownloadResponse.content)
 
-            print(outfile)  # So filename can be piped
+            print(datetime)  # So filename can be piped
         else:
             print("Error download file with error " + str(dataDownloadResponse.status_code) + "-" + dataDownloadResponse.text, file=sys.stderr)
     else:

@@ -20,8 +20,8 @@
 #    --nologfile
 #    --geometry "geom"
 #    --srid "4283"
-#    --table "Annual_Ind_Burn_Prog_DBCA_007"
-#<   "Annual_Ind_Burn_Prog_DBCA_007_WA_GDA94_Public.gpkg"
+#    --table "DBCA_Burn_Options_Program_DBCA_007"
+#<   "DBCA_Burn_Options_Program_DBCA_007_WA_GDA94_Public.gpkg"
 ################################################################################
 #< xargs
 #    --verbose
@@ -29,12 +29,12 @@
 #    unzip
 #    -o
 #    {}
-#    "Annual_Ind_Burn_Prog_DBCA_007_WA_GDA94_Public.gpkg"
+#    "DBCA_Burn_Options_Program_DBCA_007_WA_GDA94_Public.gpkg"
 ################################################################################
 #> download-data-wa-gov
 #    --nologfile
 #    --folder "Environment"
-#    --filename "Annual_Ind_Burn_Prog_DBCA_007_WA_GDA94_Public_Geopackage.zip"
-#>   --outfile "Annual_Ind_Burn_Prog_DBCA_007_WA_GDA94_Public_Geopackage.%Y-%m-%d.zip"
+#    --filename "DBCA_Burn_Options_Program_DBCA_007_WA_GDA94_Public_Geopackage.zip"
+#>   --outfile "DBCA_Burn_Options_Program_DBCA_007_WA_GDA94_Public_Geopackage.%Y-%m-%d.zip"
 #    --user "${user}"
 #    --password "${password}"

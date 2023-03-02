@@ -1,6 +1,7 @@
 ################################################################################
 # overlay_junction.sh
 #    --nologfile
-#    --eventtable "dbca_fire_history_dbca_060;legislated_lands_and_waters_dbca_011;forest_blocks_dbca_025;native_veg_extent_dpird_005_wa"
+##    --eventtable "dbca_fire_history_dbca_060;legislated_lands_and_waters_dbca_011;forest_blocks_dbca_025;native_veg_extent_dpird_005_wa"
+#    --eventtable "dbca_fire_history_dbca_060"
 #    --where ST_Intersects(geom, (SELECT ST_Union(geom) FROM dbca_region_boundaries_dbca_022 WHERE drg_region_name IN ('SOUTH COAST', 'SOUTH WEST', 'SWAN', 'WARREN')))"
 #    --basename "southern"

@@ -25,7 +25,7 @@ args=(
   "-g:--geometry::geom:Name of column to hold geometry data"
   "-s:--srid:::SRID to re-project geometry"
   "-L:--layer:::Layer to import"
-  ":filename:::Name of file to read:required,input"
+  ":filename:::Name of file to read:input"
   "-l:--logfile:::Log file to record processing, defaults to table name with extension '.log':private"
   ":--nologfile:::Don't write a log file:private,flag"
 )
@@ -33,8 +33,13 @@ args=(
 source $(dirname "$0")/argparse.sh
 
 if [[ ! -n "${table}" ]]; then
-    table=$(basename ${filename})
-    table="${table%.*}"
+    if [[ -n "${filename}" ]]; then
+        table=$(basename ${filename})
+        table="${table%.*}"
+    else
+        echo "At least one of 'table' and 'filename' must be specified" > /dev/stderr
+        return 1
+    fi
 fi
 if [[ "${nologfile}" != "true" ]]; then
     if [[ ! -n "${logfile}" ]]; then
@@ -51,11 +56,16 @@ if [[ -n "${srid}" ]]; then
     srid="-t_srs EPSG:${srid}"
 fi
 
+if [[ ! -n "${filename}" ]]; then
+    filename=$(mktemp)
+    cat >${filename}
+fi
+
 if [[ -n "${geometry}" ]]; then
     ogr2ogr -overwrite -f PostgreSQL "PG:dbname=$PGDATABASE user=$PGUSER" -lco geometry_name=${geometry} ${srid} -nln "${table}" "${filename}" ${layer}
-    psql \
-        --quiet --command="\timing off" \
-        --command="CREATE INDEX ON ${table} USING gist (${geometry})"
+#     psql \
+#         --quiet --command="\timing off" \
+#         --command="CREATE INDEX ON ${table} USING gist (${geometry})"
 else
     ogr2ogr -overwrite -f PostgreSQL "PG:dbname=$PGDATABASE user=$PGUSER" -nln "${table}" "${filename}" ${layer}
 fi
