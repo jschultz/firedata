@@ -27,8 +27,10 @@ args=(
   "-j:--junction:::Semicolon-delimited junction table names. Default is 'eventtable'_junction"
   "-S:--suffix:::Suffix to append to first event table name to generate dump, polygon, point-in-polygon and junction table names:deprecated"
   "-g:--geometry::geom:Semicolon-delimited name(s) of geometry column(s) in event tables"
-  "-w:--where:::WHERE clause(s) for selecting from event table(s)"
-  "--E:--existing:::Use existing dump and polygon tables:flag"
+  "-w:--where:::WHERE clause(s) for selecting from event table(s); deprecated in favour of 'area':deprecated"
+  "-a:--area:::Area to constrain junction calculation"
+  "--E:--existing:::Use existing tables where they exist:flag"
+  "--K:--keep:::Keep tables for re-use:flag"
   "-l:--logfile:::Log file to record processing, defaults to 'basename' + .log"
   ":--nologfile:::Don't write a log file:private,flag"
   ":--nobackup:::Don't back up existing database tables:private,flag"
@@ -74,51 +76,66 @@ for ((tableidx=0; tableidx<${#eventtable_array[@]}; tableidx++)) do
     fi
 done
 
-if [[ "${existing}" != "true" ]]; then
+force=false
 
-    echo "Testing SRIDs" > /dev/stderr
+echo "Testing SRIDs" >> /dev/stderr
 
-    SRID=$(psql \
+SRID=$(psql \
+            --quiet --tuples-only --no-align --command="\timing off" \
+            --command "SELECT ST_SRID(${geometry_array[0]}) AS srid FROM ${eventtable_array[0]} LIMIT 1" )
+            
+if [[ $SRID -eq 0 ]]; then
+    echo "ERROR: Missing SRID in shape table geometries" >> /dev/stderr
+    return 1
+fi
+
+for ((tableidx=0; tableidx<${#eventtable_array[@]}; tableidx++)) do
+    MULTIPLE_SRID=$(psql \
                 --quiet --tuples-only --no-align --command="\timing off" \
-                --command "SELECT ST_SRID(${geometry_array[0]}) AS srid FROM ${eventtable_array[0]} LIMIT 1" )
-                
-    if [[ $SRID -eq 0 ]]; then
-        echo "ERROR: Missing SRID in shape table geometries" > /dev/stderr
+                --command "SELECT EXISTS(
+                            SELECT ST_SRID(${geometry_array[tableidx]}) AS srid FROM ${eventtable_array[tableidx]} WHERE ST_SRID(${geometry_array[tableidx]}) != '${SRID}')" )
+    if [[ "$MULTIPLE_SRID" == "t" ]]; then
+        echo "ERROR: Multiple SRIDs in shape table geometries" >> /dev/stderr
         return 1
     fi
+done
 
-    for ((tableidx=0; tableidx<${#eventtable_array[@]}; tableidx++)) do
-        MULTIPLE_SRID=$(psql \
-                    --quiet --tuples-only --no-align --command="\timing off" \
-                    --command "SELECT EXISTS(
-                                SELECT ST_SRID(${geometry_array[tableidx]}) AS srid FROM ${eventtable_array[tableidx]} WHERE ST_SRID(${geometry_array[tableidx]}) != '${SRID}')" )
-        if [[ "$MULTIPLE_SRID" == "t" ]]; then
-            echo "ERROR: Multiple SRIDs in shape table geometries" > /dev/stderr
-            return 1
-        fi
-    done
-            
-    for ((tableidx=0; tableidx<${#eventtable_array[@]}; tableidx++)) do
+for ((tableidx=0; tableidx<${#eventtable_array[@]}; tableidx++)) do
+    if [[ "${existing}" == "true" &&  $(psql --quiet --tuples-only --no-align --command="\timing off" --command "SELECT table_exists('${eventtable_array[tableidx]}_dump')::int") == 1 ]]; then
+        echo "Dump table ${eventtable_array[tableidx]}_dump exists - skipping"
+        continue
+    else
+        force=true
         echo "Creating dump table ${eventtable_array[tableidx]}_dump"
-        if [[ ! -n "${where}" ]]; then
-            where="True"
-        fi
+
         if [[ "${nobackup}" != "true" ]]; then  
             backupcommand="CALL cycle_table('${eventtable_array[tableidx]}_dump')"
         else
             backupcommand=
         fi
+        if [[ -n "${area}" ]]; then
+            dumptable="WITH area as (${area})
+                        SELECT ${eventid_array[tableidx]}, (ST_Dump(ST_Intersection(area.geom,event.${geometry_array[tableidx]}))).geom AS geom FROM ${eventtable_array[tableidx]} AS event, area WHERE ST_Intersects(area.geom,event.${geometry_array[tableidx]})"
+        elif [[ -n "${where}" ]]; then
+            dumptable="SELECT ${eventid_array[tableidx]}, (ST_Dump(${geometry_array[tableidx]})).geom AS geom FROM ${eventtable_array[tableidx]} WHERE ${where}"
+        else
+            dumptable="SELECT ${eventid_array[tableidx]}, (ST_Dump(geom,event)).geom AS geom FROM ${eventtable_array[tableidx]} AS event"
+        fi
         psql \
             --quiet --tuples-only --no-align --command="\timing off" \
             --command="${backupcommand}" \
-            --command="CREATE TABLE ${eventtable_array[tableidx]}_dump AS
-                        SELECT ${eventid_array[tableidx]}, (ST_Dump(${geometry_array[tableidx]})).geom AS geom FROM ${eventtable_array[tableidx]} WHERE ${where}" \
-        --command "CREATE INDEX ON ${eventtable_array[tableidx]}_dump USING gist (geom)" \
-        --command "ANALYZE ${eventtable_array[tableidx]}_dump"
-    done
+            --command="CREATE TABLE ${eventtable_array[tableidx]}_dump AS ${dumptable}" \
+            --command "CREATE INDEX ON ${eventtable_array[tableidx]}_dump USING gist (geom)" \
+            --command "ANALYZE ${eventtable_array[tableidx]}_dump"
+    fi
+done
 
-    echo "Creating polygon table ${poly}" > /dev/stderr
-    if [[ "${nobackup}" != "true" ]]; then  
+if [[ "${force}" != "true" && "${existing}" == "true" &&  $(psql --quiet --tuples-only --no-align --command="\timing off" --command "SELECT table_exists('${poly}')::int") == 1 ]]; then
+    echo "Polygon table ${poly} exists - skipping"
+else
+    force=true
+    echo "Creating polygon table ${poly}" >> /dev/stderr
+    if [[ "${existing}" != "true" && "${nobackup}" != "true" ]]; then  
         backupcommand="CALL cycle_table('${poly}')"
     else
         backupcommand=
@@ -127,12 +144,14 @@ if [[ "${existing}" != "true" ]]; then
     psql \
         --quiet --tuples-only --no-align --command="\timing off" \
         --command="${backupcommand}" \
-        --command="CREATE TABLE ${poly} (id SERIAL PRIMARY KEY, ${geometry} geometry(Polygon));"
+        --command="CREATE TABLE ${poly} (id SERIAL PRIMARY KEY, geom geometry(Polygon));" \
+        --command "CREATE INDEX ON ${poly} USING gist (geom)" \
+        --command "ANALYZE ${poly}"
         
     dumpcommand="SELECT ST_ExteriorRing((ST_DumpRings(geom)).geom) FROM (
         SELECT geom FROM ${eventtable_array[0]}_dump"
     for ((tableidx=1; tableidx<${#eventtable_array[@]}; tableidx++)) do
-        dumpcommand+=" UNION SELECT geom FROM ${eventtable_array[0]}_dump"
+        dumpcommand+=" UNION SELECT geom FROM ${eventtable_array[tableidx]}_dump"
     done
     dumpcommand+=") foo"
 
@@ -145,46 +164,60 @@ if [[ "${existing}" != "true" ]]; then
     psql \
         --quiet --tuples-only --no-align --command="\timing off" \
         --command="\timing off" \
-        --command="\copy ${poly} (${geometry}) FROM stdin" \
-        --command "CREATE INDEX ON ${poly} USING gist (${geometry})" \
-        --command "ANALYZE ${poly}"
-
+        --command="\copy ${poly} (geom) FROM stdin"
 fi
 
-echo "Creating point in polygon table ${point}" > /dev/stderr
-psql \
-    --quiet --tuples-only --no-align --command="\timing off" \
-    --command="DROP TABLE IF EXISTS ${point}" \
-    --command="CREATE TABLE ${point} AS 
-                   SELECT id, ST_PointOnSurface(${geometry}) AS point
-                   FROM ${poly}" \
-    --command "CREATE INDEX ON ${point} USING gist (point)" \
-    --command "ANALYZE ${point}"
-
-for ((tableidx=0; tableidx<${#eventtable_array[@]}; tableidx++)) do
-    echo "Creating junction table ${junction_array[tableidx]}" > /dev/stderr
-    if [[ "${nobackup}" != "true" ]]; then  
-        backupcommand="CALL cycle_table('${junction_array[tableidx]}')"
-    else
-        backupcommand=
-    fi
+if [[ "${force}" != "true" && "${existing}" == "true" &&  $(psql --quiet --tuples-only --no-align --command="\timing off" --command "SELECT table_exists('${point}')::int") == 1 ]]; then
+    echo "Point in polygon table ${point} exists - skipping"
+else
+    echo "Creating point in polygon table ${point}" >> /dev/stderr
     psql \
         --quiet --tuples-only --no-align --command="\timing off" \
-        --command="${backupcommand}" \
-        --command="CREATE TABLE ${junction_array[tableidx]} AS 
-                    SELECT point.id AS poly_id, dump.${eventid_array[tableidx]}
-                    FROM ${eventtable_array[tableidx]}_dump AS dump
-                        JOIN ${point} AS point
-                        ON ST_Contains(dump.geom, point.point)
-                    GROUP BY point.id, dump.id" \
-        --command="CREATE INDEX ON ${junction_array[tableidx]} (poly_id)" \
-        --command="ALTER TABLE ${junction_array[tableidx]} ADD CONSTRAINT fk_poly FOREIGN KEY (poly_id) REFERENCES ${poly}(id)" \
-        --command="CREATE INDEX ON ${junction_array[tableidx]} (${eventid_array[tableidx]})" \
-        --command="ALTER TABLE ${junction_array[tableidx]} ADD CONSTRAINT fk_${eventtable_array[tableidx]} FOREIGN KEY (${eventid_array[tableidx]}) REFERENCES ${eventtable_array[tableidx]}(${eventid_array[tableidx]})" \
-        --command "ANALYZE ${junction_array[tableidx]}"
+        --command="DROP TABLE IF EXISTS ${point}" \
+        --command="CREATE TABLE ${point} AS 
+                    SELECT id, ST_PointOnSurface(geom) AS point
+                    FROM ${poly}" \
+        --command "CREATE INDEX ON ${point} USING gist (point)" \
+        --command "ANALYZE ${point}"
+fi
+
+for ((tableidx=0; tableidx<${#eventtable_array[@]}; tableidx++)) do
+    if [[ "${force}" != "true" && "${existing}" == "true" &&  $(psql --quiet --tuples-only --no-align --command="\timing off" --command "SELECT table_exists('${junction_array[tableidx]}}')::int") == 1 ]]; then
+        echo "Junction table ${junction_array[tableidx]} exists - skipping"
+        continue
+    else
+        echo "Creating junction table ${junction_array[tableidx]}" >> /dev/stderr
+        if [[ "${nobackup}" != "true" ]]; then  
+            backupcommand="CALL cycle_table('${junction_array[tableidx]}')"
+        else
+            backupcommand=
+        fi
+        psql \
+            --quiet --tuples-only --no-align --command="\timing off" \
+            --command="${backupcommand}" \
+            --command="CREATE TABLE ${junction_array[tableidx]} AS 
+                        SELECT point.id AS poly_id, dump.${eventid_array[tableidx]}
+                        FROM ${eventtable_array[tableidx]}_dump AS dump
+                            JOIN ${point} AS point
+                            ON ST_Contains(dump.geom, point.point)
+                        GROUP BY point.id, dump.${eventid_array[tableidx]}" \
+            --command="CREATE INDEX ON ${junction_array[tableidx]} (poly_id)" \
+            --command="ALTER TABLE ${junction_array[tableidx]} ADD CONSTRAINT fk_poly FOREIGN KEY (poly_id) REFERENCES ${poly}(id)" \
+            --command="CREATE INDEX ON ${junction_array[tableidx]} (${eventid_array[tableidx]})" \
+            --command="ALTER TABLE ${junction_array[tableidx]} ADD CONSTRAINT fk_${eventtable_array[tableidx]} FOREIGN KEY (${eventid_array[tableidx]}) REFERENCES ${eventtable_array[tableidx]}(${eventid_array[tableidx]})" \
+            --command "ANALYZE ${junction_array[tableidx]}"
+    fi
 done
 
-echo "Dropping point in polygon table ${point}" > /dev/stderr
-psql \
-    --quiet --tuples-only --no-align --command="\timing off" \
-    --command="DROP TABLE IF EXISTS ${point}"
+if [[ "${keep}" != "true" ]]; then  
+    echo "Dropping point in polygon table ${point}" >> /dev/stderr
+    psql \
+        --quiet --tuples-only --no-align --command="\timing off" \
+        --command="DROP TABLE ${point}"
+    for ((tableidx=0; tableidx<${#eventtable_array[@]}; tableidx++)) do
+        echo "Dropping dump table ${eventtable_array[tableidx]}_dump" >> /dev/stderr
+        psql \
+            --quiet --tuples-only --no-align --command="\timing off" \
+            --command="DROP TABLE ${eventtable_array[tableidx]}_dump"
+    done
+fi

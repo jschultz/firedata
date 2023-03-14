@@ -182,3 +182,15 @@ $$
         END IF;
     END;
 $$"
+#    --command "
+CREATE OR REPLACE FUNCTION table_exists(name text)
+RETURNS boolean
+LANGUAGE plpgsql
+AS
+$$
+    DECLARE
+        result boolean;
+    BEGIN
+        RETURN EXISTS (SELECT 1 FROM pg_tables WHERE schemaname = 'public' AND tablename = name);
+    END;
+$$"
