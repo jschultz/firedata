@@ -1,0 +1,22 @@
+################################################################################
+# psql_command.sh
+#    --command "
+SELECT description, 
+ST_Area(native_geom::geography) / 10000 as native_veg_area, 
+SUM(ST_Area(geom::geography)) FILTER (WHERE yslb <= 2)                 / ST_Area(native_geom::geography) * 100 AS yslb_0_to_2,
+SUM(ST_Area(geom::geography)) FILTER (WHERE yslb >= 3  AND yslb <= 5)  / ST_Area(native_geom::geography) * 100 AS yslb_3_to_5,
+SUM(ST_Area(geom::geography)) FILTER (WHERE yslb >= 6  AND yslb <= 11) / ST_Area(native_geom::geography) * 100 AS yslb_6_to_11,
+SUM(ST_Area(geom::geography)) FILTER (WHERE yslb >= 12 AND yslb <= 24) / ST_Area(native_geom::geography) * 100 AS yslb_12_to_24,
+SUM(ST_Area(geom::geography)) FILTER (WHERE yslb >= 25)                / ST_Area(native_geom::geography) * 100 AS yslb_25_plus,
+SUM(ST_Area(geom::geography)) FILTER (WHERE yslb IS NULL)              / ST_Area(native_geom::geography) * 100 AS yslb_unknown
+FROM (
+      SELECT description, land_management_unit.native_geom, poly.geom, ${refyear} - fireseason(event.fih_date1) AS yslb
+      FROM land_management_unit
+      JOIN southern_fmp_land_management_unit_junction AS lmu_junction ON lmu_junction.extcode = land_management_unit.extcode
+      JOIN southern_fmp_view AS view ON view.id = lmu_junction.poly_id
+      JOIN southern_fmp_poly AS poly ON poly.id = view.id
+      LEFT OUTER JOIN dbca_fire_history_dbca_060 AS event ON event.id = view.dbca_fire_history_dbca_060_id[1]
+      WHERE native_veg_extent_dpird_005_wa_id IS NOT NULL) foo
+GROUP BY description, native_geom"
+#    --csvfile "lmu_native_veg_yslb.csv"
+################################################################################
