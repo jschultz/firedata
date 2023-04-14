@@ -35,6 +35,5 @@
 #    --nologfile
 #    --folder "Environment"
 #    --filename "Forest_Man_Plan_2014_2023_DBCA_041_WA_GDA94_Public_Geopackage.zip"
-#>   --outfile "Forest_Man_Plan_2014_2023_DBCA_041_WA_GDA94_Public_Geopackage.%Y-%m-%d.zip"
 #    --user "${user}"
 #    --password "${password}"

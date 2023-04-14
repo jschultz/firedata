@@ -149,7 +149,8 @@ def csv2barGraph(arglist=None):
                    Ydata[Ybaridx+Yblockidx], width=Ybarwidth, 
                    bottom=([sum(Ydata[Ybaridx+Yblockidx-1-Yidx][idx] for Yidx in range(Yblockidx)) for idx in range(len(Xdata))] if Yblockidx > 0 else None),
                    color = args.colors[Ybaridx+Yblockidx] if args.colors else None,
-                   align='center'
+                   align='center',
+                   label=csvfieldnames[Ybaridx+Yblockidx+1]
                    )
         Ybaridx += args.blocks
         Ybarnum += 1
@@ -171,7 +172,7 @@ def csv2barGraph(arglist=None):
     #pyplot.gca().invert_xaxis()
     pyplot.grid(axis='y', color='black')
     if args.blocks > 1 or Ybars > 1:
-        ax.legend(csvfieldnames[1:args.blocks*Ybars+1], prop=legendfont, framealpha=1)
+        ax.legend(prop=legendfont, framealpha=1)
     
     if args.exec:
         exec(args.exec)
