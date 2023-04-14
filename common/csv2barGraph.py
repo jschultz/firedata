@@ -171,7 +171,7 @@ def csv2barGraph(arglist=None):
     #pyplot.gca().invert_xaxis()
     pyplot.grid(axis='y', color='black')
     if args.blocks > 1 or Ybars > 1:
-        ax.legend(csvfieldnames[1:args.blocks*Ybars], prop=legendfont, framealpha=1)
+        ax.legend(csvfieldnames[1:args.blocks*Ybars+1], prop=legendfont, framealpha=1)
     
     if args.exec:
         exec(args.exec)

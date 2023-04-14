@@ -8,8 +8,9 @@
 #    --geometry ";;;;full_geom"
 #    --polycolumns "id"
 #    --polyaliases "poly_id"
-#    --eventcolumns "dbca_fire_history_dbca_060.id;legislated_lands_and_waters_dbca_011.id;forest_blocks_dbca_025;native_veg_extent_dpird_005_wa.id;land_management_unit.extcode;forest_man_plan_2014_2023_dbca_041.id"
+#    --eventcolumns "dbca_fire_history_dbca_060.id;legislated_lands_and_waters_dbca_011.id;forest_blocks_dbca_025.id;native_veg_extent_dpird_005_wa.id;land_management_unit.extcode;forest_man_plan_2014_2023_dbca_041.id"
 #    --eventaliases "dbca_fire_history_dbca_060_id;legislated_lands_and_waters_dbca_011_id;forest_blocks_dbca_025_id;native_veg_extent_dpird_005_wa_id;land_management_unit_extcode;forest_man_plan_2014_2023_dbca_041_id"
+#    --indexes poly_id
 ################################################################################
 # overlay_junction.sh
 #    --nologfile

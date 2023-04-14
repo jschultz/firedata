@@ -169,8 +169,8 @@ else
         --quiet --tuples-only --no-align --command="\timing off" \
         --command="${dumpcommand}" \
     | \
-    jtsop.sh -a stdin -b "POLYGON (EMPTY)" -f wkb -explode OverlayNG.union 100000000 | \
-    jtsop.sh -a stdin -f wkb -srid ${SRID} -explode Polygonize.polygonize | \
+    time --portability jtsop.sh -a stdin -b "POLYGON (EMPTY)" -f wkb -explode OverlayNG.union 100000000 | \
+    time --portability jtsop.sh -a stdin -f wkb -srid ${SRID} -explode Polygonize.polygonize | \
     psql --variable=ON_ERROR_STOP=1 \
         --command="\copy ${outtable} (geom) FROM stdin"
 fi

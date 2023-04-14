@@ -160,8 +160,8 @@ else
         csvfile=/dev/stdout
     fi
     if [[ "${nocomments}" != "true" ]]; then
-#         echo "${COMMENTS//$'\n'/\\n}" > "${csvfile}"
-        echo -n "${COMMENTS}" > "${csvfile}"
+        echo -n "${COMMENTS}"            > "${csvfile}"
+        echo -n "${COMMENTS_SEPARATOR}" >> "${csvfile}"
     fi
     psql --quiet --csv \
          --command="\timing off" \
