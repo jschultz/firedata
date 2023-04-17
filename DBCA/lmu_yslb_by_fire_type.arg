@@ -39,7 +39,7 @@ pyplot.plot(list(range(45)), [
 label="“Ideal”")
 ax.legend(prop=legendfont, framealpha=1)
 "
-#>   --outfile "LMU YSLB/${lmu} yslb.pdf"
+#>   --outfile lmu_yslb_${lmu}_${baseyear}.pdf"
 #<   lmu_yslb_${lmu}_${baseyear}.csv
 ###########################################################################
 #> event_history.sh
