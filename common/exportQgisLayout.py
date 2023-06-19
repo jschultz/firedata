@@ -32,9 +32,11 @@ def exportQgisLayout(arglist=None):
     parser = ArgumentRecorder(description='Exports a layout from a QGIS file.',
                               fromfile_prefix_chars='@')
 
-    parser.add_argument('-l', '--layout', type=str, required=True, help="Print layout to export")
+    parser.add_argument('-l', '--layout', type=str, default="Layout 1", help="Print layout to export")
     parser.add_argument('-s', '--simplify', action='store_true', help="Simplify geometries")
     parser.add_argument('-o', '--outfile', type=str, help="Name of PDF file to export, default to 'layout'.pdf")
+
+    parser.add_argument('-v', '--variable', nargs='+', type=str, help='List of variable:value pairs to define as project variables')
     
     parser.add_argument('--logfile',      type=str, help="Logfile", private=True)
     parser.add_argument('--nologfile',    action='store_true', help='Do not output a logfile')
@@ -56,12 +58,15 @@ def exportQgisLayout(arglist=None):
         parser.write_comments(args, logfile, incomments=ArgumentHelper.separator())
         logfile.close()
 
-    QgsApplication.setPrefixPath("/usr", True)
+    # QgsApplication.setPrefixPath("/usr", True)
     qgs = QgsApplication([b"exportQgisLayout"], True)
     qgs.initQgis()
 
     project = QgsProject.instance()
     project.read(args.qgisfile[0])
+    if args.variable:
+        for var in args.variable:
+            QgsExpressionContextUtils.setProjectVariable(project, var.split(':')[0], var.split(':')[1])
     
     manager = QgsProject.instance().layoutManager()
     layout = manager.layoutByName(args.layout)
@@ -70,7 +75,8 @@ def exportQgisLayout(arglist=None):
     settings.simplifyGeometries = args.simplify
     settings.forceVectorOutput = True
     exporter = QgsLayoutExporter(layout)
-    exporter.exportToPdf(args.outfile, settings)
+    # exporter.exportToPdf(args.outfile, settings)
+    exporter.exportToPdf(layout.atlas(), args.outfile, settings)
     
     qgs.exitQgis()
 

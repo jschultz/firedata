@@ -1,0 +1,79 @@
+################################################################################
+##
+## Copyright 2023 Jonathan Schultz
+##
+## This program is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+##
+## This program is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with this program.  If not, see <http://www.gnu.org/licenses/>.
+##
+################################################################################
+#< csv2barGraph.py
+#    --nologfile
+#    --since 0
+#    --until 45
+#    --width 400
+#    --height 200
+#    --blocks 1
+#    --whitespace 20
+#    --title "Years since last burned by LMU"
+#    --subtitle "Reference date: 1 July ${baseyear}"
+#    --ylabel "Area (percent of LMU area)"
+#    --xlabel "Years since last burned"
+##    --ymax 20
+#    --exec "
+pyplot.plot(list(range(45)), [
+4.8750860062352,4.71312301375067,4.56735633243506,4.40539333995052,4.25962665863491,4.13005624875332,4.00048587860664,3.87091546872504,3.74134509857836,3.62,3.4984005899841,3.38502649127143,3.27165243229368,3.17,3.06110050630236,2.96392271875862,2.87,2.76956714367114,2.68858562756141,2.59140784001767,2.51042636364287,2.42944484753314,2.34846337115833,2.2674818550486,2.20269668984272,2.12171517373299,2.05692996879219,1.99214480358632,1.92735959864552,1.86257439370472,1.79778918876392,1.73300398382312,1.66821881861724,1.61962992484537,1.57104099133858,1.52245209756671,1.47386320379484,1.42527431002298,1.37668541625111,1.32809652247924,1.27950762870737,1.24711504610443,1.19852611259764,1.1661335299947,
+1.135],
+label="“Ideal”")
+ax.legend(prop=legendfont, framealpha=1)
+"
+#>   --outfile ${outfile}"
+###########################################################################
+#> clipivot
+#     max
+#     --rows yslb 
+#     --cols LMU
+#     --val percent_burned
+#<    fmp_yslb_by_lmus_${baseyear}.csv
+###########################################################################
+#> event_history.sh
+#    --nologfile
+#    --nocomments
+#    --eventtable "(
+SELECT description,
+       fireseason(fih_date1) AS year, 
+       poly.geom,
+       ARRAY_AGG(DISTINCT fih_cause) AS fih_causes
+FROM ${basename}_poly AS poly,
+     (SELECT description, view.poly_id, fih_date1, fih_cause
+      FROM land_management_unit AS lmu,
+           ${basename}_land_management_unit_junction AS lmu_junction,
+           ${basename}_view AS view,
+      LATERAL (SELECT fih_date1, fih_cause 
+               FROM (SELECT unnest(view.dbca_fire_history_dbca_060_id) AS event_id) AS event_ids
+               JOIN dbca_fire_history_dbca_060 ON dbca_fire_history_dbca_060.id = event_id
+               WHERE fireseason(fih_date1) <= ${baseyear}
+               LIMIT 1) AS event
+      WHERE lmu.description IN (${lmus})
+      AND   lmu_junction.extcode = lmu.extcode
+      AND   array_length(view.forest_man_plan_2014_2023_dbca_041_id,1) IS NOT NULL
+      AND   view.poly_id = lmu_junction.poly_id) AS polyevent
+WHERE poly.id = polyevent.poly_id
+GROUP BY description, year, poly.geom)"
+#    --eventcolumns "
+${baseyear} - year;
+description;
+ST_Area(ST_Union(event.geom)::geography)/ST_Area((SELECT ST_Union(fmp_geom) FROM land_management_unit WHERE land_management_unit.description = event.description)::geography)*100"
+#    --eventgroups year;description
+#    --order 0-year
+#    --eventaliases "yslb;LMU;percent_burned"
+#>   --csvfile fmp_yslb_by_lmus_${baseyear}.csv

@@ -20,7 +20,9 @@ set -e
 help="Run argreplay substituting 'lmu' with each LMU in turn"
 args=(
 # "-short:--long:variable:default:description:flags"
+  ":--dry-run:::Print but do not execute command:flag"
   "-p:--parallel:::Use GNU parallel:private,flag"
+  "-d:--depth::0:Depth of command history to replay, default is all."
   "-S:--substitute:::Substitutions to add to script invocation:"
   "-l:--logfile:::Log file to record processing, defaults to 'script'.log:private"
   ":--nologfile:::Don't write a log file:private,flag"
@@ -42,11 +44,22 @@ if [[ "${parallel}" == "true" ]]; then
       --quiet --tuples-only --no-align \
       --command "\timing off" \
       --command "select distinct description from land_management_unit order by description" |
-    parallel -u -q argreplay --substitute lmu:{} ${substitute} -- ${script}
+    parallel "
+        if [[ \"${dry_run}\" != "true" ]]; then
+            argreplay --depth ${depth} --substitute lmu:{} ${substitute} -- ${script}
+        else
+            echo argreplay --depth ${depth} --substitute lmu:\"{}\" ${substitute} -- ${script} 
+        fi"
 else
     psql \
       --quiet --tuples-only --no-align \
       --command "\timing off" \
       --command "select distinct description from land_management_unit order by description" |
-    while read -r lmu; do argreplay --substitute lmu:"${lmu}" ${substitute} -- ${script}; done
+    while read -r lmu; do 
+        if [[ "${dry_run}" != "true" ]]; then
+            argreplay --depth ${depth} --substitute lmu:"${lmu}" ${substitute} -- ${script}
+        else
+            echo argreplay --depth ${depth} --substitute lmu:\"${lmu}\" ${substitute} -- ${script}
+        fi
+    done
 fi

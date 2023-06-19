@@ -33,7 +33,6 @@ def csv2barGraph(arglist=None):
     parser.add_argument('-v', '--verbosity',  type=int, default=1, private=True)
     
     parser.add_argument('-b', '--blocks',     type=int, default=1, help='Number of blocks in each bar column')
-    parser.add_argument('-C', '--columns',    type=int, default=1, help='Number of coumns')
     parser.add_argument('-w', '--whitespace', type=int, default=10, help='Percentage of width to leave as white space between columns')
 
     parser.add_argument('-l', '--limit',      type=int, help='Limit number of rows to process')
@@ -43,6 +42,8 @@ def csv2barGraph(arglist=None):
     
     parser.add_argument('-W', '--width',      type=int, default=400, help='Plot width in millimetres')
     parser.add_argument('-H', '--height',     type=int, default=200,  help='Plot height in millimetres')
+    parser.add_argument(      '--ymin',       type=float,            help='Minimum value on Y axis')
+    parser.add_argument(      '--ymax',       type=float,            help='Maximum value on Y axis')
     parser.add_argument('-t', '--title',      type=str,              help='Title of plot')
     parser.add_argument('-y', '--ylabel',     type=str,              help='Label for Y axis')
     parser.add_argument('-x', '--xlabel',     type=str,              help='Label for Y axis')
@@ -63,8 +64,6 @@ def csv2barGraph(arglist=None):
     else:
         csvfile = more_itertools.peekable(sys.stdin)
 
-    #until = datetime(int(args.until), 1, 1) if args.until else None
-    #since = datetime(int(args.since), 1, 1) if args.since else None
     until = int(args.until) if args.until else None
     since = int(args.since) if args.since else None
 
@@ -136,8 +135,7 @@ def csv2barGraph(arglist=None):
 
     ax = fig.add_subplot(111)
        
-    # Ybars = (len(csvfieldnames) - 1 + args.blocks - 1) // args.blocks
-    Ybars = args.columns
+    Ybars = (len(csvfieldnames) - 1 + args.blocks - 1) // args.blocks
     Ybarwidth = (1 - args.whitespace / 100) / Ybars
     Ybaridx = 0
     Ybarnum = 0
@@ -169,7 +167,8 @@ def csv2barGraph(arglist=None):
     ax.xaxis.set_minor_locator(ticker.MaxNLocator(9999,integer=True))
     ax.set_xlim([int(args.since)-0.5 if args.since else None,
                  int(args.until)+0.5 if args.until else None])
-    #pyplot.gca().invert_xaxis()
+    ax.set_ylim([args.ymin,args.ymax])
+        
     pyplot.grid(axis='y', color='black')
     if args.blocks > 1 or Ybars > 1:
         ax.legend(prop=legendfont, framealpha=1)
@@ -178,6 +177,8 @@ def csv2barGraph(arglist=None):
         exec(args.exec)
 
     if args.outfile:
+        # pyplot.subplots_adjust(left=0, right=1, top=1, bottom=0)
+        pyplot.tight_layout()
         pyplot.savefig(args.outfile, transparent=True)
     else:
         pyplot.show()

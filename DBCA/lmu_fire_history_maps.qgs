@@ -22,34 +22,34 @@
     <customproperties>
       <Option/>
     </customproperties>
-    <layer-tree-layer name="lmu_fire_history_atlas" providerKey="postgres" source="dbname='fire' port=5432 user='qgis' sslmode=disable key='_uid0_' checkPrimaryKeyUnicity='0' table=&quot;(SELECT row_number() over () AS _uid0_, * FROM (SELECT * FROM \&quot;public\&quot;.\&quot;lmu_fire_history_atlas\&quot; ORDER BY description, year DESC&#xa;) AS _subq_0_&#xa;)&quot; (full_geom)" legend_exp="" checked="Qt::Unchecked" legend_split_behavior="0" patch_size="-1,-1" id="lmu_fire_history_atlas_28be94d6_7993_4f6b_bacc_f33b4b3bdf41" expanded="1">
+    <layer-tree-layer name="lmu_fire_history_atlas" providerKey="postgres" source="dbname='fire_old' port=5432 user='qgis' sslmode=disable key='_uid0_' checkPrimaryKeyUnicity='0' table=&quot;(SELECT row_number() over () AS _uid0_, * FROM (SELECT * FROM \&quot;public\&quot;.\&quot;lmu_fire_history_atlas\&quot; ORDER BY description, year DESC&#xa;) AS _subq_0_&#xa;)&quot; (full_geom)" legend_exp="" checked="Qt::Unchecked" legend_split_behavior="0" patch_size="-1,-1" id="lmu_fire_history_atlas_28be94d6_7993_4f6b_bacc_f33b4b3bdf41" expanded="1">
       <customproperties>
         <Option/>
       </customproperties>
     </layer-tree-layer>
-    <layer-tree-layer name="lmu_fire_cover_atlas" providerKey="postgres" source="dbname='fire' port=5432 user='qgis' sslmode=disable key='_uid0_' checkPrimaryKeyUnicity='0' table=&quot;(SELECT row_number() over () AS _uid0_, * FROM (SELECT description, full_geom, full_area, fmp_area FROM \&quot;public\&quot;.\&quot;lmu_fire_history_atlas\&quot; &#xa;GROUP BY description, full_geom, full_area, fmp_area ORDER BY description) AS _subq_0_&#xa;)&quot; (full_geom)" legend_exp="" checked="Qt::Unchecked" legend_split_behavior="0" patch_size="-1,-1" id="lmu_fire_history_atlas_29d093c8_fc85_4c86_941f_db66638fbefa" expanded="1">
+    <layer-tree-layer name="lmu_fire_cover_atlas" providerKey="postgres" source="dbname='fire_old' port=5432 user='qgis' sslmode=disable key='_uid0_' checkPrimaryKeyUnicity='0' table=&quot;(SELECT row_number() over () AS _uid0_, * FROM (SELECT description, full_geom, full_area, fmp_area FROM \&quot;public\&quot;.\&quot;lmu_fire_history_atlas\&quot; &#xa;GROUP BY description, full_geom, full_area, fmp_area ORDER BY description) AS _subq_0_&#xa;)&quot; (full_geom)" legend_exp="" checked="Qt::Unchecked" legend_split_behavior="0" patch_size="-1,-1" id="lmu_fire_history_atlas_29d093c8_fc85_4c86_941f_db66638fbefa" expanded="1">
       <customproperties>
         <Option/>
       </customproperties>
     </layer-tree-layer>
-    <layer-tree-layer name="land_management_unit" providerKey="postgres" source="dbname='fire' port=5432 user='qgis' sslmode=disable key='extcode' checkPrimaryKeyUnicity='0' table=&quot;(SELECT * FROM \&quot;public\&quot;.\&quot;land_management_unit\&quot;)&quot; (fmp_geom)" legend_exp="" checked="Qt::Checked" legend_split_behavior="0" patch_size="-1,-1" id="land_management_unit_967f175c_dd5a_4e33_94c6_e0a61b650989" expanded="1">
+    <layer-tree-layer name="land_management_unit" providerKey="postgres" source="dbname='fire_old' port=5432 user='qgis' sslmode=disable key='extcode' checkPrimaryKeyUnicity='0' table=&quot;(SELECT * FROM \&quot;public\&quot;.\&quot;land_management_unit\&quot;)&quot; (fmp_geom)" legend_exp="" checked="Qt::Checked" legend_split_behavior="0" patch_size="-1,-1" id="land_management_unit_967f175c_dd5a_4e33_94c6_e0a61b650989" expanded="1">
       <customproperties>
         <Option/>
       </customproperties>
     </layer-tree-layer>
-    <layer-tree-layer name="land_management_unit_full" providerKey="postgres" source="dbname='fire' port=5432 user='qgis' sslmode=disable key='extcode' checkPrimaryKeyUnicity='0' table=&quot;(SELECT *, round(ST_Area(full_geom::geography)/10000) AS full_area, round(ST_Area(fmp_geom::geography)/10000) AS fmp_area FROM \&quot;public\&quot;.\&quot;land_management_unit\&quot;)&quot; (full_geom)" legend_exp="" checked="Qt::Checked" legend_split_behavior="0" patch_size="-1,-1" id="land_management_unit_96ef6cca_edff_4f7f_b94e_f4ddc8410fcd" expanded="1">
+    <layer-tree-layer name="land_management_unit_full" providerKey="postgres" source="dbname='fire_old' port=5432 user='qgis' sslmode=disable key='extcode' checkPrimaryKeyUnicity='0' table=&quot;(SELECT *, round(ST_Area(full_geom::geography)/10000) AS full_area, round(ST_Area(fmp_geom::geography)/10000) AS fmp_area FROM \&quot;public\&quot;.\&quot;land_management_unit\&quot;)&quot; (full_geom)" legend_exp="" checked="Qt::Checked" legend_split_behavior="0" patch_size="-1,-1" id="land_management_unit_96ef6cca_edff_4f7f_b94e_f4ddc8410fcd" expanded="1">
       <customproperties>
         <Option/>
       </customproperties>
     </layer-tree-layer>
-    <layer-tree-layer name="lmu_fire_history" providerKey="postgres" source="dbname='fire' port=5432 user='qgis' sslmode=disable key='_uid0_' checkPrimaryKeyUnicity='0' table=&quot;(SELECT row_number() over () AS _uid0_, * FROM (SELECT ' ' AS blank,&#xa;&#x9;description, year, fih_cause, sum(lmu_area) AS lmu_area, sum(total_area) AS total_area&#xa;&#x9;FROM (&#xa;&#x9;&#x9;SELECT&#xa;&#x9;&#x9;&#x9;description, year,&#xa;&#x9;&#x9;&#x9;CASE&#xa;&#x9;&#x9;&#x9;&#x9;WHEN fih_cause &lt;> 0 AND fih_cause &lt;> 2 THEN 999&#xa;&#x9;&#x9;&#x9;&#x9;ELSE fih_cause&#xa;&#x9;&#x9;&#x9;END AS fih_cause,&#xa;&#x9;&#x9;&#x9;lmu_area,&#xa;&#x9;&#x9;&#x9;total_area&#xa;&#x9;&#x9;FROM \&quot;public\&quot;.\&quot;lmu_fire_history\&quot;) AS lmu_fire_history_3_causes&#xa;&#x9;GROUP BY description, year, fih_cause&#xa;&#x9;ORDER BY description, year, fih_cause&#xa;) AS _subq_0_&#xa;)&quot;" legend_exp="" checked="Qt::Unchecked" legend_split_behavior="0" patch_size="-1,-1" id="lmu_fire_history_6d3eaa02_6b94_432a_be70_1157ea1a9e08" expanded="1">
+    <layer-tree-layer name="lmu_fire_history" providerKey="postgres" source="dbname='fire_old' port=5432 user='qgis' sslmode=disable key='_uid0_' checkPrimaryKeyUnicity='0' table=&quot;(SELECT row_number() over () AS _uid0_, * FROM (SELECT ' ' AS blank,&#xa;&#x9;description, year, fih_cause, sum(lmu_area) AS lmu_area, sum(total_area) AS total_area&#xa;&#x9;FROM (&#xa;&#x9;&#x9;SELECT&#xa;&#x9;&#x9;&#x9;description, year,&#xa;&#x9;&#x9;&#x9;CASE&#xa;&#x9;&#x9;&#x9;&#x9;WHEN fih_cause &lt;> 0 AND fih_cause &lt;> 2 THEN 999&#xa;&#x9;&#x9;&#x9;&#x9;ELSE fih_cause&#xa;&#x9;&#x9;&#x9;END AS fih_cause,&#xa;&#x9;&#x9;&#x9;lmu_area,&#xa;&#x9;&#x9;&#x9;total_area&#xa;&#x9;&#x9;FROM \&quot;public\&quot;.\&quot;lmu_fire_history\&quot;) AS lmu_fire_history_3_causes&#xa;&#x9;GROUP BY description, year, fih_cause&#xa;&#x9;ORDER BY description, year, fih_cause&#xa;) AS _subq_0_&#xa;)&quot;" legend_exp="" checked="Qt::Unchecked" legend_split_behavior="0" patch_size="-1,-1" id="lmu_fire_history_6d3eaa02_6b94_432a_be70_1157ea1a9e08" expanded="1">
       <customproperties>
         <Option type="Map">
           <Option name="cached_name" value="lmu_fire_history" type="QString"/>
         </Option>
       </customproperties>
     </layer-tree-layer>
-    <layer-tree-layer name="dbca_fire_history_dbca_060" providerKey="postgres" source="dbname='fire' port=5432 user='qgis' sslmode=disable key='id' checkPrimaryKeyUnicity='0' table=&quot;(SELECT *, CASE WHEN EXTRACT(MONTH FROM fih_date1) &lt;= 6 THEN EXTRACT(YEAR FROM fih_date1) ELSE EXTRACT(YEAR FROM fih_date1) + 1 END AS year FROM \&quot;public\&quot;.\&quot;dbca_fire_history_dbca_060\&quot;)&quot; (geom)" legend_exp="" checked="Qt::Checked" legend_split_behavior="0" patch_size="-1,-1" id="dbca_fire_history_dbca_060_63948a44_8933_4f8e_859f_4b41bf70d5f5" expanded="1">
+    <layer-tree-layer name="dbca_fire_history_dbca_060" providerKey="postgres" source="dbname='fire_old' port=5432 user='qgis' sslmode=disable key='id' checkPrimaryKeyUnicity='0' table=&quot;(SELECT *, CASE WHEN EXTRACT(MONTH FROM fih_date1) &lt;= 6 THEN EXTRACT(YEAR FROM fih_date1) ELSE EXTRACT(YEAR FROM fih_date1) + 1 END AS year FROM \&quot;public\&quot;.\&quot;dbca_fire_history_dbca_060\&quot;)&quot; (geom)" legend_exp="" checked="Qt::Checked" legend_split_behavior="0" patch_size="-1,-1" id="dbca_fire_history_dbca_060_63948a44_8933_4f8e_859f_4b41bf70d5f5" expanded="1">
       <customproperties>
         <Option type="Map">
           <Option name="cached_name" value="dbca_fire_history_dbca_060" type="QString"/>
@@ -324,7 +324,7 @@
         <ymax>-13.74038755780123999</ymax>
       </wgs84extent>
       <id>dbca_fire_history_dbca_060_63948a44_8933_4f8e_859f_4b41bf70d5f5</id>
-      <datasource>dbname='fire' port=5432 user='qgis' sslmode=disable key='id' checkPrimaryKeyUnicity='0' table="(SELECT *, CASE WHEN EXTRACT(MONTH FROM fih_date1) &lt;= 6 THEN EXTRACT(YEAR FROM fih_date1) ELSE EXTRACT(YEAR FROM fih_date1) + 1 END AS year FROM \"public\".\"dbca_fire_history_dbca_060\")" (geom)</datasource>
+      <datasource>dbname='fire_old' port=5432 user='qgis' sslmode=disable key='id' checkPrimaryKeyUnicity='0' table="(SELECT *, CASE WHEN EXTRACT(MONTH FROM fih_date1) &lt;= 6 THEN EXTRACT(YEAR FROM fih_date1) ELSE EXTRACT(YEAR FROM fih_date1) + 1 END AS year FROM \"public\".\"dbca_fire_history_dbca_060\")" (geom)</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -895,7 +895,7 @@
         <ymax>-30.97807135979486048</ymax>
       </wgs84extent>
       <id>land_management_unit_967f175c_dd5a_4e33_94c6_e0a61b650989</id>
-      <datasource>dbname='fire' port=5432 user='qgis' sslmode=disable key='extcode' checkPrimaryKeyUnicity='0' table="(SELECT * FROM \"public\".\"land_management_unit\")" (fmp_geom)</datasource>
+      <datasource>dbname='fire_old' port=5432 user='qgis' sslmode=disable key='extcode' checkPrimaryKeyUnicity='0' table="(SELECT * FROM \"public\".\"land_management_unit\")" (fmp_geom)</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -1118,7 +1118,7 @@
         <ymax>-30.97175570848662218</ymax>
       </wgs84extent>
       <id>land_management_unit_96ef6cca_edff_4f7f_b94e_f4ddc8410fcd</id>
-      <datasource>dbname='fire' port=5432 user='qgis' sslmode=disable key='extcode' checkPrimaryKeyUnicity='0' table="(SELECT *, round(ST_Area(full_geom::geography)/10000) AS full_area, round(ST_Area(fmp_geom::geography)/10000) AS fmp_area FROM \"public\".\"land_management_unit\")" (full_geom)</datasource>
+      <datasource>dbname='fire_old' port=5432 user='qgis' sslmode=disable key='extcode' checkPrimaryKeyUnicity='0' table="(SELECT *, round(ST_Area(full_geom::geography)/10000) AS full_area, round(ST_Area(fmp_geom::geography)/10000) AS fmp_area FROM \"public\".\"land_management_unit\")" (full_geom)</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -1494,7 +1494,7 @@ def my_form_open(dialog, layer, feature):
     </maplayer>
     <maplayer hasScaleBasedVisibilityFlag="0" refreshOnNotifyEnabled="0" styleCategories="AllStyleCategories" maxScale="0" minScale="1e+08" wkbType="NoGeometry" geometry="No geometry" autoRefreshEnabled="0" refreshOnNotifyMessage="" type="vector" autoRefreshTime="0" legendPlaceholderImage="" readOnly="0">
       <id>lmu_fire_history_6d3eaa02_6b94_432a_be70_1157ea1a9e08</id>
-      <datasource>dbname='fire' port=5432 user='qgis' sslmode=disable key='_uid0_' checkPrimaryKeyUnicity='0' table="(SELECT row_number() over () AS _uid0_, * FROM (SELECT ' ' AS blank,
+      <datasource>dbname='fire_old' port=5432 user='qgis' sslmode=disable key='_uid0_' checkPrimaryKeyUnicity='0' table="(SELECT row_number() over () AS _uid0_, * FROM (SELECT ' ' AS blank,
 	description, year, fih_cause, sum(lmu_area) AS lmu_area, sum(total_area) AS total_area
 	FROM (
 		SELECT
@@ -1811,7 +1811,7 @@ def my_form_open(dialog, layer, feature):
         <ymax>-30.97175570848662218</ymax>
       </wgs84extent>
       <id>lmu_fire_history_atlas_28be94d6_7993_4f6b_bacc_f33b4b3bdf41</id>
-      <datasource>dbname='fire' port=5432 user='qgis' sslmode=disable key='_uid0_' checkPrimaryKeyUnicity='0' table="(SELECT row_number() over () AS _uid0_, * FROM (SELECT * FROM \"public\".\"lmu_fire_history_atlas\" ORDER BY description, year DESC
+      <datasource>dbname='fire_old' port=5432 user='qgis' sslmode=disable key='_uid0_' checkPrimaryKeyUnicity='0' table="(SELECT row_number() over () AS _uid0_, * FROM (SELECT * FROM \"public\".\"lmu_fire_history_atlas\" ORDER BY description, year DESC
 ) AS _subq_0_
 )" (full_geom)</datasource>
       <keywordList>
@@ -2057,7 +2057,7 @@ def my_form_open(dialog, layer, feature):
         <ymax>-30.97175570848662218</ymax>
       </wgs84extent>
       <id>lmu_fire_history_atlas_29d093c8_fc85_4c86_941f_db66638fbefa</id>
-      <datasource>dbname='fire' port=5432 user='qgis' sslmode=disable key='_uid0_' checkPrimaryKeyUnicity='0' table="(SELECT row_number() over () AS _uid0_, * FROM (SELECT description, full_geom, full_area, fmp_area FROM \"public\".\"lmu_fire_history_atlas\" 
+      <datasource>dbname='fire_old' port=5432 user='qgis' sslmode=disable key='_uid0_' checkPrimaryKeyUnicity='0' table="(SELECT row_number() over () AS _uid0_, * FROM (SELECT description, full_geom, full_area, fmp_area FROM \"public\".\"lmu_fire_history_atlas\" 
 GROUP BY description, full_geom, full_area, fmp_area ORDER BY description) AS _subq_0_
 )" (full_geom)</datasource>
       <keywordList>
@@ -2716,7 +2716,7 @@ GROUP BY description, full_geom, full_area, fmp_area ORDER BY description) AS _s
         </atlasClippingSettings>
         <itemClippingSettings forceLabelsInside="0" clipSource="" enabled="0" clippingType="1"/>
       </LayoutItem>
-      <LayoutMultiFrame gridColor="255,255,255,255" showEmptyRows="0" emptyTableMessage="" headerHAlignment="0" wrapBehavior="1" wrapString="" vectorLayerProvider="postgres" relationId="" type="65649" showOnlyVisibleFeatures="0" vectorLayer="lmu_fire_history_6d3eaa02_6b94_432a_be70_1157ea1a9e08" featureFilter="@atlas_pagename=array_to_string(array(&quot;description&quot;,&quot;year&quot;))" resizeMode="0" showUniqueRowsOnly="0" vectorLayerSource="dbname='fire' port=5432 user='qgis' sslmode=disable key='_uid0_' checkPrimaryKeyUnicity='0' table=&quot;(SELECT row_number() over () AS _uid0_, * FROM (SELECT ' ' AS blank,&#xa;&#x9;description, year, fih_cause, sum(lmu_area) AS lmu_area, sum(total_area) AS total_area&#xa;&#x9;FROM (&#xa;&#x9;&#x9;SELECT&#xa;&#x9;&#x9;&#x9;description, year,&#xa;&#x9;&#x9;&#x9;CASE&#xa;&#x9;&#x9;&#x9;&#x9;WHEN fih_cause &lt;> 0 AND fih_cause &lt;> 2 THEN 999&#xa;&#x9;&#x9;&#x9;&#x9;ELSE fih_cause&#xa;&#x9;&#x9;&#x9;END AS fih_cause,&#xa;&#x9;&#x9;&#x9;lmu_area,&#xa;&#x9;&#x9;&#x9;total_area&#xa;&#x9;&#x9;FROM \&quot;public\&quot;.\&quot;lmu_fire_history\&quot;) AS lmu_fire_history_3_causes&#xa;&#x9;GROUP BY description, year, fih_cause&#xa;&#x9;ORDER BY description, year, fih_cause&#xa;) AS _subq_0_&#xa;)&quot;" showGrid="1" backgroundColor="255,255,255,255" useConditionalStyling="1" gridStrokeWidth="0.5" emptyTableMode="1" filterToAtlasIntersection="0" source="0" horizontalGrid="1" filterFeatures="true" verticalGrid="1" headerMode="1" cellMargin="1" maxFeatures="30" templateUuid="{4d1d5d7e-526d-44a8-9546-bcf2b085fd1c}" uuid="{4d1d5d7e-526d-44a8-9546-bcf2b085fd1c}" vectorLayerName="lmu_fire_history">
+      <LayoutMultiFrame gridColor="255,255,255,255" showEmptyRows="0" emptyTableMessage="" headerHAlignment="0" wrapBehavior="1" wrapString="" vectorLayerProvider="postgres" relationId="" type="65649" showOnlyVisibleFeatures="0" vectorLayer="lmu_fire_history_6d3eaa02_6b94_432a_be70_1157ea1a9e08" featureFilter="@atlas_pagename=array_to_string(array(&quot;description&quot;,&quot;year&quot;))" resizeMode="0" showUniqueRowsOnly="0" vectorLayerSource="dbname='fire_old' port=5432 user='qgis' sslmode=disable key='_uid0_' checkPrimaryKeyUnicity='0' table=&quot;(SELECT row_number() over () AS _uid0_, * FROM (SELECT ' ' AS blank,&#xa;&#x9;description, year, fih_cause, sum(lmu_area) AS lmu_area, sum(total_area) AS total_area&#xa;&#x9;FROM (&#xa;&#x9;&#x9;SELECT&#xa;&#x9;&#x9;&#x9;description, year,&#xa;&#x9;&#x9;&#x9;CASE&#xa;&#x9;&#x9;&#x9;&#x9;WHEN fih_cause &lt;> 0 AND fih_cause &lt;> 2 THEN 999&#xa;&#x9;&#x9;&#x9;&#x9;ELSE fih_cause&#xa;&#x9;&#x9;&#x9;END AS fih_cause,&#xa;&#x9;&#x9;&#x9;lmu_area,&#xa;&#x9;&#x9;&#x9;total_area&#xa;&#x9;&#x9;FROM \&quot;public\&quot;.\&quot;lmu_fire_history\&quot;) AS lmu_fire_history_3_causes&#xa;&#x9;GROUP BY description, year, fih_cause&#xa;&#x9;ORDER BY description, year, fih_cause&#xa;) AS _subq_0_&#xa;)&quot;" showGrid="1" backgroundColor="255,255,255,255" useConditionalStyling="1" gridStrokeWidth="0.5" emptyTableMode="1" filterToAtlasIntersection="0" source="0" horizontalGrid="1" filterFeatures="true" verticalGrid="1" headerMode="1" cellMargin="1" maxFeatures="30" templateUuid="{4d1d5d7e-526d-44a8-9546-bcf2b085fd1c}" uuid="{4d1d5d7e-526d-44a8-9546-bcf2b085fd1c}" vectorLayerName="lmu_fire_history">
         <childFrame templateUuid="{dbdd858d-4ef6-4260-8218-844353aa3e7e}" uuid="{dbdd858d-4ef6-4260-8218-844353aa3e7e}"/>
         <LayoutObject>
           <dataDefinedProperties>
@@ -3008,7 +3008,7 @@ GROUP BY description, full_geom, full_area, fmp_area ORDER BY description) AS _s
           <Option name="singleFile" value="true" type="bool"/>
         </Option>
       </customproperties>
-      <Atlas coverageLayer="lmu_fire_history_atlas_28be94d6_7993_4f6b_bacc_f33b4b3bdf41" sortFeatures="0" coverageLayerProvider="postgres" pageNameExpression="array_to_string(array(attribute('description'), attribute('year')))" coverageLayerSource="dbname='fire' port=5432 user='qgis' sslmode=disable key='_uid0_' checkPrimaryKeyUnicity='0' table=&quot;(SELECT row_number() over () AS _uid0_, * FROM (SELECT * FROM \&quot;public\&quot;.\&quot;lmu_fire_history_atlas\&quot; ORDER BY description, year DESC&#xa;) AS _subq_0_&#xa;)&quot; (full_geom)" coverageLayerName="lmu_fire_history_atlas" hideCoverage="1" filterFeatures="0" enabled="1" filenamePattern="'output_'||@atlas_featurenumber"/>
+      <Atlas coverageLayer="lmu_fire_history_atlas_28be94d6_7993_4f6b_bacc_f33b4b3bdf41" sortFeatures="0" coverageLayerProvider="postgres" pageNameExpression="array_to_string(array(attribute('description'), attribute('year')))" coverageLayerSource="dbname='fire_old' port=5432 user='qgis' sslmode=disable key='_uid0_' checkPrimaryKeyUnicity='0' table=&quot;(SELECT row_number() over () AS _uid0_, * FROM (SELECT * FROM \&quot;public\&quot;.\&quot;lmu_fire_history_atlas\&quot; ORDER BY description, year DESC&#xa;) AS _subq_0_&#xa;)&quot; (full_geom)" coverageLayerName="lmu_fire_history_atlas" hideCoverage="1" filterFeatures="0" enabled="1" filenamePattern="'output_'||@atlas_featurenumber"/>
     </Layout>
     <Layout worldFileMap="{a250f2ce-2da6-4a18-bcb6-8d257872fd03}" name="Cover page" units="mm" printResolution="300">
       <Snapper snapToGuides="1" snapToGrid="0" tolerance="5" snapToItems="1"/>
@@ -3781,7 +3781,7 @@ GROUP BY description, full_geom, full_area, fmp_area ORDER BY description) AS _s
         </atlasClippingSettings>
         <itemClippingSettings forceLabelsInside="0" clipSource="" enabled="0" clippingType="1"/>
       </LayoutItem>
-      <LayoutMultiFrame gridColor="255,255,255,255" showEmptyRows="0" emptyTableMessage="" headerHAlignment="0" wrapBehavior="1" wrapString="" vectorLayerProvider="postgres" relationId="" type="65649" showOnlyVisibleFeatures="0" vectorLayer="lmu_fire_history_6d3eaa02_6b94_432a_be70_1157ea1a9e08" featureFilter="@atlas_pagename=array_to_string(array(&quot;description&quot;,&quot;year&quot;))" resizeMode="0" showUniqueRowsOnly="0" vectorLayerSource="dbname='fire' port=5432 user='qgis' sslmode=disable key='_uid0_' checkPrimaryKeyUnicity='0' table=&quot;(SELECT row_number() over () AS _uid0_, * FROM (SELECT ' ' AS blank,&#xa;&#x9;description, year, fih_cause, sum(lmu_area) AS lmu_area, sum(total_area) AS total_area&#xa;&#x9;FROM (&#xa;&#x9;&#x9;SELECT&#xa;&#x9;&#x9;&#x9;description, year,&#xa;&#x9;&#x9;&#x9;CASE&#xa;&#x9;&#x9;&#x9;&#x9;WHEN fih_cause &lt;> 0 AND fih_cause &lt;> 2 THEN 999&#xa;&#x9;&#x9;&#x9;&#x9;ELSE fih_cause&#xa;&#x9;&#x9;&#x9;END AS fih_cause,&#xa;&#x9;&#x9;&#x9;lmu_area,&#xa;&#x9;&#x9;&#x9;total_area&#xa;&#x9;&#x9;FROM \&quot;public\&quot;.\&quot;lmu_fire_history\&quot;) AS lmu_fire_history_3_causes&#xa;&#x9;GROUP BY description, year, fih_cause&#xa;&#x9;ORDER BY description, year, fih_cause&#xa;) AS _subq_0_&#xa;)&quot;" showGrid="1" backgroundColor="255,255,255,255" useConditionalStyling="1" gridStrokeWidth="0.5" emptyTableMode="1" filterToAtlasIntersection="0" source="0" horizontalGrid="1" filterFeatures="true" verticalGrid="1" headerMode="1" cellMargin="1" maxFeatures="30" templateUuid="{b6337d10-1778-46e8-a96b-9e735bd4f895}" uuid="{b6337d10-1778-46e8-a96b-9e735bd4f895}" vectorLayerName="lmu_fire_history">
+      <LayoutMultiFrame gridColor="255,255,255,255" showEmptyRows="0" emptyTableMessage="" headerHAlignment="0" wrapBehavior="1" wrapString="" vectorLayerProvider="postgres" relationId="" type="65649" showOnlyVisibleFeatures="0" vectorLayer="lmu_fire_history_6d3eaa02_6b94_432a_be70_1157ea1a9e08" featureFilter="@atlas_pagename=array_to_string(array(&quot;description&quot;,&quot;year&quot;))" resizeMode="0" showUniqueRowsOnly="0" vectorLayerSource="dbname='fire_old' port=5432 user='qgis' sslmode=disable key='_uid0_' checkPrimaryKeyUnicity='0' table=&quot;(SELECT row_number() over () AS _uid0_, * FROM (SELECT ' ' AS blank,&#xa;&#x9;description, year, fih_cause, sum(lmu_area) AS lmu_area, sum(total_area) AS total_area&#xa;&#x9;FROM (&#xa;&#x9;&#x9;SELECT&#xa;&#x9;&#x9;&#x9;description, year,&#xa;&#x9;&#x9;&#x9;CASE&#xa;&#x9;&#x9;&#x9;&#x9;WHEN fih_cause &lt;> 0 AND fih_cause &lt;> 2 THEN 999&#xa;&#x9;&#x9;&#x9;&#x9;ELSE fih_cause&#xa;&#x9;&#x9;&#x9;END AS fih_cause,&#xa;&#x9;&#x9;&#x9;lmu_area,&#xa;&#x9;&#x9;&#x9;total_area&#xa;&#x9;&#x9;FROM \&quot;public\&quot;.\&quot;lmu_fire_history\&quot;) AS lmu_fire_history_3_causes&#xa;&#x9;GROUP BY description, year, fih_cause&#xa;&#x9;ORDER BY description, year, fih_cause&#xa;) AS _subq_0_&#xa;)&quot;" showGrid="1" backgroundColor="255,255,255,255" useConditionalStyling="1" gridStrokeWidth="0.5" emptyTableMode="1" filterToAtlasIntersection="0" source="0" horizontalGrid="1" filterFeatures="true" verticalGrid="1" headerMode="1" cellMargin="1" maxFeatures="30" templateUuid="{b6337d10-1778-46e8-a96b-9e735bd4f895}" uuid="{b6337d10-1778-46e8-a96b-9e735bd4f895}" vectorLayerName="lmu_fire_history">
         <childFrame templateUuid="{4b2afbf8-3dea-4c29-aa14-343bcbc80c58}" uuid="{4b2afbf8-3dea-4c29-aa14-343bcbc80c58}"/>
         <LayoutObject>
           <dataDefinedProperties>
@@ -4313,7 +4313,7 @@ GROUP BY description, full_geom, full_area, fmp_area ORDER BY description) AS _s
           <Option name="singleFile" value="true" type="bool"/>
         </Option>
       </customproperties>
-      <Atlas coverageLayer="lmu_fire_history_atlas_29d093c8_fc85_4c86_941f_db66638fbefa" sortFeatures="0" coverageLayerProvider="postgres" pageNameExpression="&quot;description&quot;" coverageLayerSource="dbname='fire' port=5432 user='qgis' sslmode=disable key='_uid0_' checkPrimaryKeyUnicity='0' table=&quot;(SELECT row_number() over () AS _uid0_, * FROM (SELECT description, full_geom, full_area, fmp_area FROM \&quot;public\&quot;.\&quot;lmu_fire_history_atlas\&quot; &#xa;GROUP BY description, full_geom, full_area, fmp_area ORDER BY description) AS _subq_0_&#xa;)&quot; (full_geom)" coverageLayerName="lmu_fire_cover_atlas" hideCoverage="1" filterFeatures="0" enabled="1" filenamePattern="'output_'||@atlas_featurenumber"/>
+      <Atlas coverageLayer="lmu_fire_history_atlas_29d093c8_fc85_4c86_941f_db66638fbefa" sortFeatures="0" coverageLayerProvider="postgres" pageNameExpression="&quot;description&quot;" coverageLayerSource="dbname='fire_old' port=5432 user='qgis' sslmode=disable key='_uid0_' checkPrimaryKeyUnicity='0' table=&quot;(SELECT row_number() over () AS _uid0_, * FROM (SELECT description, full_geom, full_area, fmp_area FROM \&quot;public\&quot;.\&quot;lmu_fire_history_atlas\&quot; &#xa;GROUP BY description, full_geom, full_area, fmp_area ORDER BY description) AS _subq_0_&#xa;)&quot; (full_geom)" coverageLayerName="lmu_fire_cover_atlas" hideCoverage="1" filterFeatures="0" enabled="1" filenamePattern="'output_'||@atlas_featurenumber"/>
     </Layout>
   </Layouts>
   <mapViewDocks3D/>

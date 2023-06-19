@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# Copyright 2020 Jonathan Schultz
+# Copyright 2023 Jonathan Schultz
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@ import tempfile, os
 
 def renderLayout(arglist=None):
 
-    parser = ArgumentRecorder(description='Present BOM data.',
+    parser = ArgumentRecorder(description='Present .',
                               fromfile_prefix_chars='@')
 
     parser.add_argument('-v', '--verbosity',  type=int, default=1, private=True)
@@ -34,8 +34,8 @@ def renderLayout(arglist=None):
     
     parser.add_argument('-c', '--cutoff',     type=int, required=True, help='Cutoff value for graduated renderer')
 
-    parser.add_argument('-p', '--pdffile', type=str, help="Name of PDF file to export")
-    parser.add_argument('-i', '--imagefile', type=str, help="Name of image file to export")
+    parser.add_argument('-p', '--pdffile',    type=str, help="Name of PDF file to export")
+    parser.add_argument('-i', '--imagefile',  type=str, help="Name of image file to export")
 
     parser.add_argument('--logfile',          type=str, help="Logfile", private=True)
     parser.add_argument('--no-logfile',       action='store_true', help='Do not output descriptive comments')

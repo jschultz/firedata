@@ -28,8 +28,8 @@
 #             orange
 #             yellow
 #             black
-#    --title "Years since last burned by fire type: ${lmu}"
-#    --subtitle "Reference date: 1 July ${baseyear}"
+##    --title "Years since last burned by fire type: ${lmu}"
+##    --subtitle "Reference date: 1 July ${baseyear}"
 #    --ylabel "Area (percent of LMU area)"
 #    --xlabel "Years since last burned"
 #    --exec "
@@ -39,8 +39,8 @@ pyplot.plot(list(range(45)), [
 label="“Ideal”")
 ax.legend(prop=legendfont, framealpha=1)
 "
-#>   --outfile lmu_yslb_${lmu}_${baseyear}.pdf"
-#<   lmu_yslb_${lmu}_${baseyear}.csv
+#>   --outfile fmp_yslb_by_fire_type/fmp_yslb_by_fire_type_${lmu}_${baseyear}.jpg
+#<   fmp_yslb_by_fire_type/fmp_yslb_by_fire_type_${lmu}_${baseyear}.csv
 ###########################################################################
 #> event_history.sh
 #    --nologfile
@@ -73,5 +73,5 @@ ST_Area(ST_Union(event.geom) FILTER(WHERE array_length(fih_causes,1) = 1 AND fih
 ST_Area(ST_Union(event.geom) FILTER(WHERE array_length(fih_causes,1) != 1)::geography)/ST_Area((SELECT ST_Union(fmp_geom) FROM land_management_unit WHERE land_management_unit.description='${lmu}')::geography)*100"
 #    --eventgroups year
 #    --order 0-year
-#    --eventaliases "Years since last burned;Prescribed burn;Escaped prescribed burn;Other fire;Multiple"
-#>   --csvfile lmu_yslb_${lmu}_${baseyear}.csv
+#    --eventaliases "Years since last burned;Prescribed burn;Escaped prescribed burn;Other fire;Multiple types"
+#>   --csvfile fmp_yslb_by_fire_type/fmp_yslb_by_fire_type_${lmu}_${baseyear}.csv
