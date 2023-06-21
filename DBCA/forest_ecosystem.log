@@ -1,0 +1,41 @@
+################################################################################
+##
+## Copyright 2023 Jonathan Schultz
+##
+## This program is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+##
+## This program is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with this program.  If not, see <http://www.gnu.org/licenses/>.
+##
+################################################################################
+# psql
+#    --command "DROP TABLE IF EXISTS forest_ecosystem"
+#    --command "CREATE TABLE forest_ecosystem AS (
+SELECT 
+    extcode, 
+    descript, 
+    ST_Multi(ST_Union(geom)) AS full_geom, 
+    ST_Multi(ST_Union(ST_Intersection(geom, (SELECT ST_Union(geom) FROM forest_man_plan_2014_2023_dbca_041 WHERE ST_Intersects(forest_man_plan_2014_2023_dbca_041.geom, forest_ecosystem_raw.geom))))) AS fmp_geom,
+    ST_Multi(ST_Union(ST_Intersection(geom, (SELECT ST_Union(geom) FROM native_veg_extent_dpird_005_wa WHERE ST_Intersects(native_veg_extent_dpird_005_wa.geom, forest_ecosystem_raw.geom))))) AS native_geom 
+FROM forest_ecosystem_raw GROUP BY extcode, descript)"
+#    --command "CREATE UNIQUE INDEX ON forest_ecosystem (extcode)"
+#    --command "CREATE INDEX ON forest_ecosystem USING gist (full_geom)"
+#    --command "CREATE INDEX ON forest_ecosystem USING gist (fmp_geom)"
+#    --command "CREATE INDEX ON forest_ecosystem USING gist (native_geom)"
+#    --command "DROP TABLE forest_ecosystem_raw"
+################################################################################
+# load_file.sh
+#    --nologfile
+#    --table "forest_ecosystem_raw"
+#    --geometry "geom"
+#    --srid "4283"
+#<   "Forest_ecosystems"
+
