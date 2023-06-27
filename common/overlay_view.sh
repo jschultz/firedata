@@ -33,6 +33,7 @@ args=(
   "-c:--eventcolumns::id:Semicolon-separated list of fully specified columns (table and colume name) to retrieve from event table(s)"
   ":--eventaliases:::Semicolon-separated list of aliases for columns retrieved from event table(s); empty value means use column name as alias"
   ":--indexes:::Semicolon-separated list of indexes to create on view table"
+  ":--using:::Semicolon-separated list of index methods"
   "-w:--where:::WHERE clause for selecting from polygon table"
   "-a:--append:::Append output to existing view table:flag"
   "-v:--viewtable:::Table to generate, defaults to \$eventtable + \$suffix + '_view'"
@@ -59,6 +60,7 @@ IFS=';' read -r -a polyalias_array  <<< "${polyaliases}"
 IFS=';' read -r -a eventcolumn_array <<< "${eventcolumns}"
 IFS=';' read -r -a eventalias_array <<< "${eventaliases}"
 IFS=';' read -r -a index_array      <<< "${indexes}"
+IFS=';' read -r -a using_array      <<< "${using}"
 
 if [[ ! -n "${basename}" ]]; then
     basename=${eventtable_array[0]}
@@ -187,8 +189,13 @@ else
              --command="CREATE TABLE ${viewtable} AS ${VIEW_QUERY}" \
              --command="${commentcommand}"
         for ((indexidx=0; indexidx<${#index_array[@]}; indexidx++)) do
+            if [[ -n "${using_array[indexidx]}" ]]; then
+                using="USING ${using_array[indexidx]}"
+            else
+                using=""
+            fi
             psql --quiet \
-                 --command="CREATE INDEX ON ${viewtable} (${index_array[indexidx]})"
+                 --command="CREATE INDEX ON ${viewtable} ${using} (${index_array[indexidx]})"
         done
     else
         echo "Appending to table ${viewtable}"

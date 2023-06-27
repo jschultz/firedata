@@ -125,8 +125,8 @@ def csv2barGraph(arglist=None):
     
     titlefont = {'fontname':'Linux Biolinum G', 'weight':'bold', 'size':24}
     subtitlefont = {'fontname':'Linux Biolinum G', 'weight':'normal'}
-    labelfont = {'fontname':'Linux Biolinum G', 'weight':'normal'}
-    legendfont = {'family':'Linux Biolinum G', 'weight':'normal'}
+    labelfont = {'fontname':'Linux Biolinum G', 'weight':'normal', 'size':14}
+    legendfont = {'family':'Linux Biolinum G', 'weight':'normal', 'size':14}
 
     fig = pyplot.figure()
     fig.set_size_inches(args.width / 25.4, args.height / 25.4)
