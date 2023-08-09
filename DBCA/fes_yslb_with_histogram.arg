@@ -1,0 +1,8 @@
+################################################################################
+# exportQgisLayout.py
+#    --nologfile
+#    --layout "Layout 1"
+#    --variable fes:${fes}
+#    --outfile "fes_yslb_with_histogram/${fes//\\//_}_${refyear}_${cutoff}.pdf"
+#     "/home/jschultz/src/firedata/DBCA/fes_yslb_with_histogram.qgs"
+################################################################################

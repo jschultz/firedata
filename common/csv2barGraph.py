@@ -24,6 +24,7 @@ from dateutil import parser as dateparser
 #from datetime import datetime
 from matplotlib import pyplot, dates as mdates, ticker
 import numpy
+import os
 
 def csv2barGraph(arglist=None):
 
@@ -54,6 +55,7 @@ def csv2barGraph(arglist=None):
     parser.add_argument('-o', '--outfile',    type=str, help='Output file, otherwise plot on screen.', output=True)
     parser.add_argument('--logfile',          type=str, help="Logfile", private=True)
     parser.add_argument('--nologfile',        action='store_true', help='Do not output descriptive comments')
+    parser.add_argument('--nobackup',         action='store_true', help='Do not back up existing output file')
 
     parser.add_argument(      'csvfile',      type=str, nargs='?', help='Name of CSV file containing data; otherwise use stdin', input=True)
 
@@ -177,6 +179,9 @@ def csv2barGraph(arglist=None):
         exec(args.exec)
 
     if args.outfile:
+        if os.path.exists(args.outfile) and not args.nobackup:
+            os.rename(args.outfile, args.outfile + '.bak')
+            
         # pyplot.subplots_adjust(left=0, right=1, top=1, bottom=0)
         pyplot.tight_layout()
         pyplot.savefig(args.outfile, transparent=True)

@@ -28,9 +28,9 @@
 #             orange
 #             yellow
 #             black
-##    --title "Years since last burned by fire type: ${lmu}"
-##    --subtitle "Reference date: 1 July ${baseyear}"
-#    --ylabel "Area (percent of LMU area)"
+##    --title "Years since last burned by fire type: ${fes}"
+##    --subtitle "Reference date: 1 July ${refyear}"
+#    --ylabel "Area (percent of FES area)"
 #    --xlabel "Years since last burned"
 #    --exec "
 pyplot.plot(list(range(45)), [
@@ -39,8 +39,8 @@ pyplot.plot(list(range(45)), [
 label="“Ideal”")
 ax.legend(prop=legendfont, framealpha=1)
 "
-#>   --outfile fmp_yslb_by_fire_type/fmp_yslb_by_fire_type_${lmu}_${baseyear}.jpg
-#<   fmp_yslb_by_fire_type/fmp_yslb_by_fire_type_${lmu}_${baseyear}.csv
+#>   --outfile fmp_yslb_by_fire_type_fes/fmp_yslb_by_fire_type_${fes//\\//_}_${refyear}.jpg
+#<   fmp_yslb_by_fire_type_fes/fmp_yslb_by_fire_type_${fes//\\//_}_${refyear}.csv
 ###########################################################################
 #> event_history.sh
 #    --nologfile
@@ -51,28 +51,28 @@ SELECT fireseason(fih_date1) AS year,
        ARRAY_AGG(DISTINCT fih_cause) AS fih_causes
 FROM ${basename}_poly AS poly,
      (SELECT view.poly_id, fih_date1, fih_cause
-      FROM land_management_unit AS lmu,
-           ${basename}_land_management_unit_junction AS lmu_junction,
+      FROM forest_ecosystem AS fes,
+           ${basename}_forest_ecosystem_junction AS fes_junction,
            ${basename}_view AS view,
       LATERAL (SELECT fih_date1, fih_cause 
                FROM (SELECT unnest(view.dbca_fire_history_dbca_060_id) AS event_id) AS event_ids
                JOIN dbca_fire_history_dbca_060 ON dbca_fire_history_dbca_060.id = event_id
-               WHERE fireseason(fih_date1) <= ${baseyear}
+               WHERE fireseason(fih_date1) <= ${refyear}
                LIMIT 1) AS event
-      WHERE lmu.description = '${lmu}'
-      AND   lmu_junction.extcode = lmu.extcode
+      WHERE fes.descript = '${fes}'
+      AND   fes_junction.extcode = fes.extcode
       AND   view.forest_man_plan_2014_2023_dbca_041_id IS NOT NULL
-      AND   view.poly_id = lmu_junction.poly_id) AS polyevent
+      AND   view.poly_id = fes_junction.poly_id) AS polyevent
 WHERE poly.id = polyevent.poly_id
 GROUP BY year,
       poly.geom)"
 #    --eventcolumns "
-${baseyear} - year;
-ST_Area(ST_Union(event.geom) FILTER(WHERE fih_causes = '{0}')::geography)/ST_Area((SELECT ST_Union(fmp_geom) FROM land_management_unit WHERE land_management_unit.description='${lmu}')::geography)*100;
-ST_Area(ST_Union(event.geom) FILTER(WHERE fih_causes = '{2}')::geography)/ST_Area((SELECT ST_Union(fmp_geom) FROM land_management_unit WHERE land_management_unit.description='${lmu}')::geography)*100;
-ST_Area(ST_Union(event.geom) FILTER(WHERE array_length(fih_causes,1) = 1 AND fih_causes != '{0}' AND fih_causes != '{2}')::geography)/ST_Area((SELECT ST_Union(fmp_geom) FROM land_management_unit WHERE land_management_unit.description='${lmu}')::geography)*100;
-ST_Area(ST_Union(event.geom) FILTER(WHERE array_length(fih_causes,1) != 1)::geography)/ST_Area((SELECT ST_Union(fmp_geom) FROM land_management_unit WHERE land_management_unit.description='${lmu}')::geography)*100"
+${refyear} - year;
+ST_Area(ST_Union(event.geom) FILTER(WHERE fih_causes = '{0}')::geography)/ST_Area((SELECT ST_Union(fmp_geom) FROM forest_ecosystem WHERE forest_ecosystem.descript='${fes}')::geography)*100;
+ST_Area(ST_Union(event.geom) FILTER(WHERE fih_causes = '{2}')::geography)/ST_Area((SELECT ST_Union(fmp_geom) FROM forest_ecosystem WHERE forest_ecosystem.descript='${fes}')::geography)*100;
+ST_Area(ST_Union(event.geom) FILTER(WHERE array_length(fih_causes,1) = 1 AND fih_causes != '{0}' AND fih_causes != '{2}')::geography)/ST_Area((SELECT ST_Union(fmp_geom) FROM forest_ecosystem WHERE forest_ecosystem.descript='${fes}')::geography)*100;
+ST_Area(ST_Union(event.geom) FILTER(WHERE array_length(fih_causes,1) != 1)::geography)/ST_Area((SELECT ST_Union(fmp_geom) FROM forest_ecosystem WHERE forest_ecosystem.descript='${fes}')::geography)*100"
 #    --eventgroups year
 #    --order 0-year
 #    --eventaliases "Years since last burned;Prescribed burn;Escaped prescribed burn;Other fire;Multiple types"
-#>   --csvfile fmp_yslb_by_fire_type/fmp_yslb_by_fire_type_${lmu}_${baseyear}.csv
+#>   --csvfile fmp_yslb_by_fire_type_fes/fmp_yslb_by_fire_type_${fes//\\//_}_${refyear}.csv

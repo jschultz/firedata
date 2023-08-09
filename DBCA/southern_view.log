@@ -2,21 +2,21 @@
 # overlay_view.sh
 #    --nologfile
 #    --basename "southern"
-#    --eventtable "dbca_fire_history_dbca_060;legislated_lands_and_waters_dbca_011;forest_blocks_dbca_025;native_veg_extent_dpird_005_wa;land_management_unit;forest_man_plan_2014_2023_dbca_041"
-#    --eventid ";;;;extcode"
+#    --eventtable "dbca_fire_history_dbca_060;legislated_lands_and_waters_dbca_011;forest_blocks_dbca_025;native_veg_extent_dpird_005_wa;land_management_unit;forest_ecosystem;forest_man_plan_2014_2023_dbca_041"
+#    --eventid ;;;;extcode;extcode;
 #    --eventorder "fih_date1 DESC"
 #    --geometry ";;;;full_geom"
 #    --polycolumns "geom;id"
 #    --polyaliases ";poly_id"
-#    --eventcolumns "dbca_fire_history_dbca_060.id;legislated_lands_and_waters_dbca_011.id;forest_blocks_dbca_025.id;native_veg_extent_dpird_005_wa.id;land_management_unit.extcode;forest_man_plan_2014_2023_dbca_041.id"
-#    --eventaliases "dbca_fire_history_dbca_060_id;legislated_lands_and_waters_dbca_011_id;forest_blocks_dbca_025_id;native_veg_extent_dpird_005_wa_id;land_management_unit_extcode;forest_man_plan_2014_2023_dbca_041_id"
+#    --eventcolumns "dbca_fire_history_dbca_060.id;legislated_lands_and_waters_dbca_011.id;forest_blocks_dbca_025.id;native_veg_extent_dpird_005_wa.id;land_management_unit.extcode;forest_ecosystem.extcode;forest_man_plan_2014_2023_dbca_041.id"
+#    --eventaliases "dbca_fire_history_dbca_060_id;legislated_lands_and_waters_dbca_011_id;forest_blocks_dbca_025_id;native_veg_extent_dpird_005_wa_id;land_management_unit_extcode;forest_ecosystem_extcode;forest_man_plan_2014_2023_dbca_041_id"
 #    --indexes geom;poly_id
 #    --using gist
 ################################################################################
 # overlay_junction.sh
 #    --nologfile
 #    --basename "southern"
-#    --eventtable "dbca_fire_history_dbca_060;legislated_lands_and_waters_dbca_011;forest_blocks_dbca_025;native_veg_extent_dpird_005_wa;land_management_unit;forest_man_plan_2014_2023_dbca_041"
-#    --geometry ;;;;full_geom
-#    --eventid ;;;;extcode
+#    --eventtable "dbca_fire_history_dbca_060;legislated_lands_and_waters_dbca_011;forest_blocks_dbca_025;native_veg_extent_dpird_005_wa;land_management_unit;forest_ecosystem;forest_man_plan_2014_2023_dbca_041"
+#    --geometry ;;;;full_geom;full_geom;
+#    --eventid ;;;;extcode;extcode;
 #    --area "SELECT ST_Union(geom) AS geom FROM dbca_region_boundaries_dbca_022 WHERE drg_region_name IN ('SOUTH COAST', 'SOUTH WEST', 'SWAN', 'WARREN')"

@@ -16,11 +16,14 @@
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##
 ################################################################################
+# psql
+#    --command "CREATE INDEX ON DBCA_Fire_History_DBCA_060 (fih_date1)"
+################################################################################
 #< load_file.sh
 #    --nologfile
 #    --geometry "geom"
 #    --srid "4283"
-#    --table "DBCA_Fire_History_DBCA_060_XXX"
+#    --table "DBCA_Fire_History_DBCA_060"
 ################################################################################
 #<> xargs
 #    --verbose

@@ -243,7 +243,6 @@ fi
 for ((tableidx=0; tableidx<${#eventtable_array[@]}; tableidx++)) do
     if [[ "${force}" != "true" && "${existing}" == "true" && $(table_exists "${junction_array[tableidx]}") == 1 ]]; then
         echo "Junction table ${junction_array[tableidx]} exists - skipping"
-        continue
     else
         echo "Creating junction table ${junction_array[tableidx]}" >> /dev/stderr
         if [[ "${nobackup}" != "true" ]]; then  
@@ -253,12 +252,19 @@ for ((tableidx=0; tableidx<${#eventtable_array[@]}; tableidx++)) do
         fi
         psql --variable=ON_ERROR_STOP=1 \
             --command="${backupcommand}" \
+            --command="/* CREATE TABLE ${junction_array[tableidx]} AS 
+                        SELECT DISTINCT point.id AS poly_id, dump.${eventid_array[tableidx]}
+                        FROM ${eventtable_array[tableidx]}_dump AS dump,
+                             ${pointtable} AS point
+                        WHERE ST_Contains(dump.geom, point.point) */" \
             --command="CREATE TABLE ${junction_array[tableidx]} AS 
-                        SELECT point.id AS poly_id, dump.${eventid_array[tableidx]}
-                        FROM ${eventtable_array[tableidx]}_dump AS dump
-                            JOIN ${pointtable} AS point
-                            ON ST_Contains(dump.geom, point.point)
-                        GROUP BY point.id, dump.${eventid_array[tableidx]}" \
+                        WITH area as (${area})
+                        SELECT DISTINCT point.id AS poly_id, event.${eventid_array[tableidx]}
+                        FROM area,
+                             ${eventtable_array[tableidx]} AS event,
+                             ${pointtable} AS point
+                        WHERE ST_Intersects(area.geom, event.${geometry_array[tableidx]})
+                        AND   ST_Contains(event.${geometry_array[tableidx]}, point.point)" \
             --command="CREATE INDEX ON ${junction_array[tableidx]} (poly_id)" \
             --command="ALTER TABLE ${junction_array[tableidx]} ADD CONSTRAINT fk_poly FOREIGN KEY (poly_id) REFERENCES ${polytable}(id)" \
             --command="CREATE INDEX ON ${junction_array[tableidx]} (${eventid_array[tableidx]})" \

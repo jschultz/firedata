@@ -26,6 +26,7 @@ from dateutil import parser as dateparser
 import subprocess
 import sys
 import csv
+import os
 
 def exportQgisLayout(arglist=None):
 
@@ -40,6 +41,7 @@ def exportQgisLayout(arglist=None):
     
     parser.add_argument('--logfile',      type=str, help="Logfile", private=True)
     parser.add_argument('--nologfile',    action='store_true', help='Do not output a logfile')
+    parser.add_argument('--nobackup',     action='store_true', help='Do not back up existing output file')
     
     parser.add_argument('qgisfile', type=str, nargs=1, help="Name of QGIS file")
 
@@ -71,11 +73,13 @@ def exportQgisLayout(arglist=None):
     manager = QgsProject.instance().layoutManager()
     layout = manager.layoutByName(args.layout)
     
+    if os.path.exists(args.outfile) and not args.nobackup:
+        os.rename(args.outfile, args.outfile + '.bak')
+
     settings = QgsLayoutExporter.PdfExportSettings()
     settings.simplifyGeometries = args.simplify
     settings.forceVectorOutput = True
     exporter = QgsLayoutExporter(layout)
-    # exporter.exportToPdf(args.outfile, settings)
     exporter.exportToPdf(layout.atlas(), args.outfile, settings)
     
     qgs.exitQgis()
