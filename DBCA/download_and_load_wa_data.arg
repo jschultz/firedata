@@ -16,10 +16,21 @@
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##
 ################################################################################
-# argreplay
-#    --substitute table:Legislated_Lands_and_Waters_DBCA_011
-#    folder:Property_and_Planning
-#    user:${user}
-#    password:${password}
-#    --
-#    download_and_load_wa_data.arg
+#< load_file.sh
+#    --nologfile
+#    --geometry "geom"
+#    --srid "4283"
+#    --table "${table}_${datetime}"
+################################################################################
+#> unzip
+#    -p
+#    "${table}_WA_GDA94_Public_Geopackage.${datetime}.zip"
+#    "${table}_WA_GDA94_Public.gpkg"
+################################################################################
+#>datetime download-data-wa-gov
+#    --nologfile
+#    --folder "${folder}"
+#    --filename "${table}_WA_GDA94_Public_Geopackage.zip"
+#    --outfile "${table}_WA_GDA94_Public_Geopackage.{}.zip"
+#    --user "${user}"
+#    --password "${password}"

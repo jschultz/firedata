@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# Copyright 2021 Jonathan Schultz
+# Copyright 2023 Jonathan Schultz
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -38,6 +38,8 @@ def download_data_wa_gov(arglist=None):
                         help='The email address you signed up to SLIP with')
     parser.add_argument('-p', '--password', type=str, required=True, private=True, 
                         help='Your password for SLIP')
+    parser.add_argument('-o', '--outfile', type=str,
+                        help="The name of the output file to create; default is 'filename'")
 
     parser.add_argument('--logfile',          type=str, private=True,
                         help="Logfile name, default is 'filename'.log")
@@ -55,6 +57,9 @@ def download_data_wa_gov(arglist=None):
         logfile = open(logfilename, 'w')
         parser.write_comments(args, logfile)
         logfile.close()
+        
+    if not args.outfile:
+        args.outfile = args.filename
     
     tokenRequestUrl = "https://sso.slip.wa.gov.au/as/token.oauth2"
     tokenRequestHeaders = { 'Authorization' : 'Basic ZGlyZWN0LWRvd25sb2Fk'}
@@ -63,7 +68,8 @@ def download_data_wa_gov(arglist=None):
     accessToken=json.loads(tokenResponse.text)["access_token"]
     if tokenResponse.status_code == 200:
         dataDownloadRequestUrl = "https://direct-download.slip.wa.gov.au/datadownload/{0}/{1}".format(args.folder, args.filename)
-        print("Downloading file from URL: " + dataDownloadRequestUrl, file=sys.stderr)
+        if args.verbosity >= 1:
+            print("Examining file from URL: " + dataDownloadRequestUrl, file=sys.stderr)
         dataDownloadRequestHeaders = { 'Authorization' : 'Bearer ' + accessToken}
         dataDownloadResponse = requests.get(dataDownloadRequestUrl, headers=dataDownloadRequestHeaders)
         datadatetimestr = dataDownloadResponse.headers.get('Last-Modified', None)
@@ -71,17 +77,17 @@ def download_data_wa_gov(arglist=None):
         if dataDownloadResponse.status_code == 200:
             if datadatetime:
                 datetime = datadatetime.strftime('%Y%m%d')
-                filesplitext = os.path.splitext(args.filename)
-                outfile = file.splitext[0] + '.' + datetime + file.splitext[1]
+                outfile = args.outfile.replace('{}', datetime)
             else:
                 datetime = ''
-                outfile = args.filename
+                outfile = args.outfile
                 
-            print("Saving file to: " + outfile, file=sys.stderr)
+            if args.verbosity >= 1:
+                print("Saving file to: " + outfile, file=sys.stderr)
             with open(outfile, 'wb') as f:
                 f.write(dataDownloadResponse.content)
 
-            print(datetime)  # So filename can be piped
+            print(datetime, end='')  # Pipe date/timestamp
         else:
             print("Error download file with error " + str(dataDownloadResponse.status_code) + "-" + dataDownloadResponse.text, file=sys.stderr)
     else:

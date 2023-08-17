@@ -38,6 +38,9 @@ pyplot.plot(list(range(45)), [
 1.135],
 label="“Ideal”")
 ax.legend(prop=legendfont, framealpha=1)
+pyplot.plot(list(range(45)), [100 * (1 - 0.905163670615) * 0.905163670615**n for n in range(45)],
+label="Exponential")
+ax.legend(prop=legendfont, framealpha=1)
 "
 #>   --outfile fmp_yslb_by_fire_type/fmp_yslb_by_fire_type_${lmu}_${baseyear}.jpg
 #<   fmp_yslb_by_fire_type/fmp_yslb_by_fire_type_${lmu}_${baseyear}.csv
