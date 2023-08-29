@@ -22,6 +22,7 @@ from argrecord import ArgumentHelper, ArgumentRecorder
 import requests, json, getpass
 import dateparser, datetime
 import sys
+import os
 
 def download_data_wa_gov(arglist=None):
 
@@ -40,6 +41,8 @@ def download_data_wa_gov(arglist=None):
                         help='Your password for SLIP')
     parser.add_argument('-o', '--outfile', type=str,
                         help="The name of the output file to create; default is 'filename'")
+    parser.add_argument(      '--force', action='store_true', 
+                        help="Download file even if it already exists")
 
     parser.add_argument('--logfile',          type=str, private=True,
                         help="Logfile name, default is 'filename'.log")
@@ -71,7 +74,7 @@ def download_data_wa_gov(arglist=None):
         if args.verbosity >= 1:
             print("Examining file from URL: " + dataDownloadRequestUrl, file=sys.stderr)
         dataDownloadRequestHeaders = { 'Authorization' : 'Bearer ' + accessToken}
-        dataDownloadResponse = requests.get(dataDownloadRequestUrl, headers=dataDownloadRequestHeaders)
+        dataDownloadResponse = requests.get(dataDownloadRequestUrl, headers=dataDownloadRequestHeaders, stream=True)
         datadatetimestr = dataDownloadResponse.headers.get('Last-Modified', None)
         datadatetime = dateparser.parse(datadatetimestr) if datadatetimestr else None
         if dataDownloadResponse.status_code == 200:
@@ -82,10 +85,16 @@ def download_data_wa_gov(arglist=None):
                 datetime = ''
                 outfile = args.outfile
                 
-            if args.verbosity >= 1:
-                print("Saving file to: " + outfile, file=sys.stderr)
-            with open(outfile, 'wb') as f:
-                f.write(dataDownloadResponse.content)
+            if not os.path.exists(outfile) \
+            or os.path.getsize(outfile) != int(dataDownloadResponse.headers.get('Content-Length', '0')) \
+            or args.force:    
+                if args.verbosity >= 1:
+                    print("Saving file to: " + outfile, file=sys.stderr)
+                with open(outfile, 'wb') as f:
+                    f.write(dataDownloadResponse.content)
+            else:
+                if args.verbosity >= 1:
+                    print("File: " + outfile + " already exists", file=sys.stderr)
 
             print(datetime, end='')  # Pipe date/timestamp
         else:
