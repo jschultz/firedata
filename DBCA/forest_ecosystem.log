@@ -24,7 +24,7 @@ SELECT
     descript, 
     ST_Multi(ST_Union(geom)) AS full_geom, 
     ST_Multi(ST_Union(ST_Intersection(geom, (SELECT ST_Union(geom) FROM forest_man_plan_2014_2023_dbca_041 WHERE ST_Intersects(forest_man_plan_2014_2023_dbca_041.geom, forest_ecosystem_raw.geom))))) AS fmp_geom,
-    ST_Multi(ST_Union(ST_Intersection(geom, (SELECT ST_Union(geom) FROM native_veg_extent_dpird_005_wa WHERE ST_Intersects(native_veg_extent_dpird_005_wa.geom, forest_ecosystem_raw.geom))))) AS native_geom 
+    ST_Multi(ST_Union(ST_Intersection(geom, (SELECT ST_Union(geom) FROM native_veg_extent_dpird_005 WHERE ST_Intersects(native_veg_extent_dpird_005.geom, forest_ecosystem_raw.geom))))) AS native_geom 
 FROM forest_ecosystem_raw GROUP BY extcode, descript)"
 #    --command "CREATE UNIQUE INDEX ON forest_ecosystem (extcode)"
 #    --command "CREATE INDEX ON forest_ecosystem USING gist (full_geom)"

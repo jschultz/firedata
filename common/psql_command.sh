@@ -50,10 +50,17 @@ if [[ -n "${csvfile}" ]]; then
         echo -n "${COMMENTS_SEPARATOR}" >> "${csvfile}"
     fi
 
-    printf -- "--command\0%s\0" "${command_array[@]}" | xargs -0 psql ${database} \
-        --quiet --csv --command "\timing off" \
+#     printf -- "--command\0%s\0" "${command_array[@]}" | xargs -0 psql ${database} \
+#         --quiet --csv --command "\timing off" \
+#         >> "${csvfile}"
+    command_array=("\timing off" "${command_array[@]/%/;}")
+    printf "%s\n" "${command_array[@]}" | psql ${database} \
+        --quiet --csv \
         >> "${csvfile}"
 else
-    printf -- "--command\0%s\0" "${command_array[@]}" | xargs -0 psql ${database} \
-        --quiet --command "\timing off"
+#     printf -- "--command\0%s\0" "${command_array[@]}" | xargs -0 psql ${database} \
+#         --quiet --command "\timing off"
+    command_array=("\timing off" "${command_array[@]/%/;}")
+    printf "%s\n" "${command_array[@]}" | psql ${database} \
+        --quiet --csv
 fi

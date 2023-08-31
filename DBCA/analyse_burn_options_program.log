@@ -1,0 +1,57 @@
+################################################################################
+##
+## Copyright 2023 Jonathan Schultz
+##
+## This program is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+##
+## This program is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with this program.  If not, see <http://www.gnu.org/licenses/>.
+##
+################################################################################
+# psql_command.sh
+#    --nocomments
+#    --command "
+      SELECT
+          options.region,
+          options.district,
+          options.burnid,
+--          options.fin_yr,
+          options.location,
+--          options.status,
+--          options.priority,
+--          options.treatment,
+--          options.purpose,
+--          options.program,
+--          options.acb,
+--          options.trtd_dte,
+--          options.trtd_area,
+--          options.yslb,
+          ROUND(options.area_ha) AS total_area,
+--          options.perim_km,
+--          options.longitude,
+--          options.latitude,
+--          options.st_area_shape_,
+--          options.st_perimeter_shape_ 
+          COALESCE(ROUND(ST_Area(ST_Union(ST_Intersection(wetlands.geom, options.geom))::geography)/10000), 0) AS wetlands_area,
+          COALESCE(ROUND(ST_Area(ST_Union(ST_Intersection(wwa_peat.geom, options.geom))::geography)/10000), 0) AS wwa_peat_area,
+          COALESCE(ROUND(ST_Area(ST_Union(ST_Intersection(conservation.geom, options.geom))::geography)/10000), 0) AS conservation_area
+      FROM ${options} AS options
+      LEFT JOIN dir_important_wetlands_aus_wa_dbca_045 AS wetlands
+      ON   ST_Intersects(wetlands.geom, options.geom)
+      LEFT JOIN walpole_wild_peat_wetlands_unreviewed_dbca_042 AS wwa_peat
+      ON   ST_Intersects(wwa_peat.geom, options.geom)
+      LEFT JOIN legislated_lands_and_waters_dbca_011 AS conservation
+      ON   conservation_estate(conservation.leg_category) AND ST_Intersects(conservation.geom, options.geom)
+      GROUP BY options.object_id
+      ORDER BY options.region, options.district, options.burnid
+"
+#    --csvfile "analyse_burn_options_program.csv"
+################################################################################
