@@ -72,6 +72,12 @@ polytable=${basename}_poly
 pointtable=${basename}_point
 
 for ((tableidx=0; tableidx<${#eventtable_array[@]}; tableidx++)) do
+    canonical_array[tableidx]=$(psql --variable=ON_ERROR_STOP=1 \
+        --quiet --tuples-only --no-align --command="\timing off" \
+        --command="SELECT canonical_table('${eventtable_array[tableidx]}')")
+    if [[ ! -n "${canonical_array[tableidx]}" ]]; then
+        canonical_array[tableidx]="${eventtable_array[tableidx]}"
+    fi
     if [[ ! -n "${eventid_array[tableidx]}" ]]; then
         eventid_array[tableidx]="id"
     fi
@@ -100,7 +106,7 @@ for ((tableidx=0; tableidx<${#eventtable_array[@]}; tableidx++)) do
     MULTIPLE_SRID=$(psql --variable=ON_ERROR_STOP=1 \
                 --quiet --tuples-only --no-align --command="\timing off" \
                 --command "SELECT EXISTS(
-                            SELECT ST_SRID(${geometry_array[tableidx]}) AS srid FROM ${eventtable_array[tableidx]} WHERE ST_SRID(${geometry_array[tableidx]}) != '${SRID}')" )
+                            SELECT ST_SRID(${geometry_array[tableidx]}) AS srid FROM ${canonical_array[tableidx]} WHERE ST_SRID(${geometry_array[tableidx]}) != '${SRID}')" )
     if [[ "$MULTIPLE_SRID" == "t" ]]; then
         echo "ERROR: Multiple SRIDs in shape table geometries" >> /dev/stderr
         return 1
@@ -108,30 +114,31 @@ for ((tableidx=0; tableidx<${#eventtable_array[@]}; tableidx++)) do
 done
 
 for ((tableidx=0; tableidx<${#eventtable_array[@]}; tableidx++)) do
-    if [[ "${existing}" == "true" && $(table_exists "${eventtable_array[tableidx]}_dump") == 1 ]]; then
-        echo "Dump table ${eventtable_array[tableidx]}_dump exists - skipping"
+    if [[ "${existing}" == "true" && $(table_exists "${canonical_array[tableidx]}_dump") == 1 ]]; then
+        echo "Dump table ${canonical_array[tableidx]}_dump exists - skipping"
         continue
     else
         force=true
-        echo "Creating dump table ${eventtable_array[tableidx]}_dump"
+        echo "Creating dump table ${canonical_array[tableidx]}_dump"
 
         if [[ "${nobackup}" != "true" ]]; then  
-            backupcommand="CALL cycle_table('${eventtable_array[tableidx]}_dump')"
+            backupcommand="CALL cycle_table('${canonical_array[tableidx]}_dump')"
         else
             backupcommand=
         fi
         if [[ -n "${area}" ]]; then
             dumptable="WITH area as (${area})
-                        SELECT ${eventid_array[tableidx]}, (ST_Dump(ST_Intersection(area.geom,event.${geometry_array[tableidx]}))).geom AS geom FROM ${eventtable_array[tableidx]} AS event, area WHERE ST_Intersects(area.geom,event.${geometry_array[tableidx]})"
+                        SELECT ${eventid_array[tableidx]}, (ST_Dump(ST_Intersection(area.geom,event.${geometry_array[tableidx]}))).geom AS geom FROM ${canonical_array[tableidx]} AS event, area WHERE ST_Intersects(area.geom,event.${geometry_array[tableidx]})"
         elif [[ -n "${where}" ]]; then
-            dumptable="SELECT ${eventid_array[tableidx]}, (ST_Dump(${geometry_array[tableidx]})).geom AS geom FROM ${eventtable_array[tableidx]} WHERE ${where}"
+            dumptable="SELECT ${eventid_array[tableidx]}, (ST_Dump(${geometry_array[tableidx]})).geom AS geom FROM ${canonical_array[tableidx]} WHERE ${where}"
         else
-            dumptable="SELECT ${eventid_array[tableidx]}, (ST_Dump(geom,event)).geom AS geom FROM ${eventtable_array[tableidx]} AS event"
+            dumptable="SELECT ${eventid_array[tableidx]}, (ST_Dump(geom,event)).geom AS geom FROM ${canonical_array[tableidx]} AS event"
         fi
+        echo $dumptable
         psql --variable=ON_ERROR_STOP=1 \
             --command="${backupcommand}" \
-            --command="CREATE TABLE ${eventtable_array[tableidx]}_dump AS ${dumptable}" \
-            --command "CREATE INDEX ON ${eventtable_array[tableidx]}_dump USING gist (geom)"
+            --command="CREATE TABLE ${canonical_array[tableidx]}_dump AS ${dumptable}" \
+            --command "CREATE INDEX ON ${canonical_array[tableidx]}_dump USING gist (geom)"
     fi
 done
 
@@ -161,7 +168,7 @@ else
     dumpcommand="SELECT ST_ExteriorRing((ST_DumpRings(geom)).geom) FROM (
         SELECT geom FROM ${eventtable_array[0]}_dump"
     for ((tableidx=1; tableidx<${#eventtable_array[@]}; tableidx++)) do
-        dumpcommand+=" UNION SELECT geom FROM ${eventtable_array[tableidx]}_dump"
+        dumpcommand+=" UNION SELECT geom FROM ${canonical_array[tableidx]}_dump"
     done
     dumpcommand+=") foo"
 
@@ -254,21 +261,21 @@ for ((tableidx=0; tableidx<${#eventtable_array[@]}; tableidx++)) do
             --command="${backupcommand}" \
             --command="/* CREATE TABLE ${junction_array[tableidx]} AS 
                         SELECT DISTINCT point.id AS poly_id, dump.${eventid_array[tableidx]}
-                        FROM ${eventtable_array[tableidx]}_dump AS dump,
+                        FROM ${canonical_array[tableidx]}_dump AS dump,
                              ${pointtable} AS point
                         WHERE ST_Contains(dump.geom, point.point) */" \
             --command="CREATE TABLE ${junction_array[tableidx]} AS 
                         WITH area as (${area})
                         SELECT DISTINCT point.id AS poly_id, event.${eventid_array[tableidx]}
                         FROM area,
-                             ${eventtable_array[tableidx]} AS event,
+                             ${canonical_array[tableidx]} AS event,
                              ${pointtable} AS point
                         WHERE ST_Intersects(area.geom, event.${geometry_array[tableidx]})
                         AND   ST_Contains(event.${geometry_array[tableidx]}, point.point)" \
             --command="CREATE INDEX ON ${junction_array[tableidx]} (poly_id)" \
             --command="ALTER TABLE ${junction_array[tableidx]} ADD CONSTRAINT fk_poly FOREIGN KEY (poly_id) REFERENCES ${polytable}(id)" \
             --command="CREATE INDEX ON ${junction_array[tableidx]} (${eventid_array[tableidx]})" \
-            --command="ALTER TABLE ${junction_array[tableidx]} ADD CONSTRAINT fk_${eventtable_array[tableidx]} FOREIGN KEY (${eventid_array[tableidx]}) REFERENCES ${eventtable_array[tableidx]}(${eventid_array[tableidx]})"
+            --command="ALTER TABLE ${junction_array[tableidx]} ADD CONSTRAINT fk_${eventtable_array[tableidx]} FOREIGN KEY (${eventid_array[tableidx]}) REFERENCES ${canonical_array[tableidx]}(${eventid_array[tableidx]})"
     fi
 done
 
@@ -277,8 +284,8 @@ if [[ "${keep}" != "true" ]]; then
     psql --variable=ON_ERROR_STOP=1 \
         --command="DROP TABLE ${pointtable}"
     for ((tableidx=0; tableidx<${#eventtable_array[@]}; tableidx++)) do
-        echo "Dropping dump table ${eventtable_array[tableidx]}_dump" >> /dev/stderr
+        echo "Dropping dump table ${canonical_array[tableidx]}_dump" >> /dev/stderr
         psql --variable=ON_ERROR_STOP=1 \
-            --command="DROP TABLE ${eventtable_array[tableidx]}_dump"
+            --command="DROP TABLE ${canonical_array[tableidx]}_dump"
     done
 fi

@@ -149,35 +149,49 @@ $$
     END;
 $$"
 #    --command "
-CREATE OR REPLACE PROCEDURE cycle_table(name text)
+CREATE OR REPLACE PROCEDURE cycle_table(fullname text)
 LANGUAGE plpgsql
 AS
 $$
+    DECLARE schema text;
+            tablen text;
     BEGIN
-        IF EXISTS (SELECT 1 FROM pg_tables WHERE schemaname = 'public' AND tablename = name) THEN
-            IF EXISTS (SELECT 1 FROM pg_tables WHERE schemaname = 'backup' AND tablename = name) THEN  
-                EXECUTE 'DROP TABLE backup.' || name;
+        schema := SPLIT_PART(fullname, '.', 1);
+        tablen := SPLIT_PART(fullname, '.', 2);
+        IF tablen = '' then
+            tablen := schema;
+            schema := 'public';
+        END IF;
+        IF EXISTS (SELECT 1 FROM pg_tables WHERE schemaname = schema AND tablename = tablen) THEN
+            IF EXISTS (SELECT 1 FROM pg_tables WHERE schemaname = 'backup' AND tablename = tablen) THEN  
+                EXECUTE 'DROP TABLE backup.' || tablen || ' CASCADE';
             END IF;
-            EXECUTE 'ALTER TABLE ' || name || ' SET SCHEMA backup';
+            EXECUTE 'ALTER TABLE ' || fullname || ' SET SCHEMA backup';
         END IF;
     END;
 $$"
 #    --command "
-CREATE OR REPLACE PROCEDURE backup_table(name text)
+CREATE OR REPLACE PROCEDURE backup_table(fullname text)
 LANGUAGE plpgsql
 AS
 $$
-    DECLARE comment text;
-    test text;
+    DECLARE schema  text;
+            tablen  text;
+            comment text;
     BEGIN
-        IF EXISTS (SELECT 1 FROM pg_tables WHERE schemaname = 'public' AND tablename = name) THEN
-            IF EXISTS (SELECT 1 FROM pg_tables WHERE schemaname = 'backup' AND tablename = name) THEN  
-                EXECUTE 'DROP TABLE backup.' || name;
+        tablen := SPLIT_PART(fullname, '.', 2);
+        IF tablen = '' then
+            tablen := schema;
+            schema := 'public';
+        END IF;
+        IF EXISTS (SELECT 1 FROM pg_tables WHERE schemaname = schema AND tablename = tablen) THEN
+            IF EXISTS (SELECT 1 FROM pg_tables WHERE schemaname = 'backup' AND tablename = tablen) THEN  
+                EXECUTE 'DROP TABLE backup.' || tablen || ' CASCADE';
             END IF;
-            EXECUTE 'CREATE TABLE backup.' || name || ' AS TABLE public.' || name;
-            comment := obj_description(('public.' || name)::regclass);
+            EXECUTE 'CREATE TABLE backup.' || tablen || ' AS TABLE fullname';
+            comment := obj_description((schema || '.' || tablen)::regclass);
             IF comment IS NOT NULL THEN
-                EXECUTE 'COMMENT ON TABLE backup.' || name || ' IS ''' || comment || '''';
+                EXECUTE 'COMMENT ON TABLE backup.' || tablen || ' IS ''' || comment || '''';
             END IF;
         END IF;
     END;
