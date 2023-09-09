@@ -194,3 +194,13 @@ $$
         RETURN EXISTS (SELECT 1 FROM pg_tables WHERE schemaname = 'public' AND tablename = name);
     END;
 $$"
+#    --command "
+CREATE OR REPLACE FUNCTION canonical_table(name text)
+RETURNS text
+LANGUAGE plpgsql
+AS
+$$
+    BEGIN
+        RETURN (regexp_match(pg_get_viewdef(name), 'FROM\\s(.+);'))[1];
+    END;
+$$"

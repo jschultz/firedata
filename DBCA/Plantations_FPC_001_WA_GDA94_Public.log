@@ -21,5 +21,6 @@
 #    folder:Industry_and_Mining
 #    user:${user}
 #    password:${password}
+#    schema:data
 #    --
 #    download_and_load_wa_data.arg

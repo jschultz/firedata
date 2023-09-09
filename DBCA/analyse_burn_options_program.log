@@ -20,13 +20,13 @@
 #    --nocomments
 #    --command "
       SELECT
-          options.region,
-          options.district,
-          options.burnid,
+          options.burnid       AS "Burn ID",
+          options.region       AS "Region",
+          options.district     AS "District",
 --          options.fin_yr,
-          options.location,
+          options.location     AS "Location",
 --          options.status,
---          options.priority,
+            options.priority   As "Priority",
 --          options.treatment,
 --          options.purpose,
 --          options.program,
@@ -34,15 +34,17 @@
 --          options.trtd_dte,
 --          options.trtd_area,
 --          options.yslb,
-          ROUND(options.area_ha) AS total_area,
+          ROUND(options.area_ha) AS "Total Area (ha)",
 --          options.perim_km,
 --          options.longitude,
 --          options.latitude,
 --          options.st_area_shape_,
 --          options.st_perimeter_shape_ 
-          COALESCE(ROUND(ST_Area(ST_Union(ST_Intersection(wetlands.geom, options.geom))::geography)/10000), 0) AS wetlands_area,
-          COALESCE(ROUND(ST_Area(ST_Union(ST_Intersection(wwa_peat.geom, options.geom))::geography)/10000), 0) AS wwa_peat_area,
-          COALESCE(ROUND(ST_Area(ST_Union(ST_Intersection(conservation.geom, options.geom))::geography)/10000), 0) AS conservation_area
+          ROUND(ST_Area(ST_Union(ST_Intersection(conservation.geom, options.geom))::geography)/10000) AS "Conservation Estate Area (ha)",
+          ROUND(ST_Area(ST_Union(ST_Intersection(wetlands.geom, options.geom))::geography)/10000) AS "Wetlands Area (ha)",
+          ROUND(ST_Area(ST_Union(ST_Intersection(wwa_peat.geom, options.geom))::geography)/10000) AS "Peat Area (ha)*" 
+--          ROUND(ST_Area(ST_Union(ST_Intersection(forest_ecosystem.full_geom, options.geom)) FILTER (WHERE forest_ecosystem.descript = 'Rocky outcrops')::geography)/10000) AS rocky_outcrops_area,
+--          ROUND(ST_Area(ST_Union(ST_Intersection(forest_ecosystem.full_geom, options.geom)) FILTER (WHERE forest_ecosystem.descript = 'Swamps')::geography)/10000) AS swamps_area
       FROM ${options} AS options
       LEFT JOIN dir_important_wetlands_aus_wa_dbca_045 AS wetlands
       ON   ST_Intersects(wetlands.geom, options.geom)
@@ -50,6 +52,8 @@
       ON   ST_Intersects(wwa_peat.geom, options.geom)
       LEFT JOIN legislated_lands_and_waters_dbca_011 AS conservation
       ON   conservation_estate(conservation.leg_category) AND ST_Intersects(conservation.geom, options.geom)
+--      LEFT JOIN forest_ecosystem
+--      ON   ST_Intersects(conservation.geom, options.geom)
       GROUP BY options.object_id
       ORDER BY options.region, options.district, options.burnid
 "

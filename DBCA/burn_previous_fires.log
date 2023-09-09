@@ -1,6 +1,6 @@
 ################################################################################
 ##
-## Copyright 2022 Jonathan Schultz
+## Copyright 2023 Jonathan Schultz
 ##
 ## This program is free software: you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
@@ -16,20 +16,12 @@
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##
 ################################################################################
-# psql
-#    --command "DROP TABLE IF EXISTS burn_previous_fires"
-#    --command "
-CREATE TABLE burn_previous_fires AS (
-    SELECT 
-        domain.burnid, 
-        domain.location, 
-        domain.geom, 
-        fireseason(history.fih_date1) AS fireseason,
-        ST_Area(ST_Intersection(ST_Union(history.geom),domain.geom)::geography)/10000 AS fire_in_burn_area,
-        ST_Area(ST_Union(history.geom)::geography)/10000 AS fire_area
-    FROM 
-        annual_ind_burn_prog_dbca_007 AS domain, dbca_fire_history_dbca_060 AS history 
-    WHERE 
-        ST_Intersects(domain.geom, history.geom)
-    GROUP BY 
-        domain.burnid, domain.location, domain.geom, fireseason(fih_date1))"
+# create_junction_table.sh
+#    --nologfile
+#    --table1 dbca_burn_options_program_dbca_007
+#    --column1 burnid;location;geom
+#    --table2 dbca_fire_history_dbca_060
+#    --column2 id
+#    --junction dbca_007_060_junction
+#    --computed MIN(fireseason(table2.fih_date1));ST_Area(ST_Intersection(ST_Union(table2.geom),table1.geom)::geography)/10000;ST_Area(ST_Union(table2.geom)::geography)/10000
+#    --computedalias fireseason;fire_in_burn_area;fire_area

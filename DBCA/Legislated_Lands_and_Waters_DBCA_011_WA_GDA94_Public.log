@@ -21,5 +21,6 @@
 #    folder:Property_and_Planning
 #    user:${user}
 #    password:${password}
+#    schema:data
 #    --
 #    download_and_load_wa_data.arg
