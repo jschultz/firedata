@@ -58,6 +58,11 @@ def getDailyBurns(arglist=None):
     if not args.no_comments:
         parser.write_comments(args, csvfile, incomments=ArgumentHelper.separator())
 
+    def float_or_none(s):
+        try:
+            return float(s)
+        except:
+            return None
 
     def decodeDailyBurns():
         rc = []
@@ -84,18 +89,21 @@ def getDailyBurns(arglist=None):
                 for n in range(len(spans) // 2):
                     attributes[spans[2 * n].get_text()] = spans[2 * n + 1].get_text()
                     
-                attributes['burn_target_date'] = datetime.strptime(attributes['burn_target_date_raw'],'%m/%d/%y %I:%M %p').date()
+                attributes['burn_target_date'] = datetime.strptime(attributes.get('burn_target_date_raw'),'%m/%d/%y %I:%M %p').date()
                 del attributes['burn_target_date_raw']
-                attributes['indicative_area']  = float(attributes['indicative_area'])
-                attributes['burn_target_long'] = float(attributes['burn_target_long'])
-                attributes['burn_target_lat']  = float(attributes['burn_target_lat'])
-                attributes['burn_planned_area_today'] = float(attributes['burn_planned_area_today'])
-                attributes['burn_est_start'] = datetime.strptime(attributes['burn_est_start'],'%H:%M:%S').time()
+                attributes['indicative_area']  = float_or_none(attributes.get('indicative_area'))
+                attributes['burn_target_long'] = float_or_none(attributes.get('burn_target_long'))
+                attributes['burn_target_lat']  = float_or_none(attributes.get('burn_target_lat'))
+                attributes['burn_planned_area_today'] = float_or_none(attributes.get('burn_planned_area_today'))
+                try:
+                    attributes['burn_est_start'] = datetime.strptime(attributes.get('burn_est_start', ''),'%H:%M:%S').time()
+                except:
+                    pass
                 
                 if attributes['burn_target_date'] != datetime.today().date():
                     return None
                     
-            valiter = iter([float(val) for val in item.find("georss:polygon").get_text().split(' ')])
+            valiter = iter([float_or_none(val) for val in item.find("georss:polygon").get_text().split(' ')])
             polygon = Polygon([(lat, lon) for lat, lon in zip(valiter, valiter)])
             multipolygon += [polygon]
 
