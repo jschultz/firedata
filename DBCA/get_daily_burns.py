@@ -101,7 +101,7 @@ def getDailyBurns(arglist=None):
                     pass
                 
                 if attributes['burn_target_date'] != datetime.today().date():
-                    return None
+                    continue
                     
             valiter = iter([float_or_none(val) for val in item.find("georss:polygon").get_text().split(' ')])
             polygon = Polygon([(lat, lon) for lat, lon in zip(valiter, valiter)])
@@ -117,8 +117,8 @@ def getDailyBurns(arglist=None):
 
     wms = WebMapService(args.server, version=args.version)
 
-    items = None
-    while items is None:
+    items = []
+    while items == []:
         items = decodeDailyBurns()  
         if items is None:
             time.sleep(60)
