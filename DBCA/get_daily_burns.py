@@ -74,8 +74,6 @@ def getDailyBurns(arglist=None):
 
         items = data.find_all('item')
         multipolygon = []
-        csvfile = open('daily_burns.csv', 'w')
-        csvwriter = None
 
         for item in items:
             description = BeautifulSoup('<description>' + item.find("description").get_text() + '</description>', 'xml')
