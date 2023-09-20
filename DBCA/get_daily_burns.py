@@ -82,6 +82,8 @@ def getDailyBurns(arglist=None):
                 if multipolygon != []:
                     attributes['geom'] = multipolygon[0].wkt if len(multipolygon) == 1 else MultiPolygon(multipolygon).wkt
                     multipolygon = []
+
+                    rc += [attributes]
                     
                 attributes = {}
                 for n in range(len(spans) // 2):
@@ -121,7 +123,7 @@ def getDailyBurns(arglist=None):
         if items is None:
             time.sleep(60)
         
-    csvwriter=csv.DictWriter(csvfile, fieldnames=list(items[0].keys()))
+    csvwriter=csv.DictWriter(csvfile, fieldnames=list(set(sum([list(item.keys()) for item in items], start=[]))))
     csvwriter.writeheader()
     for item in items:
         csvwriter.writerow(item)
