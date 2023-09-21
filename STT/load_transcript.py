@@ -69,7 +69,6 @@ def loadTranscript(arglist=None):
         print("ERROR: Filename does not match pattern", file=sys.stderr)
     
     infile = open(args.infile, 'r')
-    csvfile = open(args.csvfile, 'w')
     csvwriter=csv.DictWriter(csvfile, fieldnames=['frequency', 'channel', 'datetime', 'text'])
     csvwriter.writeheader()
 
