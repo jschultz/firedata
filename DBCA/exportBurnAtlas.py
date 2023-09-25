@@ -17,7 +17,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from argrecord import ArgumentHelper, ArgumentRecorder
-from qgis.core import QgsLayoutExporter
+from qgis.core import QgsLayoutExporter, QgsExpressionContextUtils
 from qgis.gui import QgsMapCanvas, QgsLayerTreeMapCanvasBridge
 from qgis.PyQt import QtGui
 from PyQt5.QtGui import QColor, QFont
@@ -35,7 +35,7 @@ def exportburnAtlas(arglist=None):
     parser = ArgumentRecorder(description='Exports an atlas from a QGIS file.',
                               fromfile_prefix_chars='@')
 
-    parser.add_argument('-B', '--burn',   type=str, required=True, help="ID of burn to export")
+    parser.add_argument('-B', '--burnid',   type=str, required=True, help="ID of burn to export")
     parser.add_argument('-f', '--filter', type=str, help="Additional criteria for producing a page")
     parser.add_argument('-l', '--layout', type=str, required=True, help="Print layout to export")
     parser.add_argument('-p', '--pdffile', type=str, help="Name of PDF file to export")
@@ -65,16 +65,16 @@ def exportburnAtlas(arglist=None):
 
     project = QgsProject.instance()
     project.read(args.qgisfile[0])
-    
+
+    QgsExpressionContextUtils.setProjectVariable(project, "burnid", args.burnid)
+        
     manager = project.layoutManager()
     layout = manager.layoutByName(args.layout)
     
     atlas = layout.atlas()
-    atlas.setFilterFeatures(True)
-    filterExpression = '"burnid"=\'{}\''.format(args.burn)
     if args.filter:
-        filterExpression += ' AND ' + args.filter
-    atlas.setFilterExpression(filterExpression)
+        atlas.setFilterFeatures(True)
+        atlas.setFilterExpression(args.filter)
       
     exporter = QgsLayoutExporter(atlas.layout())
     if args.pdffile:

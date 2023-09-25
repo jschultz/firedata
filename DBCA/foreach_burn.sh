@@ -46,9 +46,9 @@ if [[ "${parallel}" == "true" ]]; then
       --command "select distinct burnid from dbca_burn_options_program_dbca_007" |
     parallel "
         if [[ \"${dry_run}\" != "true" ]]; then
-            argreplay --depth ${depth} --substitute burn:{} ${substitute} -- ${script}
+            argreplay --depth ${depth} --substitute burnid:{} ${substitute} -- ${script}
         else
-            echo argreplay --depth ${depth} --substitute burn:\"{}\" ${substitute} -- ${script} 
+            echo argreplay --depth ${depth} --substitute burnid:\"{}\" ${substitute} -- ${script} 
         fi"
 else
     psql \
@@ -57,9 +57,9 @@ else
       --command "select distinct burnid from dbca_burn_options_program_dbca_007 " |
     while read -r burnid; do 
         if [[ "${dry_run}" != "true" ]]; then
-            argreplay --depth ${depth} --substitute burn:"${burnid}" ${substitute} -- ${script}
+            argreplay --depth ${depth} --substitute burnid:"${burnid}" ${substitute} -- ${script}
         else
-            echo argreplay --depth ${depth} --substitute burn:\"${burnid}\" ${substitute} -- ${script}
+            echo argreplay --depth ${depth} --substitute burnid:\"${burnid}\" ${substitute} -- ${script}
         fi
     done
 fi
