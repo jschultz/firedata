@@ -22,54 +22,54 @@
     <customproperties>
       <Option/>
     </customproperties>
-    <layer-tree-layer id="dbca_fire_history_dbca_060_ff8ad9d9_7313_4d09_92e0_58738499dbc5" source="dbname='fire' port=5433 user='qgis' sslmode=disable key='object_id' srid=4283 type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;public&quot;.&quot;dbca_fire_history_dbca_060&quot; (geom) sql=fireseason(fih_date1) = 2022" name="dbca_fire_history_dbca_060" checked="Qt::Unchecked" legend_exp="" patch_size="-1,-1" providerKey="postgres" legend_split_behavior="0" expanded="1">
+    <layer-tree-layer id="dbca_fire_history_dbca_060_ff8ad9d9_7313_4d09_92e0_58738499dbc5" source="dbname='fire' user='qgis' sslmode=disable key='object_id' srid=4283 type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;public&quot;.&quot;dbca_fire_history_dbca_060&quot; (geom) sql=fireseason(fih_date1) = 2022" name="dbca_fire_history_dbca_060" checked="Qt::Unchecked" legend_exp="" patch_size="-1,-1" providerKey="postgres" legend_split_behavior="0" expanded="1">
       <customproperties>
         <Option type="Map">
           <Option value="dbca_fire_history_dbca_060" type="QString" name="cached_name"/>
         </Option>
       </customproperties>
     </layer-tree-layer>
-    <layer-tree-layer id="options_d3b199e8_52b3_4426_8295_5d05a4bb08ea" source="dbname='fire' port=5433 user='qgis' sslmode=disable key='_uid_' checkPrimaryKeyUnicity='1' table=&quot;(SELECT row_number() over () AS _uid_,* FROM (SELECT options.*,  &#x9;   ST_Area(ST_Union(ST_Intersection(conservation.geom, options.geom))::geography)/10000 AS \&quot;Conservation Estate Area (ha)\&quot;,  &#x9;   ST_Area(ST_Union(ST_Intersection(wetlands.geom, options.geom))::geography)/10000 AS \&quot;Wetlands Area (ha)\&quot; FROM data.dbca_burn_options_program_dbca_007_20230813 AS options       LEFT JOIN dir_important_wetlands_aus_wa_dbca_045 AS wetlands       ON   ST_Intersects(wetlands.geom, options.geom)       LEFT JOIN walpole_wild_peat_wetlands_unreviewed_dbca_042 AS wwa_peat       ON   ST_Intersects(wwa_peat.geom, options.geom)       LEFT JOIN legislated_lands_and_waters_dbca_011 AS conservation       ON   conservation_estate(conservation.leg_category) AND ST_Intersects(conservation.geom, options.geom)       GROUP BY options.object_id       ORDER BY options.region, options.district, options.burnid&#xa;) AS _subq_1_&#xa;)&quot; (geom)" name="options" checked="Qt::Unchecked" legend_exp="" patch_size="-1,-1" providerKey="postgres" legend_split_behavior="0" expanded="1">
+    <layer-tree-layer id="options_d3b199e8_52b3_4426_8295_5d05a4bb08ea" source="dbname='fire' user='qgis' sslmode=disable key='_uid_' checkPrimaryKeyUnicity='1' table=&quot;(SELECT row_number() over () AS _uid_,* FROM (SELECT options.*,  &#x9;   ST_Area(ST_Union(ST_Intersection(conservation.geom, options.geom))::geography)/10000 AS \&quot;Conservation Estate Area (ha)\&quot;,  &#x9;   ST_Area(ST_Union(ST_Intersection(wetlands.geom, options.geom))::geography)/10000 AS \&quot;Wetlands Area (ha)\&quot; FROM data.dbca_burn_options_program_dbca_007_20230813 AS options       LEFT JOIN dir_important_wetlands_aus_wa_dbca_045 AS wetlands       ON   ST_Intersects(wetlands.geom, options.geom)       LEFT JOIN walpole_wild_peat_wetlands_unreviewed_dbca_042 AS wwa_peat       ON   ST_Intersects(wwa_peat.geom, options.geom)       LEFT JOIN legislated_lands_and_waters_dbca_011 AS conservation       ON   conservation_estate(conservation.leg_category) AND ST_Intersects(conservation.geom, options.geom)       GROUP BY options.object_id       ORDER BY options.region, options.district, options.burnid&#xa;) AS _subq_1_&#xa;)&quot; (geom)" name="options" checked="Qt::Unchecked" legend_exp="" patch_size="-1,-1" providerKey="postgres" legend_split_behavior="0" expanded="1">
       <customproperties>
         <Option/>
       </customproperties>
     </layer-tree-layer>
-    <layer-tree-layer id="dbca_burn_options_program_dbca_007_81582f5d_10cb_4bf4_bcf7_dc039a47104d" source="dbname='fire' port=5433 user='qgis' sslmode=disable key='object_id' srid=4283 type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;public&quot;.&quot;dbca_burn_options_program_dbca_007&quot; (geom)" name="dbca_burn_options_program_dbca_007" checked="Qt::Unchecked" legend_exp="" patch_size="-1,-1" providerKey="postgres" legend_split_behavior="0" expanded="1">
+    <layer-tree-layer id="dbca_burn_options_program_dbca_007_81582f5d_10cb_4bf4_bcf7_dc039a47104d" source="dbname='fire' user='qgis' sslmode=disable key='object_id' srid=4283 type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;public&quot;.&quot;dbca_burn_options_program_dbca_007&quot; (geom)" name="dbca_burn_options_program_dbca_007" checked="Qt::Unchecked" legend_exp="" patch_size="-1,-1" providerKey="postgres" legend_split_behavior="0" expanded="1">
       <customproperties>
         <Option type="Map">
           <Option value="dbca_burn_options_program_dbca_007" type="QString" name="cached_name"/>
         </Option>
       </customproperties>
     </layer-tree-layer>
-    <layer-tree-layer id="numfires_since_2000_e95c0791_a64c_449e_8380_c8ecaf0bef23" source="dbname='fire' port=5433 user='qgis' sslmode=disable key='tid' srid=4283 type=Polygon checkPrimaryKeyUnicity='0' table=&quot;public&quot;.&quot;numfires_since_2000&quot; (geom)" name="numfires_since_2000" checked="Qt::Unchecked" legend_exp="" patch_size="-1,-1" providerKey="postgres" legend_split_behavior="0" expanded="1">
+    <layer-tree-layer id="southern_numfires_since_2000_e95c0791_a64c_449e_8380_c8ecaf0bef23" source="dbname='fire' user='qgis' sslmode=disable key='tid' srid=4283 type=Polygon checkPrimaryKeyUnicity='0' table=&quot;public&quot;.&quot;southern_numfires_since_2000&quot; (geom)" name="southern_numfires_since_2000" checked="Qt::Unchecked" legend_exp="" patch_size="-1,-1" providerKey="postgres" legend_split_behavior="0" expanded="1">
       <customproperties>
         <Option type="Map">
-          <Option value="numfires_since_2000" type="QString" name="cached_name"/>
+          <Option value="southern_numfires_since_2000" type="QString" name="cached_name"/>
         </Option>
       </customproperties>
     </layer-tree-layer>
-    <layer-tree-layer id="yolb_0e53bfe7_0b0a_4081_bf18_1342db7cd73c" source="dbname='fire' port=5433 user='qgis' sslmode=disable key='_uid_' checkPrimaryKeyUnicity='1' table=&quot;(SELECT row_number() over () AS _uid_,* FROM (select fireseason(fih_date1), southern_view.geom from southern_view, dbca_fire_history_dbca_060  where dbca_fire_history_dbca_060.object_id=southern_view.dbca_fire_history_dbca_060_id[1]&#xa;) AS _subq_1_&#xa;)&quot; (geom)" name="yslb" checked="Qt::Unchecked" legend_exp="" patch_size="-1,-1" providerKey="postgres" legend_split_behavior="0" expanded="1">
+    <layer-tree-layer id="yolb_0e53bfe7_0b0a_4081_bf18_1342db7cd73c" source="dbname='fire' user='qgis' sslmode=disable key='_uid_' checkPrimaryKeyUnicity='1' table=&quot;(SELECT row_number() over () AS _uid_,* FROM (select fireseason(fih_date1), southern_view.geom from southern_view, dbca_fire_history_dbca_060  where dbca_fire_history_dbca_060.object_id=southern_view.dbca_fire_history_dbca_060_id[1]&#xa;) AS _subq_1_&#xa;)&quot; (geom)" name="yslb" checked="Qt::Unchecked" legend_exp="" patch_size="-1,-1" providerKey="postgres" legend_split_behavior="0" expanded="1">
       <customproperties>
         <Option type="Map">
           <Option value="yslb" type="QString" name="cached_name"/>
         </Option>
       </customproperties>
     </layer-tree-layer>
-    <layer-tree-layer id="dir_important_wetlands_aus_wa_dbca_045_87e16bad_e578_4267_b73d_a8ba3e6028a2" source="dbname='fire' port=5433 user='qgis' sslmode=disable key='id' srid=4283 type=MultiSurface checkPrimaryKeyUnicity='1' table=&quot;public&quot;.&quot;dir_important_wetlands_aus_wa_dbca_045&quot; (geom) sql=diw_pressures like '%fire%'" name="dir_important_wetlands_aus_wa_dbca_045" checked="Qt::Unchecked" legend_exp="" patch_size="-1,-1" providerKey="postgres" legend_split_behavior="0" expanded="1">
+    <layer-tree-layer id="dir_important_wetlands_aus_wa_dbca_045_87e16bad_e578_4267_b73d_a8ba3e6028a2" source="dbname='fire' user='qgis' sslmode=disable key='id' srid=4283 type=MultiSurface checkPrimaryKeyUnicity='1' table=&quot;public&quot;.&quot;dir_important_wetlands_aus_wa_dbca_045&quot; (geom) sql=diw_pressures like '%fire%'" name="dir_important_wetlands_aus_wa_dbca_045" checked="Qt::Unchecked" legend_exp="" patch_size="-1,-1" providerKey="postgres" legend_split_behavior="0" expanded="1">
       <customproperties>
         <Option type="Map">
           <Option value="dir_important_wetlands_aus_wa_dbca_045" type="QString" name="cached_name"/>
         </Option>
       </customproperties>
     </layer-tree-layer>
-    <layer-tree-layer id="legislated_lands_and_waters_dbca_011_28f9551f_dd2d_44cf_84fa_9e4bc4feefdc" source="dbname='fire' port=5433 user='qgis' sslmode=disable key='id' srid=4283 type=Polygon checkPrimaryKeyUnicity='1' table=&quot;public&quot;.&quot;legislated_lands_and_waters_dbca_011&quot; (geom) sql=conservation_estate(&quot;leg_category&quot;)" name="legislated_lands_and_waters_dbca_011" checked="Qt::Unchecked" legend_exp="" patch_size="-1,-1" providerKey="postgres" legend_split_behavior="0" expanded="1">
+    <layer-tree-layer id="legislated_lands_and_waters_dbca_011_28f9551f_dd2d_44cf_84fa_9e4bc4feefdc" source="dbname='fire' user='qgis' sslmode=disable key='id' srid=4283 type=Polygon checkPrimaryKeyUnicity='1' table=&quot;public&quot;.&quot;legislated_lands_and_waters_dbca_011&quot; (geom) sql=conservation_estate(&quot;leg_category&quot;)" name="legislated_lands_and_waters_dbca_011" checked="Qt::Unchecked" legend_exp="" patch_size="-1,-1" providerKey="postgres" legend_split_behavior="0" expanded="1">
       <customproperties>
         <Option type="Map">
           <Option value="legislated_lands_and_waters_dbca_011" type="QString" name="cached_name"/>
         </Option>
       </customproperties>
     </layer-tree-layer>
-    <layer-tree-layer id="walpole_wild_peat_wetlands_unreviewed_dbca_042_6b7abf2d_7fd7_4608_a1ad_8ff5a2d2fd34" source="dbname='fire' port=5433 user='qgis' sslmode=disable key='id' srid=4283 type=Polygon checkPrimaryKeyUnicity='1' table=&quot;public&quot;.&quot;walpole_wild_peat_wetlands_unreviewed_dbca_042&quot; (geom)" name="walpole_wild_peat_wetlands_unreviewed_dbca_042" checked="Qt::Unchecked" legend_exp="" patch_size="-1,-1" providerKey="postgres" legend_split_behavior="0" expanded="1">
+    <layer-tree-layer id="walpole_wild_peat_wetlands_unreviewed_dbca_042_6b7abf2d_7fd7_4608_a1ad_8ff5a2d2fd34" source="dbname='fire' user='qgis' sslmode=disable key='id' srid=4283 type=Polygon checkPrimaryKeyUnicity='1' table=&quot;public&quot;.&quot;walpole_wild_peat_wetlands_unreviewed_dbca_042&quot; (geom)" name="walpole_wild_peat_wetlands_unreviewed_dbca_042" checked="Qt::Unchecked" legend_exp="" patch_size="-1,-1" providerKey="postgres" legend_split_behavior="0" expanded="1">
       <customproperties>
         <Option type="Map">
           <Option value="walpole_wild_peat_wetlands_unreviewed_dbca_042" type="QString" name="cached_name"/>
@@ -168,7 +168,7 @@
       <item>_bf565d27_fd9c_4735_9a1f_4ca3a0e5323b</item>
       <item>dbca_fire_history_dbca_060_ff8ad9d9_7313_4d09_92e0_58738499dbc5</item>
       <item>yolb_0e53bfe7_0b0a_4081_bf18_1342db7cd73c</item>
-      <item>numfires_since_2000_e95c0791_a64c_449e_8380_c8ecaf0bef23</item>
+      <item>southern_numfires_since_2000_e95c0791_a64c_449e_8380_c8ecaf0bef23</item>
       <item>options_d3b199e8_52b3_4426_8295_5d05a4bb08ea</item>
     </custom-order>
   </layer-tree-group>
@@ -189,7 +189,7 @@
       <layer-setting id="Layers_Other_2_a3e760f9_6297_4696_983a_10e0353e4e54" type="1" maxScale="0" tolerance="12" units="1" enabled="0" minScale="0"/>
       <layer-setting id="Other_3_8a807786_fbed_4d73_9d7a_b8be06dd3b37" type="1" maxScale="0" tolerance="12" units="1" enabled="0" minScale="0"/>
       <layer-setting id="dbca_fire_history_dbca_060_ff8ad9d9_7313_4d09_92e0_58738499dbc5" type="1" maxScale="0" tolerance="12" units="1" enabled="0" minScale="0"/>
-      <layer-setting id="numfires_since_2000_e95c0791_a64c_449e_8380_c8ecaf0bef23" type="1" maxScale="0" tolerance="12" units="1" enabled="0" minScale="0"/>
+      <layer-setting id="southern_numfires_since_2000_e95c0791_a64c_449e_8380_c8ecaf0bef23" type="1" maxScale="0" tolerance="12" units="1" enabled="0" minScale="0"/>
       <layer-setting id="options_d3b199e8_52b3_4426_8295_5d05a4bb08ea" type="1" maxScale="0" tolerance="12" units="1" enabled="0" minScale="0"/>
     </individual-layer-settings>
   </snapping-settings>
@@ -237,9 +237,9 @@
         <legendlayerfile isInOverview="0" visible="0" layerid="dbca_burn_options_program_dbca_007_81582f5d_10cb_4bf4_bcf7_dc039a47104d"/>
       </filegroup>
     </legendlayer>
-    <legendlayer drawingOrder="-1" open="true" checked="Qt::Unchecked" name="numfires_since_2000" showFeatureCount="0">
+    <legendlayer drawingOrder="-1" open="true" checked="Qt::Unchecked" name="southern_numfires_since_2000" showFeatureCount="0">
       <filegroup open="true" hidden="false">
-        <legendlayerfile isInOverview="0" visible="0" layerid="numfires_since_2000_e95c0791_a64c_449e_8380_c8ecaf0bef23"/>
+        <legendlayerfile isInOverview="0" visible="0" layerid="southern_numfires_since_2000_e95c0791_a64c_449e_8380_c8ecaf0bef23"/>
       </filegroup>
     </legendlayer>
     <legendlayer drawingOrder="-1" open="true" checked="Qt::Unchecked" name="yslb" showFeatureCount="0">
@@ -3337,7 +3337,7 @@
         <ymax>-13.73939583799992192</ymax>
       </wgs84extent>
       <id>dbca_burn_options_program_dbca_007_81582f5d_10cb_4bf4_bcf7_dc039a47104d</id>
-      <datasource>dbname='fire' port=5433 user='qgis' sslmode=disable key='object_id' srid=4283 type=MultiPolygon checkPrimaryKeyUnicity='1' table="public"."dbca_burn_options_program_dbca_007" (geom)</datasource>
+      <datasource>dbname='fire' user='qgis' sslmode=disable key='object_id' srid=4283 type=MultiPolygon checkPrimaryKeyUnicity='1' table="public"."dbca_burn_options_program_dbca_007" (geom)</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -4042,7 +4042,7 @@
         <ymax>-14.31872910599999749</ymax>
       </wgs84extent>
       <id>dbca_fire_history_dbca_060_ff8ad9d9_7313_4d09_92e0_58738499dbc5</id>
-      <datasource>dbname='fire' port=5433 user='qgis' sslmode=disable key='object_id' srid=4283 type=MultiPolygon checkPrimaryKeyUnicity='1' table="public"."dbca_fire_history_dbca_060" (geom) sql=fireseason(fih_date1) = 2022</datasource>
+      <datasource>dbname='fire' user='qgis' sslmode=disable key='object_id' srid=4283 type=MultiPolygon checkPrimaryKeyUnicity='1' table="public"."dbca_fire_history_dbca_060" (geom) sql=fireseason(fih_date1) = 2022</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -4649,7 +4649,7 @@
         <ymax>-14.45547152499994681</ymax>
       </wgs84extent>
       <id>dir_important_wetlands_aus_wa_dbca_045_87e16bad_e578_4267_b73d_a8ba3e6028a2</id>
-      <datasource>dbname='fire' port=5433 user='qgis' sslmode=disable key='id' srid=4283 type=MultiSurface checkPrimaryKeyUnicity='1' table="public"."dir_important_wetlands_aus_wa_dbca_045" (geom) sql=diw_pressures like '%fire%'</datasource>
+      <datasource>dbname='fire' user='qgis' sslmode=disable key='id' srid=4283 type=MultiSurface checkPrimaryKeyUnicity='1' table="public"."dir_important_wetlands_aus_wa_dbca_045" (geom) sql=diw_pressures like '%fire%'</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -5348,7 +5348,7 @@
         <ymax>-13.81656611699998294</ymax>
       </wgs84extent>
       <id>legislated_lands_and_waters_dbca_011_28f9551f_dd2d_44cf_84fa_9e4bc4feefdc</id>
-      <datasource>dbname='fire' port=5433 user='qgis' sslmode=disable key='id' srid=4283 type=Polygon checkPrimaryKeyUnicity='1' table="public"."legislated_lands_and_waters_dbca_011" (geom) sql=conservation_estate("leg_category")</datasource>
+      <datasource>dbname='fire' user='qgis' sslmode=disable key='id' srid=4283 type=Polygon checkPrimaryKeyUnicity='1' table="public"."legislated_lands_and_waters_dbca_011" (geom) sql=conservation_estate("leg_category")</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -5962,12 +5962,12 @@
         <xmax>128.765041510000259</xmax>
         <ymax>-30.97749053999998381</ymax>
       </wgs84extent>
-      <id>numfires_since_2000_e95c0791_a64c_449e_8380_c8ecaf0bef23</id>
-      <datasource>dbname='fire' port=5433 user='qgis' sslmode=disable key='tid' srid=4283 type=Polygon checkPrimaryKeyUnicity='0' table="public"."numfires_since_2000" (geom)</datasource>
+      <id>southern_numfires_since_2000_e95c0791_a64c_449e_8380_c8ecaf0bef23</id>
+      <datasource>dbname='fire' user='qgis' sslmode=disable key='tid' srid=4283 type=Polygon checkPrimaryKeyUnicity='0' table="public"."southern_numfires_since_2000" (geom)</datasource>
       <keywordList>
         <value></value>
       </keywordList>
-      <layername>numfires_since_2000</layername>
+      <layername>southern_numfires_since_2000</layername>
       <srs>
         <spatialrefsys nativeFormat="Wkt">
           <wkt>GEOGCRS["GDA94",DATUM["Geocentric Datum of Australia 1994",ELLIPSOID["GRS 1980",6378137,298.257222101,LENGTHUNIT["metre",1]]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433]],CS[ellipsoidal,2],AXIS["geodetic latitude (Lat)",north,ORDER[1],ANGLEUNIT["degree",0.0174532925199433]],AXIS["geodetic longitude (Lon)",east,ORDER[2],ANGLEUNIT["degree",0.0174532925199433]],USAGE[SCOPE["Horizontal component of 3D system."],AREA["Australia including Lord Howe Island, Macquarie Island, Ashmore and Cartier Islands, Christmas Island, Cocos (Keeling) Islands, Norfolk Island. All onshore and offshore."],BBOX[-60.55,93.41,-8.47,173.34]],ID["EPSG",4283]]</wkt>
@@ -6472,7 +6472,7 @@
         <ymax>-13.73939583799992192</ymax>
       </wgs84extent>
       <id>options_d3b199e8_52b3_4426_8295_5d05a4bb08ea</id>
-      <datasource>dbname='fire' port=5433 user='qgis' sslmode=disable key='_uid_' checkPrimaryKeyUnicity='1' table="(SELECT row_number() over () AS _uid_,* FROM (SELECT options.*,  	   ST_Area(ST_Union(ST_Intersection(conservation.geom, options.geom))::geography)/10000 AS \"Conservation Estate Area (ha)\",  	   ST_Area(ST_Union(ST_Intersection(wetlands.geom, options.geom))::geography)/10000 AS \"Wetlands Area (ha)\" FROM data.dbca_burn_options_program_dbca_007_20230813 AS options       LEFT JOIN dir_important_wetlands_aus_wa_dbca_045 AS wetlands       ON   ST_Intersects(wetlands.geom, options.geom)       LEFT JOIN walpole_wild_peat_wetlands_unreviewed_dbca_042 AS wwa_peat       ON   ST_Intersects(wwa_peat.geom, options.geom)       LEFT JOIN legislated_lands_and_waters_dbca_011 AS conservation       ON   conservation_estate(conservation.leg_category) AND ST_Intersects(conservation.geom, options.geom)       GROUP BY options.object_id       ORDER BY options.region, options.district, options.burnid
+      <datasource>dbname='fire' user='qgis' sslmode=disable key='_uid_' checkPrimaryKeyUnicity='1' table="(SELECT row_number() over () AS _uid_,* FROM (SELECT options.*,  	   ST_Area(ST_Union(ST_Intersection(conservation.geom, options.geom))::geography)/10000 AS \"Conservation Estate Area (ha)\",  	   ST_Area(ST_Union(ST_Intersection(wetlands.geom, options.geom))::geography)/10000 AS \"Wetlands Area (ha)\" FROM data.dbca_burn_options_program_dbca_007_20230813 AS options       LEFT JOIN dir_important_wetlands_aus_wa_dbca_045 AS wetlands       ON   ST_Intersects(wetlands.geom, options.geom)       LEFT JOIN walpole_wild_peat_wetlands_unreviewed_dbca_042 AS wwa_peat       ON   ST_Intersects(wwa_peat.geom, options.geom)       LEFT JOIN legislated_lands_and_waters_dbca_011 AS conservation       ON   conservation_estate(conservation.leg_category) AND ST_Intersects(conservation.geom, options.geom)       GROUP BY options.object_id       ORDER BY options.region, options.district, options.burnid
 ) AS _subq_1_
 )" (geom)</datasource>
       <keywordList>
@@ -7094,7 +7094,7 @@
         <ymax>-34.62514741099997195</ymax>
       </wgs84extent>
       <id>walpole_wild_peat_wetlands_unreviewed_dbca_042_6b7abf2d_7fd7_4608_a1ad_8ff5a2d2fd34</id>
-      <datasource>dbname='fire' port=5433 user='qgis' sslmode=disable key='id' srid=4283 type=Polygon checkPrimaryKeyUnicity='1' table="public"."walpole_wild_peat_wetlands_unreviewed_dbca_042" (geom)</datasource>
+      <datasource>dbname='fire' user='qgis' sslmode=disable key='id' srid=4283 type=Polygon checkPrimaryKeyUnicity='1' table="public"."walpole_wild_peat_wetlands_unreviewed_dbca_042" (geom)</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -7468,7 +7468,7 @@
         <ymax>-30.97749054000000157</ymax>
       </wgs84extent>
       <id>yolb_0e53bfe7_0b0a_4081_bf18_1342db7cd73c</id>
-      <datasource>dbname='fire' port=5433 user='qgis' sslmode=disable key='_uid_' checkPrimaryKeyUnicity='1' table="(SELECT row_number() over () AS _uid_,* FROM (select fireseason(fih_date1), southern_view.geom from southern_view, dbca_fire_history_dbca_060  where dbca_fire_history_dbca_060.object_id=southern_view.dbca_fire_history_dbca_060_id[1]
+      <datasource>dbname='fire' user='qgis' sslmode=disable key='_uid_' checkPrimaryKeyUnicity='1' table="(SELECT row_number() over () AS _uid_,* FROM (select fireseason(fih_date1), southern_view.geom from southern_view, dbca_fire_history_dbca_060  where dbca_fire_history_dbca_060.object_id=southern_view.dbca_fire_history_dbca_060_id[1]
 ) AS _subq_1_
 )" (geom)</datasource>
       <keywordList>
@@ -8121,7 +8121,7 @@ def my_form_open(dialog, layer, feature):
     <layer id="_bf565d27_fd9c_4735_9a1f_4ca3a0e5323b"/>
     <layer id="dbca_fire_history_dbca_060_ff8ad9d9_7313_4d09_92e0_58738499dbc5"/>
     <layer id="yolb_0e53bfe7_0b0a_4081_bf18_1342db7cd73c"/>
-    <layer id="numfires_since_2000_e95c0791_a64c_449e_8380_c8ecaf0bef23"/>
+    <layer id="southern_numfires_since_2000_e95c0791_a64c_449e_8380_c8ecaf0bef23"/>
     <layer id="options_d3b199e8_52b3_4426_8295_5d05a4bb08ea"/>
   </layerorder>
   <properties>
@@ -8434,8 +8434,8 @@ def my_form_open(dialog, layer, feature):
         </LayoutObject>
         <Extent ymin="-35.07149620966612957" xmax="116.91590200850009751" ymax="-34.81844576433376659" xmin="116.64178425049999532"/>
         <LayerSet>
-          <Layer source="dbname='fire' port=5433 user='qgis' sslmode=disable key='object_id' srid=4283 type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;public&quot;.&quot;dbca_burn_options_program_dbca_007&quot; (geom)" name="dbca_burn_options_program_dbca_007" provider="postgres">dbca_burn_options_program_dbca_007_81582f5d_10cb_4bf4_bcf7_dc039a47104d</Layer>
-          <Layer source="dbname='fire' port=5433 user='qgis' sslmode=disable key='tid' srid=4283 type=Polygon checkPrimaryKeyUnicity='0' table=&quot;public&quot;.&quot;numfires_since_2000&quot; (geom)" name="numfires_since_2000" provider="postgres">numfires_since_2000_e95c0791_a64c_449e_8380_c8ecaf0bef23</Layer>
+          <Layer source="dbname='fire' user='qgis' sslmode=disable key='object_id' srid=4283 type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;public&quot;.&quot;dbca_burn_options_program_dbca_007&quot; (geom)" name="dbca_burn_options_program_dbca_007" provider="postgres">dbca_burn_options_program_dbca_007_81582f5d_10cb_4bf4_bcf7_dc039a47104d</Layer>
+          <Layer source="dbname='fire' user='qgis' sslmode=disable key='tid' srid=4283 type=Polygon checkPrimaryKeyUnicity='0' table=&quot;public&quot;.&quot;southern_numfires_since_2000&quot; (geom)" name="southern_numfires_since_2000" provider="postgres">southern_numfires_since_2000_e95c0791_a64c_449e_8380_c8ecaf0bef23</Layer>
           <Layer source="crs=EPSG:3857&amp;dpiMode=7&amp;format=image/png&amp;layers=mapbox-satellite&amp;styles&amp;tilePixelRatio=0&amp;url=https://kmi.dpaw.wa.gov.au/geoserver/public/wms?version%3D1.1.0%26layers%3Dpublic:todays_burns%26styles%3D%26bbox%3D108.0,-45.0,155.0,-10.0%26width%3D768%26height%3D571%26srs%3DEPSG:4283" name="Mapbox satellite" provider="wms">_bf565d27_fd9c_4735_9a1f_4ca3a0e5323b</Layer>
         </LayerSet>
         <LayerStyles>
@@ -8580,7 +8580,7 @@ def my_form_open(dialog, layer, feature):
               <blendMode>0</blendMode>
             </qgis>
           </LayerStyle>
-          <LayerStyle source="dbname='fire' port=5433 user='qgis' sslmode=disable key='object_id' srid=4283 type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;public&quot;.&quot;dbca_burn_options_program_dbca_007&quot; (geom)" name="dbca_burn_options_program_dbca_007" provider="postgres" layerid="dbca_burn_options_program_dbca_007_81582f5d_10cb_4bf4_bcf7_dc039a47104d">
+          <LayerStyle source="dbname='fire' user='qgis' sslmode=disable key='object_id' srid=4283 type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;public&quot;.&quot;dbca_burn_options_program_dbca_007&quot; (geom)" name="dbca_burn_options_program_dbca_007" provider="postgres" layerid="dbca_burn_options_program_dbca_007_81582f5d_10cb_4bf4_bcf7_dc039a47104d">
             <qgis simplifyMaxScale="1" hasScaleBasedVisibilityFlag="0" symbologyReferenceScale="-1" labelsEnabled="0" simplifyLocal="1" maxScale="0" styleCategories="AllStyleCategories" simplifyDrawingHints="1" readOnly="0" simplifyDrawingTol="1" version="3.32.0-Lima" minScale="100000000" simplifyAlgorithm="0">
               <flags>
                 <Identifiable>1</Identifiable>
@@ -9221,7 +9221,7 @@ def my_form_open(dialog, layer, feature):
               <layerGeometryType>2</layerGeometryType>
             </qgis>
           </LayerStyle>
-          <LayerStyle source="dbname='fire' port=5433 user='qgis' sslmode=disable key='tid' srid=4283 type=Polygon checkPrimaryKeyUnicity='0' table=&quot;public&quot;.&quot;numfires_since_2000&quot; (geom)" name="numfires_since_2000" provider="postgres" layerid="numfires_since_2000_e95c0791_a64c_449e_8380_c8ecaf0bef23">
+          <LayerStyle source="dbname='fire' user='qgis' sslmode=disable key='tid' srid=4283 type=Polygon checkPrimaryKeyUnicity='0' table=&quot;public&quot;.&quot;southern_numfires_since_2000&quot; (geom)" name="southern_numfires_since_2000" provider="postgres" layerid="southern_numfires_since_2000_e95c0791_a64c_449e_8380_c8ecaf0bef23">
             <qgis simplifyMaxScale="1" hasScaleBasedVisibilityFlag="0" symbologyReferenceScale="-1" labelsEnabled="0" simplifyLocal="1" maxScale="0" styleCategories="AllStyleCategories" simplifyDrawingHints="1" readOnly="0" simplifyDrawingTol="1" version="3.32.0-Lima" minScale="100000000" simplifyAlgorithm="0">
               <flags>
                 <Identifiable>1</Identifiable>
@@ -10109,7 +10109,7 @@ def my_form_open(dialog, layer, feature):
           <customproperties>
             <Option/>
           </customproperties>
-          <layer-tree-layer id="numfires_since_2000_e95c0791_a64c_449e_8380_c8ecaf0bef23" source="dbname='fire' port=5433 user='qgis' sslmode=disable key='tid' srid=4283 type=Polygon checkPrimaryKeyUnicity='0' table=&quot;public&quot;.&quot;numfires_since_2000&quot; (geom)" name="numfires_since_2000" checked="Qt::Checked" legend_exp="" patch_size="-1,-1" providerKey="postgres" legend_split_behavior="0" expanded="0">
+          <layer-tree-layer id="southern_numfires_since_2000_e95c0791_a64c_449e_8380_c8ecaf0bef23" source="dbname='fire' user='qgis' sslmode=disable key='tid' srid=4283 type=Polygon checkPrimaryKeyUnicity='0' table=&quot;public&quot;.&quot;southern_numfires_since_2000&quot; (geom)" name="southern_numfires_since_2000" checked="Qt::Checked" legend_exp="" patch_size="-1,-1" providerKey="postgres" legend_split_behavior="0" expanded="0">
             <customproperties>
               <Option type="Map">
                 <Option value="Number of fires since 2000" type="QString" name="cached_name"/>
@@ -10384,7 +10384,7 @@ def my_form_open(dialog, layer, feature):
           <customproperties>
             <Option/>
           </customproperties>
-          <layer-tree-layer id="yolb_0e53bfe7_0b0a_4081_bf18_1342db7cd73c" source="dbname='fire' port=5433 user='qgis' sslmode=disable key='_uid_' checkPrimaryKeyUnicity='1' table=&quot;(SELECT row_number() over () AS _uid_,* FROM (select fireseason(fih_date1), southern_view.geom from southern_view, dbca_fire_history_dbca_060  where dbca_fire_history_dbca_060.object_id=southern_view.dbca_fire_history_dbca_060_id[1]&#xa;) AS _subq_1_&#xa;)&quot; (geom)" name="yslb" checked="Qt::Checked" legend_exp="" patch_size="-1,-1" providerKey="postgres" legend_split_behavior="0" expanded="1">
+          <layer-tree-layer id="yolb_0e53bfe7_0b0a_4081_bf18_1342db7cd73c" source="dbname='fire' user='qgis' sslmode=disable key='_uid_' checkPrimaryKeyUnicity='1' table=&quot;(SELECT row_number() over () AS _uid_,* FROM (select fireseason(fih_date1), southern_view.geom from southern_view, dbca_fire_history_dbca_060  where dbca_fire_history_dbca_060.object_id=southern_view.dbca_fire_history_dbca_060_id[1]&#xa;) AS _subq_1_&#xa;)&quot; (geom)" name="yslb" checked="Qt::Checked" legend_exp="" patch_size="-1,-1" providerKey="postgres" legend_split_behavior="0" expanded="1">
             <customproperties>
               <Option type="Map">
                 <Option value="Years Since Last Burnt" type="QString" name="cached_name"/>
@@ -10412,8 +10412,8 @@ def my_form_open(dialog, layer, feature):
         </LayoutObject>
         <Extent ymin="-35.07149620966612957" xmax="116.91590200850009751" ymax="-34.81844576433376659" xmin="116.64178425049999532"/>
         <LayerSet>
-          <Layer source="dbname='fire' port=5433 user='qgis' sslmode=disable key='object_id' srid=4283 type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;public&quot;.&quot;dbca_burn_options_program_dbca_007&quot; (geom)" name="dbca_burn_options_program_dbca_007" provider="postgres">dbca_burn_options_program_dbca_007_81582f5d_10cb_4bf4_bcf7_dc039a47104d</Layer>
-          <Layer source="dbname='fire' port=5433 user='qgis' sslmode=disable key='_uid_' checkPrimaryKeyUnicity='1' table=&quot;(SELECT row_number() over () AS _uid_,* FROM (select fireseason(fih_date1), southern_view.geom from southern_view, dbca_fire_history_dbca_060  where dbca_fire_history_dbca_060.object_id=southern_view.dbca_fire_history_dbca_060_id[1]&#xa;) AS _subq_1_&#xa;)&quot; (geom)" name="yslb" provider="postgres">yolb_0e53bfe7_0b0a_4081_bf18_1342db7cd73c</Layer>
+          <Layer source="dbname='fire' user='qgis' sslmode=disable key='object_id' srid=4283 type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;public&quot;.&quot;dbca_burn_options_program_dbca_007&quot; (geom)" name="dbca_burn_options_program_dbca_007" provider="postgres">dbca_burn_options_program_dbca_007_81582f5d_10cb_4bf4_bcf7_dc039a47104d</Layer>
+          <Layer source="dbname='fire' user='qgis' sslmode=disable key='_uid_' checkPrimaryKeyUnicity='1' table=&quot;(SELECT row_number() over () AS _uid_,* FROM (select fireseason(fih_date1), southern_view.geom from southern_view, dbca_fire_history_dbca_060  where dbca_fire_history_dbca_060.object_id=southern_view.dbca_fire_history_dbca_060_id[1]&#xa;) AS _subq_1_&#xa;)&quot; (geom)" name="yslb" provider="postgres">yolb_0e53bfe7_0b0a_4081_bf18_1342db7cd73c</Layer>
           <Layer source="crs=EPSG:3857&amp;dpiMode=7&amp;format=image/png&amp;layers=mapbox-satellite&amp;styles&amp;tilePixelRatio=0&amp;url=https://kmi.dpaw.wa.gov.au/geoserver/public/wms?version%3D1.1.0%26layers%3Dpublic:todays_burns%26styles%3D%26bbox%3D108.0,-45.0,155.0,-10.0%26width%3D768%26height%3D571%26srs%3DEPSG:4283" name="Mapbox satellite" provider="wms">_bf565d27_fd9c_4735_9a1f_4ca3a0e5323b</Layer>
         </LayerSet>
         <LayerStyles>
@@ -10558,7 +10558,7 @@ def my_form_open(dialog, layer, feature):
               <blendMode>0</blendMode>
             </qgis>
           </LayerStyle>
-          <LayerStyle source="dbname='fire' port=5433 user='qgis' sslmode=disable key='object_id' srid=4283 type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;public&quot;.&quot;dbca_burn_options_program_dbca_007&quot; (geom)" name="dbca_burn_options_program_dbca_007" provider="postgres" layerid="dbca_burn_options_program_dbca_007_81582f5d_10cb_4bf4_bcf7_dc039a47104d">
+          <LayerStyle source="dbname='fire' user='qgis' sslmode=disable key='object_id' srid=4283 type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;public&quot;.&quot;dbca_burn_options_program_dbca_007&quot; (geom)" name="dbca_burn_options_program_dbca_007" provider="postgres" layerid="dbca_burn_options_program_dbca_007_81582f5d_10cb_4bf4_bcf7_dc039a47104d">
             <qgis simplifyMaxScale="1" hasScaleBasedVisibilityFlag="0" symbologyReferenceScale="-1" labelsEnabled="0" simplifyLocal="1" maxScale="0" styleCategories="AllStyleCategories" simplifyDrawingHints="1" readOnly="0" simplifyDrawingTol="1" version="3.32.0-Lima" minScale="100000000" simplifyAlgorithm="0">
               <flags>
                 <Identifiable>1</Identifiable>
@@ -11199,7 +11199,7 @@ def my_form_open(dialog, layer, feature):
               <layerGeometryType>2</layerGeometryType>
             </qgis>
           </LayerStyle>
-          <LayerStyle source="dbname='fire' port=5433 user='qgis' sslmode=disable key='_uid_' checkPrimaryKeyUnicity='1' table=&quot;(SELECT row_number() over () AS _uid_,* FROM (select fireseason(fih_date1), southern_view.geom from southern_view, dbca_fire_history_dbca_060  where dbca_fire_history_dbca_060.object_id=southern_view.dbca_fire_history_dbca_060_id[1]&#xa;) AS _subq_1_&#xa;)&quot; (geom)" name="yslb" provider="postgres" layerid="yolb_0e53bfe7_0b0a_4081_bf18_1342db7cd73c">
+          <LayerStyle source="dbname='fire' user='qgis' sslmode=disable key='_uid_' checkPrimaryKeyUnicity='1' table=&quot;(SELECT row_number() over () AS _uid_,* FROM (select fireseason(fih_date1), southern_view.geom from southern_view, dbca_fire_history_dbca_060  where dbca_fire_history_dbca_060.object_id=southern_view.dbca_fire_history_dbca_060_id[1]&#xa;) AS _subq_1_&#xa;)&quot; (geom)" name="yslb" provider="postgres" layerid="yolb_0e53bfe7_0b0a_4081_bf18_1342db7cd73c">
             <qgis simplifyMaxScale="1" hasScaleBasedVisibilityFlag="0" symbologyReferenceScale="-1" labelsEnabled="0" simplifyLocal="1" maxScale="0" styleCategories="AllStyleCategories" simplifyDrawingHints="1" readOnly="0" simplifyDrawingTol="1" version="3.32.0-Lima" minScale="100000000" simplifyAlgorithm="0">
               <flags>
                 <Identifiable>1</Identifiable>
@@ -11923,7 +11923,7 @@ def my_form_open(dialog, layer, feature):
           <Option value="true" type="bool" name="singleFile"/>
         </Option>
       </customproperties>
-      <Atlas coverageLayerProvider="postgres" hideCoverage="0" coverageLayerName="dbca_burn_options_program_dbca_007" filterFeatures="1" sortFeatures="0" coverageLayer="dbca_burn_options_program_dbca_007_81582f5d_10cb_4bf4_bcf7_dc039a47104d" featureFilter="burnid=@burnid" enabled="1" coverageLayerSource="dbname='fire' port=5433 user='qgis' sslmode=disable key='object_id' srid=4283 type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;public&quot;.&quot;dbca_burn_options_program_dbca_007&quot; (geom)" filenamePattern="'output_'||@atlas_featurenumber" pageNameExpression="array_to_string(array(&quot;burnid&quot;, 0))"/>
+      <Atlas coverageLayerProvider="postgres" hideCoverage="0" coverageLayerName="dbca_burn_options_program_dbca_007" filterFeatures="1" sortFeatures="0" coverageLayer="dbca_burn_options_program_dbca_007_81582f5d_10cb_4bf4_bcf7_dc039a47104d" featureFilter="burnid=@burnid" enabled="1" coverageLayerSource="dbname='fire' user='qgis' sslmode=disable key='object_id' srid=4283 type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;public&quot;.&quot;dbca_burn_options_program_dbca_007&quot; (geom)" filenamePattern="'output_'||@atlas_featurenumber" pageNameExpression="array_to_string(array(&quot;burnid&quot;, 0))"/>
     </Layout>
     <Layout printResolution="300" name="Cover sheet 1" worldFileMap="{f1bf880d-d137-4623-8694-23b87fdfe363}" units="mm">
       <Snapper snapToItems="1" snapToGrid="0" snapToGuides="1" tolerance="5"/>
@@ -12270,7 +12270,7 @@ def my_form_open(dialog, layer, feature):
           <customproperties>
             <Option/>
           </customproperties>
-          <layer-tree-layer id="dbca_burn_options_program_dbca_007_81582f5d_10cb_4bf4_bcf7_dc039a47104d" source="dbname='fire' port=5433 user='qgis' sslmode=disable key='object_id' srid=4283 type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;public&quot;.&quot;dbca_burn_options_program_dbca_007&quot; (geom)" name="dbca_burn_options_program_dbca_007" checked="Qt::Checked" legend_exp="" patch_size="-1,-1" providerKey="postgres" legend_split_behavior="0" expanded="1">
+          <layer-tree-layer id="dbca_burn_options_program_dbca_007_81582f5d_10cb_4bf4_bcf7_dc039a47104d" source="dbname='fire' user='qgis' sslmode=disable key='object_id' srid=4283 type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;public&quot;.&quot;dbca_burn_options_program_dbca_007&quot; (geom)" name="dbca_burn_options_program_dbca_007" checked="Qt::Checked" legend_exp="" patch_size="-1,-1" providerKey="postgres" legend_split_behavior="0" expanded="1">
             <customproperties>
               <Option type="Map">
                 <Option value="Planned burn" type="QString" name="legend/label-0"/>
@@ -12280,14 +12280,14 @@ def my_form_open(dialog, layer, feature):
               </Option>
             </customproperties>
           </layer-tree-layer>
-          <layer-tree-layer id="dir_important_wetlands_aus_wa_dbca_045_87e16bad_e578_4267_b73d_a8ba3e6028a2" source="dbname='fire' port=5433 user='qgis' sslmode=disable key='id' srid=4283 type=MultiSurface checkPrimaryKeyUnicity='1' table=&quot;public&quot;.&quot;dir_important_wetlands_aus_wa_dbca_045&quot; (geom) sql=diw_pressures like '%fire%'" name="dir_important_wetlands_aus_wa_dbca_045" checked="Qt::Checked" legend_exp="" patch_size="-1,-1" providerKey="postgres" legend_split_behavior="0" expanded="1">
+          <layer-tree-layer id="dir_important_wetlands_aus_wa_dbca_045_87e16bad_e578_4267_b73d_a8ba3e6028a2" source="dbname='fire' user='qgis' sslmode=disable key='id' srid=4283 type=MultiSurface checkPrimaryKeyUnicity='1' table=&quot;public&quot;.&quot;dir_important_wetlands_aus_wa_dbca_045&quot; (geom) sql=diw_pressures like '%fire%'" name="dir_important_wetlands_aus_wa_dbca_045" checked="Qt::Checked" legend_exp="" patch_size="-1,-1" providerKey="postgres" legend_split_behavior="0" expanded="1">
             <customproperties>
               <Option type="Map">
                 <Option value="Wetland under pressure from fire" type="QString" name="legend/title-label"/>
               </Option>
             </customproperties>
           </layer-tree-layer>
-          <layer-tree-layer id="legislated_lands_and_waters_dbca_011_28f9551f_dd2d_44cf_84fa_9e4bc4feefdc" source="dbname='fire' port=5433 user='qgis' sslmode=disable key='id' srid=4283 type=Polygon checkPrimaryKeyUnicity='1' table=&quot;public&quot;.&quot;legislated_lands_and_waters_dbca_011&quot; (geom) sql=conservation_estate(&quot;leg_category&quot;)" name="legislated_lands_and_waters_dbca_011" checked="Qt::Checked" legend_exp="" patch_size="-1,-1" providerKey="postgres" legend_split_behavior="0" expanded="1">
+          <layer-tree-layer id="legislated_lands_and_waters_dbca_011_28f9551f_dd2d_44cf_84fa_9e4bc4feefdc" source="dbname='fire' user='qgis' sslmode=disable key='id' srid=4283 type=Polygon checkPrimaryKeyUnicity='1' table=&quot;public&quot;.&quot;legislated_lands_and_waters_dbca_011&quot; (geom) sql=conservation_estate(&quot;leg_category&quot;)" name="legislated_lands_and_waters_dbca_011" checked="Qt::Checked" legend_exp="" patch_size="-1,-1" providerKey="postgres" legend_split_behavior="0" expanded="1">
             <customproperties>
               <Option type="Map">
                 <Option value="Conservation Estate" type="QString" name="legend/title-label"/>
@@ -12616,9 +12616,9 @@ def my_form_open(dialog, layer, feature):
           </spatialrefsys>
         </crs>
         <LayerSet>
-          <Layer source="dbname='fire' port=5433 user='qgis' sslmode=disable key='object_id' srid=4283 type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;public&quot;.&quot;dbca_burn_options_program_dbca_007&quot; (geom)" name="dbca_burn_options_program_dbca_007" provider="postgres">dbca_burn_options_program_dbca_007_81582f5d_10cb_4bf4_bcf7_dc039a47104d</Layer>
-          <Layer source="dbname='fire' port=5433 user='qgis' sslmode=disable key='id' srid=4283 type=MultiSurface checkPrimaryKeyUnicity='1' table=&quot;public&quot;.&quot;dir_important_wetlands_aus_wa_dbca_045&quot; (geom) sql=diw_pressures like '%fire%'" name="dir_important_wetlands_aus_wa_dbca_045" provider="postgres">dir_important_wetlands_aus_wa_dbca_045_87e16bad_e578_4267_b73d_a8ba3e6028a2</Layer>
-          <Layer source="dbname='fire' port=5433 user='qgis' sslmode=disable key='id' srid=4283 type=Polygon checkPrimaryKeyUnicity='1' table=&quot;public&quot;.&quot;legislated_lands_and_waters_dbca_011&quot; (geom) sql=conservation_estate(&quot;leg_category&quot;)" name="legislated_lands_and_waters_dbca_011" provider="postgres">legislated_lands_and_waters_dbca_011_28f9551f_dd2d_44cf_84fa_9e4bc4feefdc</Layer>
+          <Layer source="dbname='fire' user='qgis' sslmode=disable key='object_id' srid=4283 type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;public&quot;.&quot;dbca_burn_options_program_dbca_007&quot; (geom)" name="dbca_burn_options_program_dbca_007" provider="postgres">dbca_burn_options_program_dbca_007_81582f5d_10cb_4bf4_bcf7_dc039a47104d</Layer>
+          <Layer source="dbname='fire' user='qgis' sslmode=disable key='id' srid=4283 type=MultiSurface checkPrimaryKeyUnicity='1' table=&quot;public&quot;.&quot;dir_important_wetlands_aus_wa_dbca_045&quot; (geom) sql=diw_pressures like '%fire%'" name="dir_important_wetlands_aus_wa_dbca_045" provider="postgres">dir_important_wetlands_aus_wa_dbca_045_87e16bad_e578_4267_b73d_a8ba3e6028a2</Layer>
+          <Layer source="dbname='fire' user='qgis' sslmode=disable key='id' srid=4283 type=Polygon checkPrimaryKeyUnicity='1' table=&quot;public&quot;.&quot;legislated_lands_and_waters_dbca_011&quot; (geom) sql=conservation_estate(&quot;leg_category&quot;)" name="legislated_lands_and_waters_dbca_011" provider="postgres">legislated_lands_and_waters_dbca_011_28f9551f_dd2d_44cf_84fa_9e4bc4feefdc</Layer>
           <Layer source="crs=EPSG:3857&amp;dpiMode=7&amp;format=image/png&amp;layers=mapbox-satellite&amp;styles&amp;tilePixelRatio=0&amp;url=https://kmi.dpaw.wa.gov.au/geoserver/public/wms?version%3D1.1.0%26layers%3Dpublic:todays_burns%26styles%3D%26bbox%3D108.0,-45.0,155.0,-10.0%26width%3D768%26height%3D571%26srs%3DEPSG:4283" name="Mapbox satellite" provider="wms">_bf565d27_fd9c_4735_9a1f_4ca3a0e5323b</Layer>
         </LayerSet>
         <LayerStyles>
@@ -12763,7 +12763,7 @@ def my_form_open(dialog, layer, feature):
               <blendMode>0</blendMode>
             </qgis>
           </LayerStyle>
-          <LayerStyle source="dbname='fire' port=5433 user='qgis' sslmode=disable key='object_id' srid=4283 type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;public&quot;.&quot;dbca_burn_options_program_dbca_007&quot; (geom)" name="dbca_burn_options_program_dbca_007" provider="postgres" layerid="dbca_burn_options_program_dbca_007_81582f5d_10cb_4bf4_bcf7_dc039a47104d">
+          <LayerStyle source="dbname='fire' user='qgis' sslmode=disable key='object_id' srid=4283 type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;public&quot;.&quot;dbca_burn_options_program_dbca_007&quot; (geom)" name="dbca_burn_options_program_dbca_007" provider="postgres" layerid="dbca_burn_options_program_dbca_007_81582f5d_10cb_4bf4_bcf7_dc039a47104d">
             <qgis simplifyMaxScale="1" hasScaleBasedVisibilityFlag="0" symbologyReferenceScale="-1" labelsEnabled="0" simplifyLocal="1" maxScale="0" styleCategories="AllStyleCategories" simplifyDrawingHints="1" readOnly="0" simplifyDrawingTol="1" version="3.32.0-Lima" minScale="100000000" simplifyAlgorithm="0">
               <flags>
                 <Identifiable>1</Identifiable>
@@ -13404,7 +13404,7 @@ def my_form_open(dialog, layer, feature):
               <layerGeometryType>2</layerGeometryType>
             </qgis>
           </LayerStyle>
-          <LayerStyle source="dbname='fire' port=5433 user='qgis' sslmode=disable key='id' srid=4283 type=MultiSurface checkPrimaryKeyUnicity='1' table=&quot;public&quot;.&quot;dir_important_wetlands_aus_wa_dbca_045&quot; (geom) sql=diw_pressures like '%fire%'" name="dir_important_wetlands_aus_wa_dbca_045" provider="postgres" layerid="dir_important_wetlands_aus_wa_dbca_045_87e16bad_e578_4267_b73d_a8ba3e6028a2">
+          <LayerStyle source="dbname='fire' user='qgis' sslmode=disable key='id' srid=4283 type=MultiSurface checkPrimaryKeyUnicity='1' table=&quot;public&quot;.&quot;dir_important_wetlands_aus_wa_dbca_045&quot; (geom) sql=diw_pressures like '%fire%'" name="dir_important_wetlands_aus_wa_dbca_045" provider="postgres" layerid="dir_important_wetlands_aus_wa_dbca_045_87e16bad_e578_4267_b73d_a8ba3e6028a2">
             <qgis simplifyMaxScale="1" hasScaleBasedVisibilityFlag="0" symbologyReferenceScale="-1" labelsEnabled="0" simplifyLocal="1" maxScale="0" styleCategories="AllStyleCategories" simplifyDrawingHints="1" readOnly="0" simplifyDrawingTol="1" version="3.32.0-Lima" minScale="100000000" simplifyAlgorithm="0">
               <flags>
                 <Identifiable>1</Identifiable>
@@ -14039,7 +14039,7 @@ def my_form_open(dialog, layer, feature):
               <layerGeometryType>2</layerGeometryType>
             </qgis>
           </LayerStyle>
-          <LayerStyle source="dbname='fire' port=5433 user='qgis' sslmode=disable key='id' srid=4283 type=Polygon checkPrimaryKeyUnicity='1' table=&quot;public&quot;.&quot;legislated_lands_and_waters_dbca_011&quot; (geom) sql=conservation_estate(&quot;leg_category&quot;)" name="legislated_lands_and_waters_dbca_011" provider="postgres" layerid="legislated_lands_and_waters_dbca_011_28f9551f_dd2d_44cf_84fa_9e4bc4feefdc">
+          <LayerStyle source="dbname='fire' user='qgis' sslmode=disable key='id' srid=4283 type=Polygon checkPrimaryKeyUnicity='1' table=&quot;public&quot;.&quot;legislated_lands_and_waters_dbca_011&quot; (geom) sql=conservation_estate(&quot;leg_category&quot;)" name="legislated_lands_and_waters_dbca_011" provider="postgres" layerid="legislated_lands_and_waters_dbca_011_28f9551f_dd2d_44cf_84fa_9e4bc4feefdc">
             <qgis simplifyMaxScale="1" hasScaleBasedVisibilityFlag="0" symbologyReferenceScale="-1" labelsEnabled="0" simplifyLocal="1" maxScale="0" styleCategories="AllStyleCategories" simplifyDrawingHints="1" readOnly="0" simplifyDrawingTol="1" version="3.32.0-Lima" minScale="100000000" simplifyAlgorithm="0">
               <flags>
                 <Identifiable>1</Identifiable>
@@ -14789,7 +14789,7 @@ def my_form_open(dialog, layer, feature):
           <Option value="true" type="bool" name="singleFile"/>
         </Option>
       </customproperties>
-      <Atlas coverageLayerProvider="postgres" hideCoverage="0" coverageLayerName="options" filterFeatures="1" sortFeatures="0" coverageLayer="options_d3b199e8_52b3_4426_8295_5d05a4bb08ea" featureFilter="burnid=@burnid" enabled="1" coverageLayerSource="dbname='fire' port=5433 user='qgis' sslmode=disable key='_uid_' checkPrimaryKeyUnicity='1' table=&quot;(SELECT row_number() over () AS _uid_,* FROM (SELECT options.*,  &#x9;   ST_Area(ST_Union(ST_Intersection(conservation.geom, options.geom))::geography)/10000 AS \&quot;Conservation Estate Area (ha)\&quot;,  &#x9;   ST_Area(ST_Union(ST_Intersection(wetlands.geom, options.geom))::geography)/10000 AS \&quot;Wetlands Area (ha)\&quot; FROM data.dbca_burn_options_program_dbca_007_20230813 AS options       LEFT JOIN dir_important_wetlands_aus_wa_dbca_045 AS wetlands       ON   ST_Intersects(wetlands.geom, options.geom)       LEFT JOIN walpole_wild_peat_wetlands_unreviewed_dbca_042 AS wwa_peat       ON   ST_Intersects(wwa_peat.geom, options.geom)       LEFT JOIN legislated_lands_and_waters_dbca_011 AS conservation       ON   conservation_estate(conservation.leg_category) AND ST_Intersects(conservation.geom, options.geom)       GROUP BY options.object_id       ORDER BY options.region, options.district, options.burnid&#xa;) AS _subq_1_&#xa;)&quot; (geom)" filenamePattern="'output_'||@atlas_featurenumber" pageNameExpression="array_to_string(array(&quot;burnid&quot;, 0))"/>
+      <Atlas coverageLayerProvider="postgres" hideCoverage="0" coverageLayerName="options" filterFeatures="1" sortFeatures="0" coverageLayer="options_d3b199e8_52b3_4426_8295_5d05a4bb08ea" featureFilter="burnid=@burnid" enabled="1" coverageLayerSource="dbname='fire' user='qgis' sslmode=disable key='_uid_' checkPrimaryKeyUnicity='1' table=&quot;(SELECT row_number() over () AS _uid_,* FROM (SELECT options.*,  &#x9;   ST_Area(ST_Union(ST_Intersection(conservation.geom, options.geom))::geography)/10000 AS \&quot;Conservation Estate Area (ha)\&quot;,  &#x9;   ST_Area(ST_Union(ST_Intersection(wetlands.geom, options.geom))::geography)/10000 AS \&quot;Wetlands Area (ha)\&quot; FROM data.dbca_burn_options_program_dbca_007_20230813 AS options       LEFT JOIN dir_important_wetlands_aus_wa_dbca_045 AS wetlands       ON   ST_Intersects(wetlands.geom, options.geom)       LEFT JOIN walpole_wild_peat_wetlands_unreviewed_dbca_042 AS wwa_peat       ON   ST_Intersects(wwa_peat.geom, options.geom)       LEFT JOIN legislated_lands_and_waters_dbca_011 AS conservation       ON   conservation_estate(conservation.leg_category) AND ST_Intersects(conservation.geom, options.geom)       GROUP BY options.object_id       ORDER BY options.region, options.district, options.burnid&#xa;) AS _subq_1_&#xa;)&quot; (geom)" filenamePattern="'output_'||@atlas_featurenumber" pageNameExpression="array_to_string(array(&quot;burnid&quot;, 0))"/>
     </Layout>
   </Layouts>
   <mapViewDocks3D/>
@@ -14862,7 +14862,7 @@ def my_form_open(dialog, layer, feature):
       </spatialrefsys>
     </CoordinateCustomCrs>
   </ProjectDisplaySettings>
-  <ProjectGpsSettings destinationLayer="numfires_since_2000_e95c0791_a64c_449e_8380_c8ecaf0bef23" destinationLayerSource="dbname='fire' port=5433 user='qgis' sslmode=disable key='tid' srid=4283 type=Polygon checkPrimaryKeyUnicity='0' table=&quot;public&quot;.&quot;numfires_since_2000&quot; (geom)" destinationLayerName="numfires_since_2000" destinationLayerProvider="postgres" autoAddTrackVertices="0" destinationFollowsActiveLayer="1" autoCommitFeatures="0">
+  <ProjectGpsSettings destinationLayer="southern_numfires_since_2000_e95c0791_a64c_449e_8380_c8ecaf0bef23" destinationLayerSource="dbname='fire' user='qgis' sslmode=disable key='tid' srid=4283 type=Polygon checkPrimaryKeyUnicity='0' table=&quot;public&quot;.&quot;southern_numfires_since_2000&quot; (geom)" destinationLayerName="southern_numfires_since_2000" destinationLayerProvider="postgres" autoAddTrackVertices="0" destinationFollowsActiveLayer="1" autoCommitFeatures="0">
     <timeStampFields/>
   </ProjectGpsSettings>
 </qgis>
