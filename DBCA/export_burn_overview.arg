@@ -16,6 +16,19 @@
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##
 ################################################################################
+#  rm
+#     "/home/jschultz/data/Fire/burn_overview/${burnid}.ps"
+#     "/home/jschultz/data/Fire/burn_overview/${burnid}_1.pdf"
+#     "/home/jschultz/data/Fire/burn_overview/${burnid}_2.pdf"
+################################################################################
+#  ps2pdf
+#     "/home/jschultz/data/Fire/burn_overview/${burnid}.ps"
+#     "/home/jschultz/data/Fire/burn_overview/${burnid}.pdf"
+################################################################################
+#  pdf2ps
+#     "/home/jschultz/data/Fire/burn_overview/${burnid}.pdf"
+#     "/home/jschultz/data/Fire/burn_overview/${burnid}.ps"
+################################################################################
 #  pdftk
 #     "/home/jschultz/data/Fire/burn_overview/${burnid}_1.pdf"
 #     "/home/jschultz/data/Fire/burn_overview/${burnid}_2.pdf"
