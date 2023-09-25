@@ -72,9 +72,9 @@ def exportburnAtlas(arglist=None):
     layout = manager.layoutByName(args.layout)
     
     atlas = layout.atlas()
-    if args.filter:
-        atlas.setFilterFeatures(True)
-        atlas.setFilterExpression(args.filter)
+    # if args.filter:
+    #     atlas.setFilterFeatures(True)
+    #     atlas.setFilterExpression(args.filter)
       
     exporter = QgsLayoutExporter(atlas.layout())
     if args.pdffile:

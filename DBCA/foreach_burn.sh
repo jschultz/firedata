@@ -21,6 +21,7 @@ help="Run argreplay substituting 'burnid' with each LMU in turn"
 args=(
 # "-short:--long:variable:default:description:flags"
   ":--dry-run:::Print but do not execute command:flag"
+  "-f:--filter:::Filter to apply to burns before replaying:"
   "-p:--parallel:::Use GNU parallel:private,flag"
   "-d:--depth::0:Depth of command history to replay, default is all."
   "-S:--substitute:::Substitutions to add to script invocation:"
@@ -39,11 +40,14 @@ if [[ "${nologfile}" != "true" ]]; then
     echo "${COMMENTS}" > ${logfile}
 fi
 
+if [[ ! -n "${filter}" ]]; then
+    filter = "TRUE"
+fi
 if [[ "${parallel}" == "true" ]]; then
     psql \
       --quiet --tuples-only --no-align \
       --command "\timing off" \
-      --command "select distinct burnid from dbca_burn_options_program_dbca_007" |
+      --command "select distinct burnid from dbca_burn_options_program_dbca_007 where ${filter}" |
     parallel "
         if [[ \"${dry_run}\" != "true" ]]; then
             argreplay --depth ${depth} --substitute burnid:{} ${substitute} -- ${script}
@@ -54,7 +58,7 @@ else
     psql \
       --quiet --tuples-only --no-align \
       --command "\timing off" \
-      --command "select distinct burnid from dbca_burn_options_program_dbca_007 " |
+      --command "select distinct burnid from dbca_burn_options_program_dbca_007 where ${filter}" |
     while read -r burnid; do 
         if [[ "${dry_run}" != "true" ]]; then
             argreplay --depth ${depth} --substitute burnid:"${burnid}" ${substitute} -- ${script}
