@@ -40,13 +40,9 @@
 #    --nologfile
 #    --burnid "${burnid}"
 #    --layout "Cover sheet 1"
+#             "Cover sheet 2"
 #    --pdffile "/home/jschultz/data/Fire/burn_overview/${burnid}_1.pdf"
-#    --nologfile "/home/jschultz/src/firedata/DBCA/burn_details.qgs"
-################################################################################
-# exportBurnAtlas.py
+#              "/home/jschultz/data/Fire/burn_overview/${burnid}_2.pdf"
 #    --nologfile
-#    --burnid "${burnid}"
-#    --layout "Cover sheet 2"
-#    --pdffile "/home/jschultz/data/Fire/burn_overview/${burnid}_2.pdf"
-#    --nologfile "/home/jschultz/src/firedata/DBCA/burn_details.qgs"
+#    "/home/jschultz/src/firedata/DBCA/burn_details.qgs"
 ################################################################################

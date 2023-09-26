@@ -32,8 +32,8 @@
 ##    --subtitle "Reference date: 1 July ${baseyear}"
 #    --ylabel "Area (percent of burn area)"
 #    --xlabel "Years since last burned"
-#>   --outfile leg_yslb_by_fire_type_burn/leg_yslb_by_fire_type_${burnid}_${baseyear}.svg
-#<   leg_yslb_by_fire_type_burn/leg_yslb_by_fire_type_${burnid}_${baseyear}.csv
+#>   --outfile /home/jschultz/data/Fire/yslb_by_fire_type_burn/yslb_by_fire_type_${burnid}_${baseyear}.svg
+#<   /home/jschultz/data/Fire/yslb_by_fire_type_burn/yslb_by_fire_type_${burnid}_${baseyear}.csv
 ###########################################################################
 #> event_history.sh
 #    --nologfile
@@ -52,7 +52,6 @@ FROM ${basename}_poly AS poly,
                WHERE fireseason(fih_date1) <= ${baseyear}
                LIMIT 1) AS event
       WHERE burn.burnid = '${burnid}'
-      AND   view.legislated_lands_and_waters_dbca_011_id IS NOT NULL
       AND   ST_Intersects(view.geom, burn.geom)) AS polyevent
 WHERE poly.id = polyevent.poly_id
 GROUP BY year,
@@ -66,4 +65,4 @@ ST_Area(ST_Union(event.geom) FILTER(WHERE array_length(fih_causes,1) != 1)::geog
 #    --eventgroups year
 #    --order 0-year
 #    --eventaliases "Years since last burned;Prescribed burn;Escaped prescribed burn;Other fire;Multiple types"
-#>   --csvfile leg_yslb_by_fire_type_burn/leg_yslb_by_fire_type_${burnid}_${baseyear}.csv
+#>   --csvfile /home/jschultz/data/Fire/yslb_by_fire_type_burn/yslb_by_fire_type_${burnid}_${baseyear}.csv

@@ -37,9 +37,9 @@ def exportburnAtlas(arglist=None):
 
     parser.add_argument('-B', '--burnid',   type=str, required=True, help="ID of burn to export")
     parser.add_argument('-f', '--filter', type=str, help="Additional criteria for producing a page")
-    parser.add_argument('-l', '--layout', type=str, required=True, help="Print layout to export")
-    parser.add_argument('-p', '--pdffile', type=str, help="Name of PDF file to export")
-    parser.add_argument('-i', '--imagefile', type=str, help="Name of image file to export")
+    parser.add_argument('-l', '--layout', type=str, nargs='+', required=True, help="Print layout(s) to export")
+    parser.add_argument('-p', '--pdffile', type=str, nargs='*', help="Name(s) of PDF file(s) to export")
+    parser.add_argument('-i', '--imagefile', type=str, nargs='*', help="Name(s) of image file(s) to export")
     
     parser.add_argument('--logfile',      type=str, help="Logfile", private=True)
     parser.add_argument('--nologfile',    action='store_true', help='Do not output a logfile')
@@ -69,27 +69,31 @@ def exportburnAtlas(arglist=None):
     QgsExpressionContextUtils.setProjectVariable(project, "burnid", args.burnid)
         
     manager = project.layoutManager()
-    layout = manager.layoutByName(args.layout)
-    
-    atlas = layout.atlas()
-    # if args.filter:
-    #     atlas.setFilterFeatures(True)
-    #     atlas.setFilterExpression(args.filter)
-      
-    exporter = QgsLayoutExporter(atlas.layout())
-    if args.pdffile:
-        pdfsettings = QgsLayoutExporter.PdfExportSettings()
-        pdfsettings.simplifyGeometries = False
-        #pdfsettings.forceVectorOutput = True
-        exporter.exportToPdf(atlas, args.pdffile, pdfsettings)
-    if args.imagefile:
-        imagesettings = QgsLayoutExporter.ImageExportSettings()
-        imagesettings.simplifyGeometries = False
-        imagesettings.forceVectorOutput = True
-        imagebase, imagename = args.imagefile.rsplit('/',1)
-        imageext = imagename.rsplit('.',1)[1]
-        exporter.exportToImage(atlas, imagebase + '/', imageext, imagesettings)
-        os.rename(imagebase + '/' + 'output_1.' + imageext, args.imagefile)
+    itemnum = 0
+    for layout in args.layout:
+        layoutitem = manager.layoutByName(layout)
+        
+        atlas = layoutitem.atlas()
+        # if args.filter:
+        #     atlas.setFilterFeatures(True)
+        #     atlas.setFilterExpression(args.filter)
+        
+        exporter = QgsLayoutExporter(atlas.layout())
+        if args.pdffile:
+            pdfsettings = QgsLayoutExporter.PdfExportSettings()
+            pdfsettings.simplifyGeometries = False
+            #pdfsettings.forceVectorOutput = True
+            exporter.exportToPdf(atlas, args.pdffile[itemnum], pdfsettings)
+        if args.imagefile:
+            imagesettings = QgsLayoutExporter.ImageExportSettings()
+            imagesettings.simplifyGeometries = False
+            imagesettings.forceVectorOutput = True
+            imagebase, imagename = args.imagefile[itemnum].rsplit('/',1)
+            imageext = imagename.rsplit('.',1)[1]
+            exporter.exportToImage(atlas, imagebase + '/', imageext, imagesettings)
+            os.rename(imagebase + '/' + 'output_1.' + imageext, args.imagefile[itemnum])
+            
+        itemnum += 1
     
     qgs.exitQgis()
 

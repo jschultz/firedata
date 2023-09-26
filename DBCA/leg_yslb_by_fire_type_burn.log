@@ -3,5 +3,5 @@
 #    --filter "region in ('South Coast', 'South West', 'Warren', 'Swan')"
 #    --depth "0"
 #    --substitute "baseyear:2023 basename:southern"
-#    "/home/jschultz/src/firedata/DBCA/leg_yslb_by_fire_type_burn.arg"
+#    "/home/jschultz/src/firedata/DBCA/yslb_by_fire_type_burn.arg"
 
