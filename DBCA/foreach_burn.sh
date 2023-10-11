@@ -41,7 +41,7 @@ if [[ "${nologfile}" != "true" ]]; then
 fi
 
 if [[ ! -n "${filter}" ]]; then
-    filter = "TRUE"
+    filter="TRUE"
 fi
 if [[ "${parallel}" == "true" ]]; then
     psql \

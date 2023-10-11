@@ -16,24 +16,25 @@
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##
 ################################################################################
-#  rm
-#     "/home/jschultz/data/Fire/burn_overview/${burnid}_1.pdf"
-#     "/home/jschultz/data/Fire/burn_overview/${burnid}_2.pdf"
+# load_file.sh
+#     --append
+#     --srid 4283
+#     --table peat_landuse_posteuro
+#     Shapefiles/EP_Landuse_PostEuro.shp
 ################################################################################
-#  pdftk
-#     "/home/jschultz/data/Fire/burn_overview/${burnid}_1.pdf"
-#     "/home/jschultz/data/Fire/burn_overview/${burnid}_2.pdf"
-#     cat
-#     output
-#     "/home/jschultz/data/Fire/burn_overview/${burnid}.pdf"
+# load_file.sh
+#     --append
+#     --srid 4283
+#     --table peat_landuse_posteuro
+#     Shapefiles/JF_Landuse_PostEuro.shp
 ################################################################################
-# exportBurnAtlas.py
-#    --nologfile
-#    --burnid "${burnid}"
-#    --layout "Cover sheet 1"
-#             "Cover sheet 2"
-#    --pdffile "/home/jschultz/data/Fire/burn_overview/${burnid}_1.pdf"
-#              "/home/jschultz/data/Fire/burn_overview/${burnid}_2.pdf"
-#    --nologfile
-#    "/home/jschultz/src/firedata/DBCA/burn_details.qgs"
+# load_file.sh
+#     --append
+#     --srid 4283
+#     --table peat_landuse_posteuro
+#     Shapefiles/SCP_Landuse_PostEuro.shp
 ################################################################################
+# load_file.sh
+#     --srid 4283
+#     --table peat_landuse_posteuro
+#     Shapefiles/Warren_Landuse_PostEuro.shp

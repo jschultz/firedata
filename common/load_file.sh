@@ -22,6 +22,7 @@ args=(
 # "-short:--long:variable:default:description:flags"
   ":--debug:::Debug execution:flag"
   "-t:--table:::Name of table to create, defaults to file name without extension"
+  "-a:--append:::Append to existing table; otherwise overwrite:flag"
   "-g:--geometry::geom:Name of column to hold geometry data"
   "-s:--srid:::SRID to re-project geometry"
   "-L:--layer:::Layer to import"
@@ -61,11 +62,17 @@ if [[ ! -n "${filename}" ]]; then
     cat >${filename}
 fi
 
+if [[ "${append}" == "true" ]]; then
+    overwrite=
+else
+    overwrite="-overwrite"
+fi
+
 if [[ -n "${geometry}" ]]; then
-    ogr2ogr -overwrite -f PostgreSQL "PG:dbname=$PGDATABASE user=$PGUSER" -lco geometry_name=${geometry} ${srid} -nln "${table}" "${filename}" ${layer}
+    ogr2ogr ${overwrite} -f PostgreSQL "PG:dbname=$PGDATABASE user=$PGUSER" -lco geometry_name=${geometry} ${srid} -nln "${table}" -nlt PROMOTE_TO_MULTI "${filename}" ${layer}
 #     psql \
 #         --quiet --command="\timing off" \
 #         --command="CREATE INDEX ON ${table} USING gist (${geometry})"
 else
-    ogr2ogr -overwrite -f PostgreSQL "PG:dbname=$PGDATABASE user=$PGUSER" -nln "${table}" "${filename}" ${layer}
+    ogr2ogr -overwrite -f PostgreSQL "PG:dbname=$PGDATABASE user=$PGUSER" -nln "${table}" -nlt PROMOTE_TO_MULTI "${filename}" ${layer}
 fi
