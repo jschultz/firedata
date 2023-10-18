@@ -132,7 +132,7 @@ for ((tableidx=0; tableidx<${#eventtable_array[@]}; tableidx++)) do
         elif [[ -n "${where}" ]]; then
             dumptable="SELECT ${eventid_array[tableidx]}, (ST_Dump(${geometry_array[tableidx]})).geom AS geom FROM ${canonical_array[tableidx]} WHERE ${where}"
         else
-            dumptable="SELECT ${eventid_array[tableidx]}, (ST_Dump(geom,event)).geom AS geom FROM ${canonical_array[tableidx]} AS event"
+            dumptable="SELECT ${eventid_array[tableidx]}, (ST_Dump(${geometry_array[tableidx]})).geom AS geom FROM ${canonical_array[tableidx]}"
         fi
         echo $dumptable
         psql --variable=ON_ERROR_STOP=1 \
@@ -257,21 +257,25 @@ for ((tableidx=0; tableidx<${#eventtable_array[@]}; tableidx++)) do
         else
             backupcommand=
         fi
+        if [[ -n "${area}" ]]; then
+            junctioncommand="CREATE TABLE ${junction_array[tableidx]} AS 
+                                WITH area as (${area})
+                                SELECT DISTINCT point.id AS poly_id, event.${eventid_array[tableidx]}
+                                FROM area,
+                                    ${canonical_array[tableidx]} AS event,
+                                    ${pointtable} AS point
+                                WHERE ST_Intersects(area.geom, event.${geometry_array[tableidx]})
+                                AND   ST_Contains(event.${geometry_array[tableidx]}, point.point)"
+        else
+            junctioncommand="CREATE TABLE ${junction_array[tableidx]} AS 
+                                SELECT DISTINCT point.id AS poly_id, event.${eventid_array[tableidx]}
+                                FROM ${canonical_array[tableidx]} AS event,
+                                     ${pointtable} AS point
+                                WHERE ST_Contains(event.${geometry_array[tableidx]}, point.point)"
+        fi
         psql --variable=ON_ERROR_STOP=1 \
             --command="${backupcommand}" \
-            --command="/* CREATE TABLE ${junction_array[tableidx]} AS 
-                        SELECT DISTINCT point.id AS poly_id, dump.${eventid_array[tableidx]}
-                        FROM ${canonical_array[tableidx]}_dump AS dump,
-                             ${pointtable} AS point
-                        WHERE ST_Contains(dump.geom, point.point) */" \
-            --command="CREATE TABLE ${junction_array[tableidx]} AS 
-                        WITH area as (${area})
-                        SELECT DISTINCT point.id AS poly_id, event.${eventid_array[tableidx]}
-                        FROM area,
-                             ${canonical_array[tableidx]} AS event,
-                             ${pointtable} AS point
-                        WHERE ST_Intersects(area.geom, event.${geometry_array[tableidx]})
-                        AND   ST_Contains(event.${geometry_array[tableidx]}, point.point)" \
+            --command="${junctioncommand}" \
             --command="CREATE INDEX ON ${junction_array[tableidx]} (poly_id)" \
             --command="ALTER TABLE ${junction_array[tableidx]} ADD CONSTRAINT fk_poly FOREIGN KEY (poly_id) REFERENCES ${polytable}(id)" \
             --command="CREATE INDEX ON ${junction_array[tableidx]} (${eventid_array[tableidx]})" \

@@ -35,5 +35,5 @@
 #    --pdffile "/home/jschultz/data/Fire/burn_overview/${burnid}_1.pdf"
 #              "/home/jschultz/data/Fire/burn_overview/${burnid}_2.pdf"
 #    --nologfile
-#    "/home/jschultz/src/firedata/DBCA/burn_details.qgs"
+#    "/home/jschultz/src/firedata/DBCA/burn_overview.qgs"
 ################################################################################
