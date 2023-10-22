@@ -28,7 +28,7 @@ import os
 import shutil
 
 def getDailyBurns(arglist=None):
-    parser = ArgumentRecorder(description='Read Daily Burns from DBCA WMS server, stopping when today''s burns have been retrieved',
+    parser = ArgumentRecorder(description='Read Daily Burns from DBCA WMS server, stopping a change is detected.',
                               fromfile_prefix_chars='@')
 
     parser.add_argument('-v', '--verbosity',  type=int, default=1, private=True)
@@ -47,22 +47,29 @@ def getDailyBurns(arglist=None):
 
     args = parser.parse_args(arglist)
 
-    if args.csvfile is None:
-        csvfile = sys.stdout
-    else:
-        if os.path.exists(args.csvfile):
-            shutil.move(args.csvfile, args.csvfile + '.bak')
-
-        csvfile = open(args.csvfile, 'w')
+    csv.field_size_limit(sys.maxsize)
+    
+    incomments = None
+    infieldnames = []
+    if args.csvfile is not None and os.path.exists(args.csvfile):
+        infile = open(args.csvfile, 'r')
+        incomments = ArgumentHelper.read_comments(infile) or ArgumentHelper.separator()
+        try:
+            infieldnames = next(csv.reader([next(infile)]))
+            inreader=csv.DictReader(infile, fieldnames=infieldnames)
+            indata = [row for row in inreader]
+            infile.close()
+        except StopIteration:
+            pass
 
     if not args.no_comments:
-        parser.write_comments(args, csvfile, incomments=ArgumentHelper.separator())
+        parser.write_comments(args, csvfile, incomments=incomments)
 
     def float_or_none(s):
         try:
-            return float(s)
+            return str(float(s))
         except:
-            return None
+            return ''
 
     def decodeDailyBurns():
         rc = []
@@ -80,7 +87,7 @@ def getDailyBurns(arglist=None):
             spans = description.find_all("span")
             if len(spans) > 0:
                 if multipolygon != []:
-                    attributes['geom'] = multipolygon[0].wkt if len(multipolygon) == 1 else MultiPolygon(multipolygon).wkt
+                    # attributes['geom'] = multipolygon[0].wkt if len(multipolygon) == 1 else MultiPolygon(multipolygon).wkt
                     multipolygon = []
 
                     rc += [attributes]
@@ -89,7 +96,7 @@ def getDailyBurns(arglist=None):
                 for n in range(len(spans) // 2):
                     attributes[spans[2 * n].get_text()] = spans[2 * n + 1].get_text()
                     
-                attributes['burn_target_date'] = datetime.strptime(attributes.get('burn_target_date_raw'),'%m/%d/%y %I:%M %p').date()
+                attributes['burn_target_date'] = str(datetime.strptime(attributes.get('burn_target_date_raw'),'%m/%d/%y %I:%M %p').date())
                 del attributes['burn_target_date_raw']
                 attributes['indicative_area']  = float_or_none(attributes.get('indicative_area'))
                 attributes['burn_target_long'] = float_or_none(attributes.get('burn_target_long'))
@@ -99,16 +106,13 @@ def getDailyBurns(arglist=None):
                     attributes['burn_est_start'] = datetime.strptime(attributes.get('burn_est_start', ''),'%H:%M:%S').time()
                 except:
                     pass
-                
-                if attributes['burn_target_date'] != datetime.today().date():
-                    continue
                     
             valiter = iter([float_or_none(val) for val in item.find("georss:polygon").get_text().split(' ')])
             polygon = Polygon([(lat, lon) for lat, lon in zip(valiter, valiter)])
             multipolygon += [polygon]
 
         if multipolygon != []:
-            attributes['geom'] = multipolygon[0].wkt if len(multipolygon) == 1 else MultiPolygon(multipolygon).wkt
+            # attributes['geom'] = multipolygon[0].wkt if len(multipolygon) == 1 else MultiPolygon(multipolygon).wkt
             multipolygon = []
             
             rc += [attributes]
@@ -117,15 +121,29 @@ def getDailyBurns(arglist=None):
 
     wms = WebMapService(args.server, version=args.version)
 
-    items = []
-    while items == []:
-        items = decodeDailyBurns()  
-        if items is None:
-            time.sleep(60)
+    while True:
+        outdata       = decodeDailyBurns()
+        outfieldnames = list(set(sum([list(item.keys()) for item in outdata], start=[])))
+        if set(outfieldnames) != set(infieldnames) or len(outdata) != len(indata):
+            break
+
+        for data in outdata:
+            for fieldname in outfieldnames:
+                data[fieldname] = data.get(fieldname, '')
+            
+        if not all((indata[idx] == outdata[idx] for idx in range(len(indata)))):
+            break
+                               
+        time.sleep(60)
         
-    csvwriter=csv.DictWriter(csvfile, fieldnames=list(set(sum([list(item.keys()) for item in items], start=[]))))
+    if args.csvfile is not None:
+        if os.path.exists(args.csvfile):
+            shutil.move(args.csvfile, args.csvfile + '.bak')
+
+    csvfile = open(args.csvfile, 'w')
+    csvwriter=csv.DictWriter(csvfile, fieldnames=outfieldnames)
     csvwriter.writeheader()
-    for item in items:
+    for item in outdata:
         csvwriter.writerow(item)
         
     csvfile.close()
