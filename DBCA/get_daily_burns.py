@@ -62,10 +62,7 @@ def getDailyBurns(arglist=None):
         except StopIteration:
             pass
 
-    if not args.no_comments:
-        parser.write_comments(args, csvfile, incomments=incomments)
-
-    def float_or_none(s):
+    def float2str(s):
         try:
             return str(float(s))
         except:
@@ -98,16 +95,16 @@ def getDailyBurns(arglist=None):
                     
                 attributes['burn_target_date'] = str(datetime.strptime(attributes.get('burn_target_date_raw'),'%m/%d/%y %I:%M %p').date())
                 del attributes['burn_target_date_raw']
-                attributes['indicative_area']  = float_or_none(attributes.get('indicative_area'))
-                attributes['burn_target_long'] = float_or_none(attributes.get('burn_target_long'))
-                attributes['burn_target_lat']  = float_or_none(attributes.get('burn_target_lat'))
-                attributes['burn_planned_area_today'] = float_or_none(attributes.get('burn_planned_area_today'))
+                attributes['indicative_area']  = float2str(attributes.get('indicative_area'))
+                attributes['burn_target_long'] = float2str(attributes.get('burn_target_long'))
+                attributes['burn_target_lat']  = float2str(attributes.get('burn_target_lat'))
+                attributes['burn_planned_area_today'] = float2str(attributes.get('burn_planned_area_today'))
                 try:
                     attributes['burn_est_start'] = datetime.strptime(attributes.get('burn_est_start', ''),'%H:%M:%S').time()
                 except:
                     pass
                     
-            valiter = iter([float_or_none(val) for val in item.find("georss:polygon").get_text().split(' ')])
+            valiter = iter([float(val) for val in item.find("georss:polygon").get_text().split(' ')])
             polygon = Polygon([(lat, lon) for lat, lon in zip(valiter, valiter)])
             multipolygon += [polygon]
 
@@ -141,6 +138,9 @@ def getDailyBurns(arglist=None):
             shutil.move(args.csvfile, args.csvfile + '.bak')
 
     csvfile = open(args.csvfile, 'w')
+    if not args.no_comments:
+        parser.write_comments(args, csvfile, incomments=incomments)
+
     csvwriter=csv.DictWriter(csvfile, fieldnames=outfieldnames)
     csvwriter.writeheader()
     for item in outdata:
@@ -150,3 +150,4 @@ def getDailyBurns(arglist=None):
         
 if __name__ == '__main__':
     getDailyBurns(None)
+
