@@ -100,7 +100,7 @@ def getDailyBurns(arglist=None):
                 attributes['burn_target_lat']  = float2str(attributes.get('burn_target_lat'))
                 attributes['burn_planned_area_today'] = float2str(attributes.get('burn_planned_area_today'))
                 try:
-                    attributes['burn_est_start'] = datetime.strptime(attributes.get('burn_est_start', ''),'%H:%M:%S').time()
+                    attributes['burn_est_start'] = str(datetime.strptime(attributes.get('burn_est_start', ''),'%H:%M:%S').time())
                 except:
                     pass
                     
@@ -130,6 +130,13 @@ def getDailyBurns(arglist=None):
             
         if not all((indata[idx] == outdata[idx] for idx in range(len(indata)))):
             break
+        # innerbreak = False
+        # for idx in range(len(indata)):
+        #     if indata[idx] != outdata[idx]:
+        #         innerbreak = True
+        #         break
+        # if innerbreak:
+        #     break
                                
         time.sleep(60)
         
