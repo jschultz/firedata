@@ -32,7 +32,7 @@
         </Option>
       </customproperties>
     </layer-tree-layer>
-    <layer-tree-layer source="dbname='fire_202303' port=5433 user='qgis' sslmode=disable key='_uid_' checkPrimaryKeyUnicity='0' table=&quot;(SELECT row_number() over () AS _uid_,* FROM (&#xa;SELECT southern_view.geom, forest_ecosystem.descript, fireseason(fih_date1) AS yolb &#xa;FROM southern_view, forest_ecosystem, dbca_fire_history_dbca_060 &#xa;WHERE forest_ecosystem.extcode = ANY(southern_view.forest_ecosystem_extcode) &#xa;AND southern_view.forest_man_plan_2014_2023_dbca_041_id IS NOT NULL&#xa;AND dbca_fire_history_dbca_060.object_id = southern_view.dbca_fire_history_dbca_060.object_id[1]&#xa;) AS _subq_1_&#xa;)&quot; (geom)" providerKey="postgres" expanded="1" patch_size="-1,-1" legend_exp="" name="yolb" checked="Qt::Checked" id="yolb_e971fa67_000c_40c8_81b6_d01d6b46f524" legend_split_behavior="0">
+    <layer-tree-layer source="dbname='fire_202303' port=5433 user='qgis' sslmode=disable key='_uid_' checkPrimaryKeyUnicity='0' table=&quot;(SELECT row_number() over () AS _uid_,* FROM (&#xa;SELECT southern_view.geom, forest_ecosystem.descript, fireseason(fih_date1) AS yolb &#xa;FROM southern_view, forest_ecosystem, dbca_fire_history_dbca_060 &#xa;WHERE forest_ecosystem.extcode = ANY(southern_view.forest_ecosystem_extcode) &#xa;AND southern_view.forest_man_plan_2014_2023_dbca_041_id IS NOT NULL&#xa;AND dbca_fire_history_dbca_060.object_id = southern_view.dbca_fire_history_dbca_060_object_id[1]&#xa;) AS _subq_1_&#xa;)&quot; (geom)" providerKey="postgres" expanded="1" patch_size="-1,-1" legend_exp="" name="yolb" checked="Qt::Checked" id="yolb_e971fa67_000c_40c8_81b6_d01d6b46f524" legend_split_behavior="0">
       <customproperties>
         <Option type="Map">
           <Option name="cached_name" value="yolb" type="QString"/>
@@ -1844,7 +1844,7 @@ SELECT southern_view.geom, forest_ecosystem.descript, fireseason(fih_date1) AS y
 FROM southern_view, forest_ecosystem, dbca_fire_history_dbca_060 
 WHERE forest_ecosystem.extcode = ANY(southern_view.forest_ecosystem_extcode) 
 AND southern_view.forest_man_plan_2014_2023_dbca_041_id IS NOT NULL
-AND dbca_fire_history_dbca_060.object_id = southern_view.dbca_fire_history_dbca_060.object_id[1]
+AND dbca_fire_history_dbca_060.object_id = southern_view.dbca_fire_history_dbca_060_object_id[1]
 ) AS _subq_1_
 )" (geom)</datasource>
       <keywordList>
@@ -3404,7 +3404,7 @@ AND dbca_fire_history_dbca_060.object_id = southern_view.dbca_fire_history_dbca_
           <customproperties>
             <Option/>
           </customproperties>
-          <layer-tree-layer source="dbname='fire_202303' port=5433 user='qgis' sslmode=disable key='_uid_' checkPrimaryKeyUnicity='0' table=&quot;(SELECT row_number() over () AS _uid_,* FROM (&#xa;SELECT southern_view.geom, forest_ecosystem.descript, fireseason(fih_date1) AS yolb &#xa;FROM southern_view, forest_ecosystem, dbca_fire_history_dbca_060 &#xa;WHERE forest_ecosystem.extcode = ANY(southern_view.forest_ecosystem_extcode) &#xa;AND southern_view.forest_man_plan_2014_2023_dbca_041_id IS NOT NULL&#xa;AND dbca_fire_history_dbca_060.object_id = southern_view.dbca_fire_history_dbca_060.object_id[1]&#xa;) AS _subq_1_&#xa;)&quot; (geom)" providerKey="postgres" expanded="1" patch_size="-1,-1" legend_exp="" name="yolb" checked="Qt::Checked" id="yolb_e971fa67_000c_40c8_81b6_d01d6b46f524" legend_split_behavior="0">
+          <layer-tree-layer source="dbname='fire_202303' port=5433 user='qgis' sslmode=disable key='_uid_' checkPrimaryKeyUnicity='0' table=&quot;(SELECT row_number() over () AS _uid_,* FROM (&#xa;SELECT southern_view.geom, forest_ecosystem.descript, fireseason(fih_date1) AS yolb &#xa;FROM southern_view, forest_ecosystem, dbca_fire_history_dbca_060 &#xa;WHERE forest_ecosystem.extcode = ANY(southern_view.forest_ecosystem_extcode) &#xa;AND southern_view.forest_man_plan_2014_2023_dbca_041_id IS NOT NULL&#xa;AND dbca_fire_history_dbca_060.object_id = southern_view.dbca_fire_history_dbca_060_object_id[1]&#xa;) AS _subq_1_&#xa;)&quot; (geom)" providerKey="postgres" expanded="1" patch_size="-1,-1" legend_exp="" name="yolb" checked="Qt::Checked" id="yolb_e971fa67_000c_40c8_81b6_d01d6b46f524" legend_split_behavior="0">
             <customproperties>
               <Option type="Map">
                 <Option name="cached_name" value="Years since last burn" type="QString"/>
@@ -3629,7 +3629,7 @@ AND dbca_fire_history_dbca_060.object_id = southern_view.dbca_fire_history_dbca_
         </LayoutObject>
         <Extent ymin="-33.94770575522488798" xmax="117.24157360740444744" ymax="-30.80395990197647649" xmin="113.85958827672040172"/>
         <LayerSet>
-          <Layer source="dbname='fire_202303' port=5433 user='qgis' sslmode=disable key='_uid_' checkPrimaryKeyUnicity='0' table=&quot;(SELECT row_number() over () AS _uid_,* FROM (&#xa;SELECT southern_view.geom, forest_ecosystem.descript, fireseason(fih_date1) AS yolb &#xa;FROM southern_view, forest_ecosystem, dbca_fire_history_dbca_060 &#xa;WHERE forest_ecosystem.extcode = ANY(southern_view.forest_ecosystem_extcode) &#xa;AND southern_view.forest_man_plan_2014_2023_dbca_041_id IS NOT NULL&#xa;AND dbca_fire_history_dbca_060.object_id = southern_view.dbca_fire_history_dbca_060.object_id[1]&#xa;) AS _subq_1_&#xa;)&quot; (geom)" name="yolb" provider="postgres">yolb_e971fa67_000c_40c8_81b6_d01d6b46f524</Layer>
+          <Layer source="dbname='fire_202303' port=5433 user='qgis' sslmode=disable key='_uid_' checkPrimaryKeyUnicity='0' table=&quot;(SELECT row_number() over () AS _uid_,* FROM (&#xa;SELECT southern_view.geom, forest_ecosystem.descript, fireseason(fih_date1) AS yolb &#xa;FROM southern_view, forest_ecosystem, dbca_fire_history_dbca_060 &#xa;WHERE forest_ecosystem.extcode = ANY(southern_view.forest_ecosystem_extcode) &#xa;AND southern_view.forest_man_plan_2014_2023_dbca_041_id IS NOT NULL&#xa;AND dbca_fire_history_dbca_060.object_id = southern_view.dbca_fire_history_dbca_060_object_id[1]&#xa;) AS _subq_1_&#xa;)&quot; (geom)" name="yolb" provider="postgres">yolb_e971fa67_000c_40c8_81b6_d01d6b46f524</Layer>
           <Layer source="crs=EPSG:3857&amp;dpiMode=7&amp;format=image/png&amp;layers=mapbox-satellite&amp;styles&amp;url=https://kmi.dpaw.wa.gov.au/geoserver/public/wms?version%3D1.1.0%26layers%3Dpublic:todays_burns%26styles%3D%26bbox%3D108.0,-45.0,155.0,-10.0%26width%3D768%26height%3D571%26srs%3DEPSG:4283" name="Mapbox satellite" provider="wms">Mapbox_satellite_cf37afb0_e976_4701_bd8e_12d41bc02646</Layer>
         </LayerSet>
         <AtlasMap margin="0.20000000000000001" atlasDriven="1" scalingMode="2"/>
@@ -3717,7 +3717,7 @@ AND dbca_fire_history_dbca_060.object_id = southern_view.dbca_fire_history_dbca_
       </spatialrefsys>
     </CoordinateCustomCrs>
   </ProjectDisplaySettings>
-  <ProjectGpsSettings destinationLayerName="yolb" destinationFollowsActiveLayer="1" destinationLayer="yolb_e971fa67_000c_40c8_81b6_d01d6b46f524" destinationLayerSource="dbname='fire_202303' port=5433 user='qgis' sslmode=disable key='_uid_' checkPrimaryKeyUnicity='0' table=&quot;(SELECT row_number() over () AS _uid_,* FROM (&#xa;SELECT southern_view.geom, forest_ecosystem.descript, fireseason(fih_date1) AS yolb &#xa;FROM southern_view, forest_ecosystem, dbca_fire_history_dbca_060 &#xa;WHERE forest_ecosystem.extcode = ANY(southern_view.forest_ecosystem_extcode) &#xa;AND southern_view.forest_man_plan_2014_2023_dbca_041_id IS NOT NULL&#xa;AND dbca_fire_history_dbca_060.object_id = southern_view.dbca_fire_history_dbca_060.object_id[1]&#xa;) AS _subq_1_&#xa;)&quot; (geom)" destinationLayerProvider="postgres" autoAddTrackVertices="0" autoCommitFeatures="0">
+  <ProjectGpsSettings destinationLayerName="yolb" destinationFollowsActiveLayer="1" destinationLayer="yolb_e971fa67_000c_40c8_81b6_d01d6b46f524" destinationLayerSource="dbname='fire_202303' port=5433 user='qgis' sslmode=disable key='_uid_' checkPrimaryKeyUnicity='0' table=&quot;(SELECT row_number() over () AS _uid_,* FROM (&#xa;SELECT southern_view.geom, forest_ecosystem.descript, fireseason(fih_date1) AS yolb &#xa;FROM southern_view, forest_ecosystem, dbca_fire_history_dbca_060 &#xa;WHERE forest_ecosystem.extcode = ANY(southern_view.forest_ecosystem_extcode) &#xa;AND southern_view.forest_man_plan_2014_2023_dbca_041_id IS NOT NULL&#xa;AND dbca_fire_history_dbca_060.object_id = southern_view.dbca_fire_history_dbca_060_object_id[1]&#xa;) AS _subq_1_&#xa;)&quot; (geom)" destinationLayerProvider="postgres" autoAddTrackVertices="0" autoCommitFeatures="0">
     <timeStampFields/>
   </ProjectGpsSettings>
 </qgis>

@@ -13,7 +13,7 @@ CREATE TABLE ${basename}_numfires_since_${sinceyear} AS
                 fireseason(LEAD(fih_date1) OVER (PARTITION BY poly_id ORDER BY fih_date1 DESC)) AS prevfireseason
          FROM ${basename}_view,
               ${basename}_poly,
-              unnest(${basename}_view.dbca_fire_history_dbca_060.object_id) AS dbca_fire_history_dbca_060_object_id,
+              unnest(${basename}_view.dbca_fire_history_dbca_060_object_id) AS dbca_fire_history_dbca_060_object_id,
               dbca_fire_history_dbca_060
         WHERE ${basename}_poly.id = poly_id    
           AND dbca_fire_history_dbca_060.object_id = dbca_fire_history_dbca_060_object_id  

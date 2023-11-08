@@ -34,8 +34,9 @@ def exportQgisLayout(arglist=None):
                               fromfile_prefix_chars='@')
 
     parser.add_argument('-l', '--layout', type=str, default="Layout 1", help="Print layout to export")
-    parser.add_argument('-s', '--simplify', action='store_true', help="Simplify geometries")
-    parser.add_argument('-o', '--outfile', type=str, help="Name of PDF file to export, default to 'layout'.pdf")
+    parser.add_argument('-o', '--outpath', type=str, help="Name of PDF file or d to export, default to 'layout'.pdf")
+
+    parser.add_argument('-s', '--single',  action='store_true', help='Output atlas as a single file')
 
     parser.add_argument('-v', '--variable', nargs='+', type=str, help='List of variable:value pairs to define as project variables')
     
@@ -47,14 +48,16 @@ def exportQgisLayout(arglist=None):
 
     args = parser.parse_args(arglist)
 
-    if not args.outfile:
-        args.outfile = args.layout + '.pdf'
+    # if not args.outpath:
+    #     args.outpath = args.layout + '.pdf'
         
     if not args.nologfile:
         if args.logfile:
             logfilename = args.logfile
-        elif args.outfile:
-            logfilename = args.outfile.split('/')[-1].rsplit('.',1)[0] + '.log'
+        elif args.outpath:
+            logfilename = args.outpath.split('/')[-1].rsplit('.',1)[0] + '.log'
+        else:
+            logfilename = args.qgisfile[0].split('/')[-1].rsplit('.',1)[0] + '.log'
                 
         logfile = open(logfilename, 'w')
         parser.write_comments(args, logfile, incomments=ArgumentHelper.separator())
@@ -72,16 +75,26 @@ def exportQgisLayout(arglist=None):
     
     manager = QgsProject.instance().layoutManager()
     layout = manager.layoutByName(args.layout)
-    
-    if os.path.exists(args.outfile) and not args.nobackup:
-        os.rename(args.outfile, args.outfile + '.bak')
-
     settings = QgsLayoutExporter.PdfExportSettings()
-    settings.simplifyGeometries = args.simplify
-    settings.forceVectorOutput = True
-    exporter = QgsLayoutExporter(layout)
-    exporter.exportToPdf(layout.atlas(), args.outfile, settings)
-    
+
+    if args.single:
+        if args.outpath and os.path.exists(args.outpath) and not args.nobackup:
+            os.rename(args.outpath, args.outpath + '.bak')
+
+        exporter = QgsLayoutExporter(layout)
+        exporter.exportToPdf(layout.atlas(), args.outpath, settings)
+    else:
+        atlas =layout.atlas()
+        atlas.beginRender()
+        while atlas.next():
+            exporter = QgsLayoutExporter(atlas.layout())
+            atlasitempath = os.path.join(args.outpath, atlas.currentFilename() + '.pdf')
+            if os.path.exists(atlasitempath) and not args.nobackup:
+                os.rename(atlasitempath, atlasitempath + '.bak')
+            exporter.exportToPdf(atlasitempath, settings)
+            
+        atlas.endRender
+        
     qgs.exitQgis()
 
 if __name__ == '__main__':

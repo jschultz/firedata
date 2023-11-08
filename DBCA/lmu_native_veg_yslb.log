@@ -15,7 +15,7 @@ FROM (
       JOIN southern_fmp_land_management_unit_junction AS lmu_junction ON lmu_junction.extcode = land_management_unit.extcode
       JOIN southern_fmp_view AS view ON view.id = lmu_junction.poly_id
       JOIN southern_fmp_poly AS poly ON poly.id = view.id
-      LEFT OUTER JOIN dbca_fire_history_dbca_060 AS event ON event.id = view.dbca_fire_history_dbca_060.object_id[1]
+      LEFT OUTER JOIN dbca_fire_history_dbca_060 AS event ON event.id = view.dbca_fire_history_dbca_060_object_id[1]
       WHERE native_veg_extent_dpird_005_wa_id IS NOT NULL) foo
 GROUP BY description, native_geom"
 #    --csvfile "lmu_native_veg_yslb.csv"

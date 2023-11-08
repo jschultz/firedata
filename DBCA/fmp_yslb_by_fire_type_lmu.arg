@@ -22,7 +22,8 @@
 #    --until 45
 #    --width 400
 #    --height 200
-#    --blocks 4
+#    --blocks 3
+#    --bars 1
 #    --whitespace 20
 #    --colors red
 #             orange
@@ -32,17 +33,7 @@
 ##    --subtitle "Reference date: 1 July ${baseyear}"
 #    --ylabel "Area (percent of LMU area)"
 #    --xlabel "Years since last burned"
-#    --exec "
-pyplot.plot(list(range(45)), [
-4.8750860062352,4.71312301375067,4.56735633243506,4.40539333995052,4.25962665863491,4.13005624875332,4.00048587860664,3.87091546872504,3.74134509857836,3.62,3.4984005899841,3.38502649127143,3.27165243229368,3.17,3.06110050630236,2.96392271875862,2.87,2.76956714367114,2.68858562756141,2.59140784001767,2.51042636364287,2.42944484753314,2.34846337115833,2.2674818550486,2.20269668984272,2.12171517373299,2.05692996879219,1.99214480358632,1.92735959864552,1.86257439370472,1.79778918876392,1.73300398382312,1.66821881861724,1.61962992484537,1.57104099133858,1.52245209756671,1.47386320379484,1.42527431002298,1.37668541625111,1.32809652247924,1.27950762870737,1.24711504610443,1.19852611259764,1.1661335299947,
-1.135],
-label="“Ideal”")
-ax.legend(prop=legendfont, framealpha=1)
-pyplot.plot(list(range(45)), [100 * (1 - 0.905163670615) * 0.905163670615**n for n in range(45)],
-label="Exponential")
-ax.legend(prop=legendfont, framealpha=1)
-"
-#>   --outfile fmp_yslb_by_fire_type/fmp_yslb_by_fire_type_${lmu}_${baseyear}.jpg
+#>   --outfile fmp_yslb_by_fire_type/fmp_yslb_by_fire_type_${lmu}_${baseyear}.svg
 #<   fmp_yslb_by_fire_type/fmp_yslb_by_fire_type_${lmu}_${baseyear}.csv
 ###########################################################################
 #> event_history.sh
@@ -58,7 +49,7 @@ FROM ${basename}_poly AS poly,
            ${basename}_land_management_unit_junction AS lmu_junction,
            ${basename}_view AS view,
       LATERAL (SELECT fih_date1, fih_cause 
-               FROM (SELECT unnest(view.dbca_fire_history_dbca_060.object_id) AS event_id) AS event_ids
+               FROM (SELECT unnest(view.dbca_fire_history_dbca_060_object_id) AS event_id) AS event_ids
                JOIN dbca_fire_history_dbca_060 ON dbca_fire_history_dbca_060.object_id = event_id
                WHERE fireseason(fih_date1) <= ${baseyear}
                LIMIT 1) AS event

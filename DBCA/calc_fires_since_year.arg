@@ -10,7 +10,7 @@ CREATE TABLE ${table} AS (
             fireseason(LEAD(fih_date1) OVER (PARTITION BY poly_id ORDER BY fih_date1 DESC)) AS prevfireseason
         FROM
             ${history} history, 
-            unnest(history.dbca_fire_history_dbca_060.object_id) AS history_id, 
+            unnest(history.dbca_fire_history_dbca_060_object_id) AS history_id, 
             dbca_fire_history_dbca_060
         WHERE dbca_fire_history_dbca_060.object_id = history_id
         ORDER BY fih_date1 DESC)

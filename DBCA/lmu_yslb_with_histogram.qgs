@@ -22,7 +22,7 @@
     <customproperties>
       <Option/>
     </customproperties>
-    <layer-tree-layer expanded="1" source="dbname='fire_202303' port=5433 user='qgis' sslmode=disable key='extcode' srid=4283 type=MultiPolygon checkPrimaryKeyUnicity='0' table=&quot;public&quot;.&quot;land_management_unit&quot; (full_geom)" providerKey="postgres" checked="Qt::Checked" id="land_management_unit_e89b90ae_3194_4a5a_894a_593d3d89cc30" patch_size="-1,-1" legend_exp="" legend_split_behavior="0" name="land_management_unit">
+    <layer-tree-layer expanded="1" source="dbname='fire' port=5432 user='qgis' sslmode=disable key='extcode' srid=4283 type=MultiPolygon checkPrimaryKeyUnicity='0' table=&quot;public&quot;.&quot;land_management_unit&quot; (full_geom)" providerKey="postgres" checked="Qt::Checked" id="land_management_unit_e89b90ae_3194_4a5a_894a_593d3d89cc30" patch_size="-1,-1" legend_exp="" legend_split_behavior="0" name="land_management_unit">
       <customproperties>
         <Option type="Map">
           <Option type="QString" value="land_management_unit" name="cached_name"/>
@@ -32,7 +32,7 @@
         </Option>
       </customproperties>
     </layer-tree-layer>
-    <layer-tree-layer expanded="1" source="dbname='fire_202303' port=5433 user='qgis' sslmode=disable key='_uid_' checkPrimaryKeyUnicity='0' table=&quot;(SELECT row_number() over () AS _uid_,* FROM (&#xa;SELECT southern_view.geom, land_management_unit.description, fireseason(fih_date1) AS yolb &#xa;FROM southern_view, land_management_unit, dbca_fire_history_dbca_060 &#xa;WHERE land_management_unit.extcode = ANY(southern_view.land_management_unit_extcode) &#xa;AND southern_view.forest_man_plan_2014_2023_dbca_041_id IS NOT NULL&#xa;AND dbca_fire_history_dbca_060.object_id = southern_view.dbca_fire_history_dbca_060.object_id[1]&#xa;) AS _subq_1_&#xa;)&quot; (geom)" providerKey="postgres" checked="Qt::Unchecked" id="yolb_e971fa67_000c_40c8_81b6_d01d6b46f524" patch_size="-1,-1" legend_exp="" legend_split_behavior="0" name="yolb">
+    <layer-tree-layer expanded="1" source="dbname='fire' port=5432 user='qgis' sslmode=disable key='_uid_' checkPrimaryKeyUnicity='0' table=&quot;(SELECT row_number() over () AS _uid_,* FROM (&#xa;SELECT southern_view.geom, land_management_unit.description, fireseason(fih_date1) AS yolb &#xa;FROM southern_view, land_management_unit, dbca_fire_history_dbca_060 &#xa;WHERE land_management_unit.extcode = ANY(southern_view.land_management_unit_extcode) &#xa;AND southern_view.forest_man_plan_2014_2023_dbca_041_id IS NOT NULL&#xa;AND dbca_fire_history_dbca_060.object_id = southern_view.dbca_fire_history_dbca_060_object_id[1]&#xa;) AS _subq_1_&#xa;)&quot; (geom)" providerKey="postgres" checked="Qt::Unchecked" id="yolb_e971fa67_000c_40c8_81b6_d01d6b46f524" patch_size="-1,-1" legend_exp="" legend_split_behavior="0" name="yolb">
       <customproperties>
         <Option type="Map">
           <Option type="QString" value="yolb" name="cached_name"/>
@@ -40,7 +40,7 @@
         </Option>
       </customproperties>
     </layer-tree-layer>
-    <layer-tree-layer expanded="1" source="dbname='fire_202303' port=5433 user='qgis' sslmode=disable key='_uid_' checkPrimaryKeyUnicity='0' table=&quot;(SELECT row_number() over () AS _uid_,* FROM (&#xa;SELECT ST_Union(dbca_fire_history_dbca_060.geom) AS geom, fireseason(fih_date1) AS year, fih_cause, fih_date1 &#xa;FROM dbca_fire_history_dbca_060 &#xa;WHERE fih_date1 >= '2011-07-01' AND fih_date1 &lt; '2012-07-01'&#xa;GROUP BY fih_date1, fih_cause&#xa;) AS _subq_1_&#xa;)&quot; (geom) sql=&quot;year&quot;=2012" providerKey="postgres" checked="Qt::Checked" id="yolb_6b127292_3ee0_41e8_a8a8_fa520bc6e13f" patch_size="-1,-1" legend_exp="" legend_split_behavior="0" name="burns by year and cause">
+    <layer-tree-layer expanded="1" source="dbname='fire' port=5432 user='qgis' sslmode=disable key='_uid_' checkPrimaryKeyUnicity='0' table=&quot;(SELECT row_number() over () AS _uid_,* FROM (&#xa;SELECT ST_Union(dbca_fire_history_dbca_060.geom) AS geom, fireseason(fih_date1) AS year, fih_cause, fih_date1 &#xa;FROM dbca_fire_history_dbca_060 &#xa;WHERE fih_date1 >= '2011-07-01' AND fih_date1 &lt; '2012-07-01'&#xa;GROUP BY fih_date1, fih_cause&#xa;) AS _subq_1_&#xa;)&quot; (geom) sql=&quot;year&quot;=2012" providerKey="postgres" checked="Qt::Checked" id="yolb_6b127292_3ee0_41e8_a8a8_fa520bc6e13f" patch_size="-1,-1" legend_exp="" legend_split_behavior="0" name="burns by year and cause">
       <customproperties>
         <Option/>
       </customproperties>
@@ -630,7 +630,7 @@
         <ymax>-30.97176920199996175</ymax>
       </wgs84extent>
       <id>land_management_unit_e89b90ae_3194_4a5a_894a_593d3d89cc30</id>
-      <datasource>dbname='fire_202303' port=5433 user='qgis' sslmode=disable key='extcode' srid=4283 type=MultiPolygon checkPrimaryKeyUnicity='0' table="public"."land_management_unit" (full_geom)</datasource>
+      <datasource>dbname='fire' port=5432 user='qgis' sslmode=disable key='extcode' srid=4283 type=MultiPolygon checkPrimaryKeyUnicity='0' table="public"."land_management_unit" (full_geom)</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -1014,7 +1014,7 @@
         <ymax>-31.03502962999998971</ymax>
       </wgs84extent>
       <id>yolb_6b127292_3ee0_41e8_a8a8_fa520bc6e13f</id>
-      <datasource>dbname='fire_202303' port=5433 user='qgis' password='qgis' sslmode=disable key='_uid_' checkPrimaryKeyUnicity='0' table="(SELECT row_number() over () AS _uid_,* FROM (
+      <datasource>dbname='fire' port=5432 user='qgis' password='qgis' sslmode=disable key='_uid_' checkPrimaryKeyUnicity='0' table="(SELECT row_number() over () AS _uid_,* FROM (
 SELECT ST_Union(dbca_fire_history_dbca_060.geom) AS geom, fireseason(fih_date1) AS year, fih_cause, fih_date1 
 FROM dbca_fire_history_dbca_060 
 WHERE fih_date1 >= '2011-07-01' AND fih_date1 &lt; '2012-07-01'
@@ -1688,12 +1688,12 @@ GROUP BY fih_date1, fih_cause
         <ymax>-30.97807145999999889</ymax>
       </wgs84extent>
       <id>yolb_e971fa67_000c_40c8_81b6_d01d6b46f524</id>
-      <datasource>dbname='fire_202303' port=5433 user='qgis' password='qgis' sslmode=disable key='_uid_' checkPrimaryKeyUnicity='0' table="(SELECT row_number() over () AS _uid_,* FROM (
+      <datasource>dbname='fire' port=5432 user='qgis' password='qgis' sslmode=disable key='_uid_' checkPrimaryKeyUnicity='0' table="(SELECT row_number() over () AS _uid_,* FROM (
 SELECT southern_view.geom, land_management_unit.description, fireseason(fih_date1) AS yolb 
 FROM southern_view, land_management_unit, dbca_fire_history_dbca_060 
 WHERE land_management_unit.extcode = ANY(southern_view.land_management_unit_extcode) 
 AND southern_view.forest_man_plan_2014_2023_dbca_041_id IS NOT NULL
-AND dbca_fire_history_dbca_060.object_id = southern_view.dbca_fire_history_dbca_060.object_id[1]
+AND dbca_fire_history_dbca_060.object_id = southern_view.dbca_fire_history_dbca_060_object_id[1]
 ) AS _subq_1_
 )" (geom)</datasource>
       <keywordList>
@@ -3253,7 +3253,7 @@ AND dbca_fire_history_dbca_060.object_id = southern_view.dbca_fire_history_dbca_
           <customproperties>
             <Option/>
           </customproperties>
-          <layer-tree-layer expanded="1" source="dbname='fire_202303' port=5433 user='qgis' sslmode=disable key='_uid_' checkPrimaryKeyUnicity='0' table=&quot;(SELECT row_number() over () AS _uid_,* FROM (&#xa;SELECT southern_view.geom, land_management_unit.description, fireseason(fih_date1) AS yolb &#xa;FROM southern_view, land_management_unit, dbca_fire_history_dbca_060 &#xa;WHERE land_management_unit.extcode = ANY(southern_view.land_management_unit_extcode) &#xa;AND southern_view.forest_man_plan_2014_2023_dbca_041_id IS NOT NULL&#xa;AND dbca_fire_history_dbca_060.object_id = southern_view.dbca_fire_history_dbca_060.object_id[1]&#xa;) AS _subq_1_&#xa;)&quot; (geom)" providerKey="postgres" checked="Qt::Checked" id="yolb_e971fa67_000c_40c8_81b6_d01d6b46f524" patch_size="-1,-1" legend_exp="" legend_split_behavior="0" name="yolb">
+          <layer-tree-layer expanded="1" source="dbname='fire' port=5432 user='qgis' sslmode=disable key='_uid_' checkPrimaryKeyUnicity='0' table=&quot;(SELECT row_number() over () AS _uid_,* FROM (&#xa;SELECT southern_view.geom, land_management_unit.description, fireseason(fih_date1) AS yolb &#xa;FROM southern_view, land_management_unit, dbca_fire_history_dbca_060 &#xa;WHERE land_management_unit.extcode = ANY(southern_view.land_management_unit_extcode) &#xa;AND southern_view.forest_man_plan_2014_2023_dbca_041_id IS NOT NULL&#xa;AND dbca_fire_history_dbca_060.object_id = southern_view.dbca_fire_history_dbca_060_object_id[1]&#xa;) AS _subq_1_&#xa;)&quot; (geom)" providerKey="postgres" checked="Qt::Checked" id="yolb_e971fa67_000c_40c8_81b6_d01d6b46f524" patch_size="-1,-1" legend_exp="" legend_split_behavior="0" name="yolb">
             <customproperties>
               <Option type="Map">
                 <Option type="QString" value="Years since last burn" name="cached_name"/>
@@ -3406,7 +3406,7 @@ AND dbca_fire_history_dbca_060.object_id = southern_view.dbca_fire_history_dbca_
         </LayoutObject>
         <Extent ymin="-35.51584687766403903" xmin="114.34734899785112816" ymax="-30.52052875133587406" xmax="118.33568825114898004"/>
         <LayerSet>
-          <Layer source="dbname='fire_202303' port=5433 user='qgis' sslmode=disable key='extcode' srid=4283 type=MultiPolygon checkPrimaryKeyUnicity='0' table=&quot;public&quot;.&quot;land_management_unit&quot; (full_geom)" provider="postgres" name="land_management_unit">land_management_unit_e89b90ae_3194_4a5a_894a_593d3d89cc30</Layer>
+          <Layer source="dbname='fire' port=5432 user='qgis' sslmode=disable key='extcode' srid=4283 type=MultiPolygon checkPrimaryKeyUnicity='0' table=&quot;public&quot;.&quot;land_management_unit&quot; (full_geom)" provider="postgres" name="land_management_unit">land_management_unit_e89b90ae_3194_4a5a_894a_593d3d89cc30</Layer>
           <Layer source="crs=EPSG:3857&amp;dpiMode=7&amp;format=image/png&amp;layers=mapbox-satellite&amp;styles&amp;url=https://kmi.dpaw.wa.gov.au/geoserver/public/wms?version%3D1.1.0%26layers%3Dpublic:todays_burns%26styles%3D%26bbox%3D108.0,-45.0,155.0,-10.0%26width%3D768%26height%3D571%26srs%3DEPSG:4283" provider="wms" name="Mapbox satellite">Mapbox_satellite_cf37afb0_e976_4701_bd8e_12d41bc02646</Layer>
         </LayerSet>
         <LayerStyles>
@@ -3550,7 +3550,7 @@ AND dbca_fire_history_dbca_060.object_id = southern_view.dbca_fire_history_dbca_
               <blendMode>0</blendMode>
             </qgis>
           </LayerStyle>
-          <LayerStyle source="dbname='fire_202303' port=5433 user='qgis' sslmode=disable key='extcode' srid=4283 type=MultiPolygon checkPrimaryKeyUnicity='0' table=&quot;public&quot;.&quot;land_management_unit&quot; (full_geom)" provider="postgres" layerid="land_management_unit_e89b90ae_3194_4a5a_894a_593d3d89cc30" name="land_management_unit">
+          <LayerStyle source="dbname='fire' port=5432 user='qgis' sslmode=disable key='extcode' srid=4283 type=MultiPolygon checkPrimaryKeyUnicity='0' table=&quot;public&quot;.&quot;land_management_unit&quot; (full_geom)" provider="postgres" layerid="land_management_unit_e89b90ae_3194_4a5a_894a_593d3d89cc30" name="land_management_unit">
             <qgis styleCategories="AllStyleCategories" version="3.28.3-Firenze" readOnly="0" minScale="100000000" simplifyMaxScale="1" symbologyReferenceScale="-1" simplifyDrawingTol="1" simplifyDrawingHints="1" hasScaleBasedVisibilityFlag="0" maxScale="0" simplifyAlgorithm="0" simplifyLocal="1" labelsEnabled="0">
               <flags>
                 <Identifiable>1</Identifiable>
@@ -3934,8 +3934,8 @@ AND dbca_fire_history_dbca_060.object_id = southern_view.dbca_fire_history_dbca_
         </LayoutObject>
         <Extent ymin="-35.41822085810418486" xmin="116.63529467987993371" ymax="-34.33090975386902954" xmax="117.80500443889670237"/>
         <LayerSet>
-          <Layer source="dbname='fire_202303' port=5433 user='qgis' sslmode=disable key='_uid_' checkPrimaryKeyUnicity='0' table=&quot;(SELECT row_number() over () AS _uid_,* FROM (&#xa;SELECT southern_view.geom, land_management_unit.description, fireseason(fih_date1) AS yolb &#xa;FROM southern_view, land_management_unit, dbca_fire_history_dbca_060 &#xa;WHERE land_management_unit.extcode = ANY(southern_view.land_management_unit_extcode) &#xa;AND southern_view.forest_man_plan_2014_2023_dbca_041_id IS NOT NULL&#xa;AND dbca_fire_history_dbca_060.object_id = southern_view.dbca_fire_history_dbca_060.object_id[1]&#xa;) AS _subq_1_&#xa;)&quot; (geom)" provider="postgres" name="yolb">yolb_e971fa67_000c_40c8_81b6_d01d6b46f524</Layer>
-          <Layer source="dbname='fire_202303' port=5433 user='qgis' sslmode=disable key='extcode' srid=4283 type=MultiPolygon checkPrimaryKeyUnicity='0' table=&quot;public&quot;.&quot;land_management_unit&quot; (full_geom)" provider="postgres" name="land_management_unit">land_management_unit_e89b90ae_3194_4a5a_894a_593d3d89cc30</Layer>
+          <Layer source="dbname='fire' port=5432 user='qgis' sslmode=disable key='_uid_' checkPrimaryKeyUnicity='0' table=&quot;(SELECT row_number() over () AS _uid_,* FROM (&#xa;SELECT southern_view.geom, land_management_unit.description, fireseason(fih_date1) AS yolb &#xa;FROM southern_view, land_management_unit, dbca_fire_history_dbca_060 &#xa;WHERE land_management_unit.extcode = ANY(southern_view.land_management_unit_extcode) &#xa;AND southern_view.forest_man_plan_2014_2023_dbca_041_id IS NOT NULL&#xa;AND dbca_fire_history_dbca_060.object_id = southern_view.dbca_fire_history_dbca_060_object_id[1]&#xa;) AS _subq_1_&#xa;)&quot; (geom)" provider="postgres" name="yolb">yolb_e971fa67_000c_40c8_81b6_d01d6b46f524</Layer>
+          <Layer source="dbname='fire' port=5432 user='qgis' sslmode=disable key='extcode' srid=4283 type=MultiPolygon checkPrimaryKeyUnicity='0' table=&quot;public&quot;.&quot;land_management_unit&quot; (full_geom)" provider="postgres" name="land_management_unit">land_management_unit_e89b90ae_3194_4a5a_894a_593d3d89cc30</Layer>
           <Layer source="crs=EPSG:3857&amp;dpiMode=7&amp;format=image/png&amp;layers=mapbox-satellite&amp;styles&amp;url=https://kmi.dpaw.wa.gov.au/geoserver/public/wms?version%3D1.1.0%26layers%3Dpublic:todays_burns%26styles%3D%26bbox%3D108.0,-45.0,155.0,-10.0%26width%3D768%26height%3D571%26srs%3DEPSG:4283" provider="wms" name="Mapbox satellite">Mapbox_satellite_cf37afb0_e976_4701_bd8e_12d41bc02646</Layer>
         </LayerSet>
         <LayerStyles>
@@ -4080,7 +4080,7 @@ AND dbca_fire_history_dbca_060.object_id = southern_view.dbca_fire_history_dbca_
               <blendMode>0</blendMode>
             </qgis>
           </LayerStyle>
-          <LayerStyle source="dbname='fire_202303' port=5433 user='qgis' sslmode=disable key='extcode' srid=4283 type=MultiPolygon checkPrimaryKeyUnicity='0' table=&quot;public&quot;.&quot;land_management_unit&quot; (full_geom)" provider="postgres" layerid="land_management_unit_e89b90ae_3194_4a5a_894a_593d3d89cc30" name="land_management_unit">
+          <LayerStyle source="dbname='fire' port=5432 user='qgis' sslmode=disable key='extcode' srid=4283 type=MultiPolygon checkPrimaryKeyUnicity='0' table=&quot;public&quot;.&quot;land_management_unit&quot; (full_geom)" provider="postgres" layerid="land_management_unit_e89b90ae_3194_4a5a_894a_593d3d89cc30" name="land_management_unit">
             <qgis version="3.30.3-'s-Hertogenbosch" styleCategories="AllStyleCategories" readOnly="0" minScale="100000000" simplifyMaxScale="1" symbologyReferenceScale="-1" simplifyDrawingHints="1" simplifyDrawingTol="1" hasScaleBasedVisibilityFlag="0" maxScale="0" simplifyAlgorithm="0" labelsEnabled="0" simplifyLocal="1">
               <flags>
                 <Identifiable>1</Identifiable>
@@ -4400,7 +4400,7 @@ AND dbca_fire_history_dbca_060.object_id = southern_view.dbca_fire_history_dbca_
               <layerGeometryType>2</layerGeometryType>
             </qgis>
           </LayerStyle>
-          <LayerStyle source="dbname='fire_202303' port=5433 user='qgis' sslmode=disable key='_uid_' checkPrimaryKeyUnicity='0' table=&quot;(SELECT row_number() over () AS _uid_,* FROM (&#xa;SELECT southern_view.geom, land_management_unit.description, fireseason(fih_date1) AS yolb &#xa;FROM southern_view, land_management_unit, dbca_fire_history_dbca_060 &#xa;WHERE land_management_unit.extcode = ANY(southern_view.land_management_unit_extcode) &#xa;AND southern_view.forest_man_plan_2014_2023_dbca_041_id IS NOT NULL&#xa;AND dbca_fire_history_dbca_060.object_id = southern_view.dbca_fire_history_dbca_060.object_id[1]&#xa;) AS _subq_1_&#xa;)&quot; (geom)" provider="postgres" layerid="yolb_e971fa67_000c_40c8_81b6_d01d6b46f524" name="yolb">
+          <LayerStyle source="dbname='fire' port=5432 user='qgis' sslmode=disable key='_uid_' checkPrimaryKeyUnicity='0' table=&quot;(SELECT row_number() over () AS _uid_,* FROM (&#xa;SELECT southern_view.geom, land_management_unit.description, fireseason(fih_date1) AS yolb &#xa;FROM southern_view, land_management_unit, dbca_fire_history_dbca_060 &#xa;WHERE land_management_unit.extcode = ANY(southern_view.land_management_unit_extcode) &#xa;AND southern_view.forest_man_plan_2014_2023_dbca_041_id IS NOT NULL&#xa;AND dbca_fire_history_dbca_060.object_id = southern_view.dbca_fire_history_dbca_060_object_id[1]&#xa;) AS _subq_1_&#xa;)&quot; (geom)" provider="postgres" layerid="yolb_e971fa67_000c_40c8_81b6_d01d6b46f524" name="yolb">
             <qgis version="3.30.3-'s-Hertogenbosch" styleCategories="AllStyleCategories" readOnly="0" minScale="100000000" simplifyMaxScale="1" symbologyReferenceScale="-1" simplifyDrawingHints="1" simplifyDrawingTol="1" hasScaleBasedVisibilityFlag="0" maxScale="0" simplifyAlgorithm="0" labelsEnabled="0" simplifyLocal="1">
               <flags>
                 <Identifiable>1</Identifiable>
@@ -4721,7 +4721,7 @@ AND dbca_fire_history_dbca_060.object_id = southern_view.dbca_fire_history_dbca_
           <Option type="bool" value="true" name="singleFile"/>
         </Option>
       </customproperties>
-      <Atlas filterFeatures="1" coverageLayerName="land_management_unit" filenamePattern="'output_'||@atlas_featurenumber" sortFeatures="0" featureFilter="description=@lmu" enabled="1" hideCoverage="0" coverageLayerSource="dbname='fire_202303' port=5433 user='qgis' sslmode=disable key='extcode' srid=4283 type=MultiPolygon checkPrimaryKeyUnicity='0' table=&quot;public&quot;.&quot;land_management_unit&quot; (full_geom)" pageNameExpression="&quot;description&quot;" coverageLayerProvider="postgres" coverageLayer="land_management_unit_e89b90ae_3194_4a5a_894a_593d3d89cc30"/>
+      <Atlas filterFeatures="1" coverageLayerName="land_management_unit" filenamePattern="'output_'||@atlas_featurenumber" sortFeatures="0" featureFilter="description=@lmu" enabled="1" hideCoverage="0" coverageLayerSource="dbname='fire' port=5432 user='qgis' sslmode=disable key='extcode' srid=4283 type=MultiPolygon checkPrimaryKeyUnicity='0' table=&quot;public&quot;.&quot;land_management_unit&quot; (full_geom)" pageNameExpression="&quot;description&quot;" coverageLayerProvider="postgres" coverageLayer="land_management_unit_e89b90ae_3194_4a5a_894a_593d3d89cc30"/>
     </Layout>
   </Layouts>
   <mapViewDocks3D/>
@@ -4793,7 +4793,7 @@ AND dbca_fire_history_dbca_060.object_id = southern_view.dbca_fire_history_dbca_
       </spatialrefsys>
     </CoordinateCustomCrs>
   </ProjectDisplaySettings>
-  <ProjectGpsSettings autoCommitFeatures="0" destinationLayerName="burns by year and cause" destinationLayer="yolb_6b127292_3ee0_41e8_a8a8_fa520bc6e13f" autoAddTrackVertices="0" destinationLayerProvider="postgres" destinationLayerSource="dbname='fire_202303' port=5433 user='qgis' sslmode=disable key='_uid_' checkPrimaryKeyUnicity='0' table=&quot;(SELECT row_number() over () AS _uid_,* FROM (&#xa;SELECT southern_view.geom, fireseason(fih_date1) AS year, fih_cause, fih_number &#xa;FROM southern_view, dbca_fire_history_dbca_060 &#xa;WHERE southern_view.forest_man_plan_2014_2023_dbca_041_id IS NOT NULL&#xa;AND dbca_fire_history_dbca_060.object_id = southern_view.dbca_fire_history_dbca_060.object_id[1]&#xa;) AS _subq_1_&#xa;)&quot; (geom) sql=&quot;year&quot;=2012" destinationFollowsActiveLayer="1">
+  <ProjectGpsSettings autoCommitFeatures="0" destinationLayerName="burns by year and cause" destinationLayer="yolb_6b127292_3ee0_41e8_a8a8_fa520bc6e13f" autoAddTrackVertices="0" destinationLayerProvider="postgres" destinationLayerSource="dbname='fire' port=5432 user='qgis' sslmode=disable key='_uid_' checkPrimaryKeyUnicity='0' table=&quot;(SELECT row_number() over () AS _uid_,* FROM (&#xa;SELECT southern_view.geom, fireseason(fih_date1) AS year, fih_cause, fih_number &#xa;FROM southern_view, dbca_fire_history_dbca_060 &#xa;WHERE southern_view.forest_man_plan_2014_2023_dbca_041_id IS NOT NULL&#xa;AND dbca_fire_history_dbca_060.object_id = southern_view.dbca_fire_history_dbca_060_object_id[1]&#xa;) AS _subq_1_&#xa;)&quot; (geom) sql=&quot;year&quot;=2012" destinationFollowsActiveLayer="1">
     <timeStampFields/>
   </ProjectGpsSettings>
 </qgis>
