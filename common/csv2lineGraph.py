@@ -33,8 +33,8 @@ def csv2lineGraph(arglist=None):
     parser.add_argument('-v', '--verbosity',  type=int, default=1, private=True)
     
     parser.add_argument('-l', '--limit',      type=int, help='Limit number of rows to process')
-    parser.add_argument(      '--since',      type=str, help='X axis lower bound')
-    parser.add_argument(      '--until',      type=str, help='X axis upper bound')
+    parser.add_argument(      '--since',      type=float, help='X axis lower bound')
+    parser.add_argument(      '--until',      type=float, help='X axis upper bound')
     parser.add_argument(      '--cumulative',  action='store_true', help='Cumulate Y data')
     
     parser.add_argument('-W', '--width',      type=int, default=400, help='Plot width in millimetres')
@@ -61,8 +61,8 @@ def csv2lineGraph(arglist=None):
     else:
         csvfile = more_itertools.peekable(sys.stdin)
 
-    until = int(args.until) if args.until else None
-    since = int(args.since) if args.since else None
+    until = float(args.until) if args.until else None
+    since = float(args.since) if args.since else None
 
     # Read comments at start of csvfile.
     incomments = ArgumentHelper.read_comments(csvfile) or ArgumentHelper.separator()
@@ -143,23 +143,25 @@ def csv2lineGraph(arglist=None):
                 )
         Ylineidx += 1
         
-    ax.set_xlabel(csvfieldnames[0], **labelfont)
+    if len(csvfieldnames) >= 1:
+        ax.set_xlabel(csvfieldnames[0], **labelfont)
     if args.subtitle:
         ax.set_title(args.subtitle, **subtitlefont)
     if args.ylabel:
         ax.set_ylabel(args.ylabel, **labelfont)
     if args.xlabel:
         ax.set_xlabel(args.xlabel, **labelfont)
-    else:
+    elif len(csvfieldnames) >= 1:
         ax.set_ylabel(csvfieldnames[1], **labelfont)
     ax.xaxis.set_major_locator(ticker.AutoLocator())
     # I just want a tick at each interval value. 9999 is just a big number.
     ax.xaxis.set_minor_locator(ticker.MaxNLocator(9999,integer=True))
-    ax.set_xlim([int(args.since) if args.since else None,
-                 int(args.until) if args.until else None])
+    # ax.set_xlim([float(args.since) if args.since else None,
+    #              float(args.until) if args.until else None])
+    ax.set_xlim([since, until])
     ax.set_ylim([args.ymin,args.ymax])
         
-    pyplot.grid(axis='y', color='black')
+    # pyplot.grid(axis='y', color='black')
     if Ylines > 1:
         
         # Place legend outside plot: https://stackoverflow.com/questions/4700614/how-to-put-the-legend-outside-the-plot

@@ -30,8 +30,8 @@
 # exportBurnAtlas.py
 #    --nologfile
 #    --burnid "${burnid}"
-#    --layout "Cover sheet 1"
-#             "Cover sheet 2"
+#    --layout "Burn overview page 1"
+#             "Burn overview page 2"
 #    --pdffile "/home/jschultz/data/Fire/burn_overview/${burnid}_1.pdf"
 #              "/home/jschultz/data/Fire/burn_overview/${burnid}_2.pdf"
 #    --nologfile

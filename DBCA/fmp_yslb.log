@@ -56,8 +56,8 @@ FROM ${basename}_poly AS poly,
      (SELECT view.poly_id, fih_date1, fih_cause
       FROM ${basename}_view AS view,
       LATERAL (SELECT fih_date1, fih_cause 
-               FROM (SELECT unnest(view.dbca_fire_history_dbca_060_id) AS event_id) AS event_ids
-               JOIN dbca_fire_history_dbca_060 ON dbca_fire_history_dbca_060.id = event_id
+               FROM (SELECT unnest(view.dbca_fire_history_dbca_060.object_id) AS event_id) AS event_ids
+               JOIN dbca_fire_history_dbca_060 ON dbca_fire_history_dbca_060.object_id = event_id
                WHERE fireseason(fih_date1) <= ${baseyear}
                LIMIT 1) AS event
       WHERE view.forest_man_plan_2014_2023_dbca_041_id IS NOT NULL) AS polyevent

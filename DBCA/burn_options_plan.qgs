@@ -68,7 +68,7 @@
         </Option>
       </customproperties>
     </layer-tree-layer>
-    <layer-tree-layer expanded="1" id="yolb_0e53bfe7_0b0a_4081_bf18_1342db7cd73c" name="yslb" checked="Qt::Unchecked" legend_split_behavior="0" providerKey="postgres" patch_size="-1,-1" source="dbname='fire' user='qgis' sslmode=disable key='_uid_' checkPrimaryKeyUnicity='1' table=&quot;(SELECT row_number() over () AS _uid_,* FROM (select fireseason(fih_date1), southern_view.geom from southern_view, dbca_fire_history_dbca_060  where dbca_fire_history_dbca_060.object_id=southern_view.dbca_fire_history_dbca_060_id[1]&#xa;) AS _subq_1_&#xa;)&quot; (geom)" legend_exp="">
+    <layer-tree-layer expanded="1" id="yolb_0e53bfe7_0b0a_4081_bf18_1342db7cd73c" name="yslb" checked="Qt::Unchecked" legend_split_behavior="0" providerKey="postgres" patch_size="-1,-1" source="dbname='fire' user='qgis' sslmode=disable key='_uid_' checkPrimaryKeyUnicity='1' table=&quot;(SELECT row_number() over () AS _uid_,* FROM (select fireseason(fih_date1), southern_view.geom from southern_view, dbca_fire_history_dbca_060  where dbca_fire_history_dbca_060.object_id=southern_view.dbca_fire_history_dbca_060.object_id[1]&#xa;) AS _subq_1_&#xa;)&quot; (geom)" legend_exp="">
       <customproperties>
         <Option type="Map">
           <Option name="cached_name" value="yslb" type="QString"/>
@@ -6791,7 +6791,7 @@ def my_form_open(dialog, layer, feature):
         <ymax>-30.97749054000000157</ymax>
       </wgs84extent>
       <id>yolb_0e53bfe7_0b0a_4081_bf18_1342db7cd73c</id>
-      <datasource>dbname='fire' user='qgis' sslmode=disable key='_uid_' checkPrimaryKeyUnicity='1' table="(SELECT row_number() over () AS _uid_,* FROM (select fireseason(fih_date1), southern_view.geom from southern_view, dbca_fire_history_dbca_060  where dbca_fire_history_dbca_060.object_id=southern_view.dbca_fire_history_dbca_060_id[1]
+      <datasource>dbname='fire' user='qgis' sslmode=disable key='_uid_' checkPrimaryKeyUnicity='1' table="(SELECT row_number() over () AS _uid_,* FROM (select fireseason(fih_date1), southern_view.geom from southern_view, dbca_fire_history_dbca_060  where dbca_fire_history_dbca_060.object_id=southern_view.dbca_fire_history_dbca_060.object_id[1]
 ) AS _subq_1_
 )" (geom)</datasource>
       <keywordList>
@@ -12842,7 +12842,7 @@ def my_form_open(dialog, layer, feature):
           <customproperties>
             <Option/>
           </customproperties>
-          <layer-tree-layer expanded="1" id="yolb_0e53bfe7_0b0a_4081_bf18_1342db7cd73c" name="yslb" checked="Qt::Checked" legend_split_behavior="0" providerKey="postgres" patch_size="-1,-1" source="dbname='fire' user='qgis' sslmode=disable key='_uid_' checkPrimaryKeyUnicity='1' table=&quot;(SELECT row_number() over () AS _uid_,* FROM (select fireseason(fih_date1), southern_view.geom from southern_view, dbca_fire_history_dbca_060  where dbca_fire_history_dbca_060.object_id=southern_view.dbca_fire_history_dbca_060_id[1]&#xa;) AS _subq_1_&#xa;)&quot; (geom)" legend_exp="">
+          <layer-tree-layer expanded="1" id="yolb_0e53bfe7_0b0a_4081_bf18_1342db7cd73c" name="yslb" checked="Qt::Checked" legend_split_behavior="0" providerKey="postgres" patch_size="-1,-1" source="dbname='fire' user='qgis' sslmode=disable key='_uid_' checkPrimaryKeyUnicity='1' table=&quot;(SELECT row_number() over () AS _uid_,* FROM (select fireseason(fih_date1), southern_view.geom from southern_view, dbca_fire_history_dbca_060  where dbca_fire_history_dbca_060.object_id=southern_view.dbca_fire_history_dbca_060.object_id[1]&#xa;) AS _subq_1_&#xa;)&quot; (geom)" legend_exp="">
             <customproperties>
               <Option type="Map">
                 <Option name="cached_name" value="Years Since Last Burnt" type="QString"/>
@@ -12871,7 +12871,7 @@ def my_form_open(dialog, layer, feature):
         <Extent xmin="116.28466318130007551" ymin="-35.44035743309120789" ymax="-34.08508284190872928" xmax="117.72773093270005518"/>
         <LayerSet>
           <Layer name="dbca_burn_options_program_dbca_007" provider="postgres" source="dbname='fire' user='qgis' sslmode=disable key='object_id' srid=4283 type=MultiPolygon checkPrimaryKeyUnicity='1' table=&quot;public&quot;.&quot;dbca_burn_options_program_dbca_007&quot; (geom)">dbca_burn_options_program_dbca_007_81582f5d_10cb_4bf4_bcf7_dc039a47104d</Layer>
-          <Layer name="yslb" provider="postgres" source="dbname='fire' user='qgis' sslmode=disable key='_uid_' checkPrimaryKeyUnicity='1' table=&quot;(SELECT row_number() over () AS _uid_,* FROM (select fireseason(fih_date1), southern_view.geom from southern_view, dbca_fire_history_dbca_060  where dbca_fire_history_dbca_060.object_id=southern_view.dbca_fire_history_dbca_060_id[1]&#xa;) AS _subq_1_&#xa;)&quot; (geom)">yolb_0e53bfe7_0b0a_4081_bf18_1342db7cd73c</Layer>
+          <Layer name="yslb" provider="postgres" source="dbname='fire' user='qgis' sslmode=disable key='_uid_' checkPrimaryKeyUnicity='1' table=&quot;(SELECT row_number() over () AS _uid_,* FROM (select fireseason(fih_date1), southern_view.geom from southern_view, dbca_fire_history_dbca_060  where dbca_fire_history_dbca_060.object_id=southern_view.dbca_fire_history_dbca_060.object_id[1]&#xa;) AS _subq_1_&#xa;)&quot; (geom)">yolb_0e53bfe7_0b0a_4081_bf18_1342db7cd73c</Layer>
           <Layer name="Mapbox satellite" provider="wms" source="crs=EPSG:3857&amp;dpiMode=7&amp;format=image/png&amp;layers=mapbox-satellite&amp;styles&amp;tilePixelRatio=0&amp;url=https://kmi.dpaw.wa.gov.au/geoserver/public/wms?version%3D1.1.0%26layers%3Dpublic:todays_burns%26styles%3D%26bbox%3D108.0,-45.0,155.0,-10.0%26width%3D768%26height%3D571%26srs%3DEPSG:4283">_bf565d27_fd9c_4735_9a1f_4ca3a0e5323b</Layer>
         </LayerSet>
         <LayerStyles>
@@ -13657,7 +13657,7 @@ def my_form_open(dialog, layer, feature):
               <layerGeometryType>2</layerGeometryType>
             </qgis>
           </LayerStyle>
-          <LayerStyle name="yslb" layerid="yolb_0e53bfe7_0b0a_4081_bf18_1342db7cd73c" provider="postgres" source="dbname='fire' user='qgis' sslmode=disable key='_uid_' checkPrimaryKeyUnicity='1' table=&quot;(SELECT row_number() over () AS _uid_,* FROM (select fireseason(fih_date1), southern_view.geom from southern_view, dbca_fire_history_dbca_060  where dbca_fire_history_dbca_060.object_id=southern_view.dbca_fire_history_dbca_060_id[1]&#xa;) AS _subq_1_&#xa;)&quot; (geom)">
+          <LayerStyle name="yslb" layerid="yolb_0e53bfe7_0b0a_4081_bf18_1342db7cd73c" provider="postgres" source="dbname='fire' user='qgis' sslmode=disable key='_uid_' checkPrimaryKeyUnicity='1' table=&quot;(SELECT row_number() over () AS _uid_,* FROM (select fireseason(fih_date1), southern_view.geom from southern_view, dbca_fire_history_dbca_060  where dbca_fire_history_dbca_060.object_id=southern_view.dbca_fire_history_dbca_060.object_id[1]&#xa;) AS _subq_1_&#xa;)&quot; (geom)">
             <qgis hasScaleBasedVisibilityFlag="0" simplifyDrawingTol="1" simplifyLocal="1" simplifyAlgorithm="0" maxScale="0" minScale="100000000" labelsEnabled="0" version="3.32.3-Lima" readOnly="0" simplifyMaxScale="1" symbologyReferenceScale="-1" styleCategories="AllStyleCategories" simplifyDrawingHints="1">
               <flags>
                 <Identifiable>1</Identifiable>

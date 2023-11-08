@@ -32,7 +32,7 @@
         <Option/>
       </customproperties>
     </layer-tree-layer>
-    <layer-tree-layer expanded="0" legend_split_behavior="0" providerKey="postgres" name="dbca_fire_history_dbca_060_southern_yolb" checked="Qt::Unchecked" source="dbname='fire' port=5432 user='qgis' sslmode=disable key='_uid_' checkPrimaryKeyUnicity='0' table=&quot;(SELECT row_number() over () AS _uid_,* FROM (SELECT dbca_fire_history_dbca_060_southern_history.geom, fireseason(fih_date1) AS year    FROM dbca_fire_history_dbca_060_southern_history, dbca_fire_history_dbca_060   WHERE dbca_fire_history_dbca_060_southern_history.id[1] = dbca_fire_history_dbca_060.id&#xa;) AS _subq_1_&#xa;)&quot; (geom)" id="dbca_fire_history_dbca_060_southern_yolb_e6389e42_b26c_47ae_99dc_f33e2b7ccbca" patch_size="-1,-1" legend_exp="">
+    <layer-tree-layer expanded="0" legend_split_behavior="0" providerKey="postgres" name="dbca_fire_history_dbca_060_southern_yolb" checked="Qt::Unchecked" source="dbname='fire' port=5432 user='qgis' sslmode=disable key='_uid_' checkPrimaryKeyUnicity='0' table=&quot;(SELECT row_number() over () AS _uid_,* FROM (SELECT dbca_fire_history_dbca_060_southern_history.geom, fireseason(fih_date1) AS year    FROM dbca_fire_history_dbca_060_southern_history, dbca_fire_history_dbca_060   WHERE dbca_fire_history_dbca_060_southern_history.id[1] = dbca_fire_history_dbca_060.object_id&#xa;) AS _subq_1_&#xa;)&quot; (geom)" id="dbca_fire_history_dbca_060_southern_yolb_e6389e42_b26c_47ae_99dc_f33e2b7ccbca" patch_size="-1,-1" legend_exp="">
       <customproperties>
         <Option/>
       </customproperties>
@@ -728,7 +728,7 @@
         <ymax>-30.89354650676625624</ymax>
       </wgs84extent>
       <id>dbca_fire_history_dbca_060_southern_yolb_e6389e42_b26c_47ae_99dc_f33e2b7ccbca</id>
-      <datasource>dbname='fire' port=5432 user='qgis' sslmode=disable key='_uid_' checkPrimaryKeyUnicity='0' table="(SELECT row_number() over () AS _uid_,* FROM (SELECT dbca_fire_history_dbca_060_southern_history.geom, fireseason(fih_date1) AS year    FROM dbca_fire_history_dbca_060_southern_history, dbca_fire_history_dbca_060   WHERE dbca_fire_history_dbca_060_southern_history.id[1] = dbca_fire_history_dbca_060.id
+      <datasource>dbname='fire' port=5432 user='qgis' sslmode=disable key='_uid_' checkPrimaryKeyUnicity='0' table="(SELECT row_number() over () AS _uid_,* FROM (SELECT dbca_fire_history_dbca_060_southern_history.geom, fireseason(fih_date1) AS year    FROM dbca_fire_history_dbca_060_southern_history, dbca_fire_history_dbca_060   WHERE dbca_fire_history_dbca_060_southern_history.id[1] = dbca_fire_history_dbca_060.object_id
 ) AS _subq_1_
 )" (geom)</datasource>
       <keywordList>
@@ -5990,7 +5990,7 @@ def my_form_open(dialog, layer, feature):
           <customproperties>
             <Option/>
           </customproperties>
-          <layer-tree-layer expanded="1" legend_split_behavior="0" providerKey="postgres" name="dbca_fire_history_dbca_060_southern_yolb" checked="Qt::Checked" source="dbname='fire' port=5432 user='qgis' sslmode=disable key='_uid_' checkPrimaryKeyUnicity='0' table=&quot;(SELECT row_number() over () AS _uid_,* FROM (SELECT dbca_fire_history_dbca_060_southern_history.geom, fireseason(fih_date1) AS year    FROM dbca_fire_history_dbca_060_southern_history, dbca_fire_history_dbca_060   WHERE dbca_fire_history_dbca_060_southern_history.id[1] = dbca_fire_history_dbca_060.id&#xa;) AS _subq_1_&#xa;)&quot; (geom)" id="dbca_fire_history_dbca_060_southern_yolb_e6389e42_b26c_47ae_99dc_f33e2b7ccbca" patch_size="-1,-1" legend_exp="">
+          <layer-tree-layer expanded="1" legend_split_behavior="0" providerKey="postgres" name="dbca_fire_history_dbca_060_southern_yolb" checked="Qt::Checked" source="dbname='fire' port=5432 user='qgis' sslmode=disable key='_uid_' checkPrimaryKeyUnicity='0' table=&quot;(SELECT row_number() over () AS _uid_,* FROM (SELECT dbca_fire_history_dbca_060_southern_history.geom, fireseason(fih_date1) AS year    FROM dbca_fire_history_dbca_060_southern_history, dbca_fire_history_dbca_060   WHERE dbca_fire_history_dbca_060_southern_history.id[1] = dbca_fire_history_dbca_060.object_id&#xa;) AS _subq_1_&#xa;)&quot; (geom)" id="dbca_fire_history_dbca_060_southern_yolb_e6389e42_b26c_47ae_99dc_f33e2b7ccbca" patch_size="-1,-1" legend_exp="">
             <customproperties>
               <Option type="Map">
                 <Option value=" " name="legend/label-14" type="QString"/>
@@ -6098,7 +6098,7 @@ def my_form_open(dialog, layer, feature):
         <Extent ymax="-34.9522735493229959" xmin="116.71506079750005824" xmax="116.83435767850008347" ymin="-35.06462881367693285"/>
         <LayerSet>
           <Layer provider="postgres" name="annual_ind_burn_prog_dbca_007" source="dbname='fire' port=5432 user='qgis' sslmode=disable key='id' srid=4283 type=MultiSurface checkPrimaryKeyUnicity='0' table=&quot;public&quot;.&quot;annual_ind_burn_prog_dbca_007&quot; (geom)">annual_ind_burn_prog_dbca_007_1bbaf9ae_280e_4775_a3ca_30948e4f6edd</Layer>
-          <Layer provider="postgres" name="dbca_fire_history_dbca_060_southern_yolb" source="dbname='fire' port=5432 user='qgis' sslmode=disable key='_uid_' checkPrimaryKeyUnicity='0' table=&quot;(SELECT row_number() over () AS _uid_,* FROM (SELECT dbca_fire_history_dbca_060_southern_history.geom, fireseason(fih_date1) AS year    FROM dbca_fire_history_dbca_060_southern_history, dbca_fire_history_dbca_060   WHERE dbca_fire_history_dbca_060_southern_history.id[1] = dbca_fire_history_dbca_060.id&#xa;) AS _subq_1_&#xa;)&quot; (geom)">dbca_fire_history_dbca_060_southern_yolb_e6389e42_b26c_47ae_99dc_f33e2b7ccbca</Layer>
+          <Layer provider="postgres" name="dbca_fire_history_dbca_060_southern_yolb" source="dbname='fire' port=5432 user='qgis' sslmode=disable key='_uid_' checkPrimaryKeyUnicity='0' table=&quot;(SELECT row_number() over () AS _uid_,* FROM (SELECT dbca_fire_history_dbca_060_southern_history.geom, fireseason(fih_date1) AS year    FROM dbca_fire_history_dbca_060_southern_history, dbca_fire_history_dbca_060   WHERE dbca_fire_history_dbca_060_southern_history.id[1] = dbca_fire_history_dbca_060.object_id&#xa;) AS _subq_1_&#xa;)&quot; (geom)">dbca_fire_history_dbca_060_southern_yolb_e6389e42_b26c_47ae_99dc_f33e2b7ccbca</Layer>
           <Layer provider="wms" name="Custom" source="crs=EPSG:3857&amp;dpiMode=7&amp;format=image/png&amp;layers=cl03rc0di002b14n8pag7n8p5&amp;styles=default&amp;tileMatrixSet=GoogleMapsCompatible&amp;url=https://api.mapbox.com/styles/v1/jschultz/cl03rc0di002b14n8pag7n8p5/wmts?access_token%3Dpk.eyJ1IjoianNjaHVsdHoiLCJhIjoiY2wwM3JtbnJmMWdxODNldDgzanU3ZmVpdCJ9.PWbiFDAIHNucVfMjR2nCHg">Custom_89241b04_0609_4fdf_a19f_0d3fc2f0f874</Layer>
         </LayerSet>
         <AtlasMap margin="0.5" atlasDriven="1" scalingMode="2"/>

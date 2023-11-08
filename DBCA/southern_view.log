@@ -9,7 +9,7 @@
 #    --polycolumns "geom;id"
 #    --polyaliases ";poly_id"
 #    --eventcolumns "dbca_fire_history_dbca_060.object_id;legislated_lands_and_waters_dbca_011.id;forest_blocks_dbca_025.id;native_veg_extent_dpird_005.id;land_management_unit.extcode;forest_ecosystem.extcode;forest_man_plan_2014_2023_dbca_041.id"
-#    --eventaliases "dbca_fire_history_dbca_060_id;legislated_lands_and_waters_dbca_011_id;forest_blocks_dbca_025_id;native_veg_extent_dpird_005_id;land_management_unit_extcode;forest_ecosystem_extcode;forest_man_plan_2014_2023_dbca_041_id"
+#    --eventaliases "dbca_fire_history_dbca_060_object_id;legislated_lands_and_waters_dbca_011_id;forest_blocks_dbca_025_id;native_veg_extent_dpird_005_id;land_management_unit_extcode;forest_ecosystem_extcode;forest_man_plan_2014_2023_dbca_041_id"
 #    --indexes geom;poly_id
 #    --using gist
 ################################################################################
