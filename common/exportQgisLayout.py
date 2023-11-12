@@ -34,9 +34,10 @@ def exportQgisLayout(arglist=None):
                               fromfile_prefix_chars='@')
 
     parser.add_argument('-l', '--layout', type=str, default="Layout 1", help="Print layout to export")
-    parser.add_argument('-o', '--outpath', type=str, help="Name of PDF file or d to export, default to 'layout'.pdf")
+    parser.add_argument('-o', '--outpath', type=str, help="Name of PDF file or directory to export to, default is 'layout'.pdf")
 
     parser.add_argument('-s', '--single',  action='store_true', help='Output atlas as a single file')
+    parser.add_argument('-t', '--theme',   type=str, help='Map theme to apply')
 
     parser.add_argument('-v', '--variable', nargs='+', type=str, help='List of variable:value pairs to define as project variables')
     
@@ -75,6 +76,13 @@ def exportQgisLayout(arglist=None):
     
     manager = QgsProject.instance().layoutManager()
     layout = manager.layoutByName(args.layout)
+
+    if args.theme is not None:
+        for item in layout.items():
+            if type(item).__name__ == 'QgsLayoutItemMap':
+                item.setFollowVisibilityPreset(True)
+                item.setFollowVisibilityPresetName(args.theme)
+
     settings = QgsLayoutExporter.PdfExportSettings()
 
     if args.single:
