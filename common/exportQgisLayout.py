@@ -38,6 +38,7 @@ def exportQgisLayout(arglist=None):
 
     parser.add_argument('-s', '--single',  action='store_true', help='Output atlas as a single file')
     parser.add_argument('-t', '--theme',   type=str, help='Map theme to apply')
+    parser.add_argument('-r', '--raster',  action='store_true', help='Export all layers as raster')
 
     parser.add_argument('-v', '--variable', nargs='+', type=str, help='List of variable:value pairs to define as project variables')
     
@@ -77,11 +78,16 @@ def exportQgisLayout(arglist=None):
     manager = QgsProject.instance().layoutManager()
     layout = manager.layoutByName(args.layout)
 
-    if args.theme is not None:
-        for item in layout.items():
-            if type(item).__name__ == 'QgsLayoutItemMap':
+    for item in layout.items():
+        if type(item).__name__ == 'QgsLayoutItemMap':
+            if args.theme is not None:
                 item.setFollowVisibilityPreset(True)
                 item.setFollowVisibilityPresetName(args.theme)
+            
+            if args.raster:
+                for layer in item.layersToRender():
+                    if type(layer).__name__ == 'QgsVectorLayer':
+                        layer.renderer().setForceRasterRender(True)
 
     settings = QgsLayoutExporter.PdfExportSettings()
 
