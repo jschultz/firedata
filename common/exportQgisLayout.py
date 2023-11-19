@@ -18,25 +18,25 @@
 
 from argrecord import ArgumentHelper, ArgumentRecorder
 from qgis.core import *
-from qgis.gui import QgsMapCanvas, QgsLayerTreeMapCanvasBridge
-from qgis.PyQt import QtGui
-from PyQt5.QtGui import QColor, QFont
-from PyQt5.QtCore import QDate, QTime, QDateTime
-from dateutil import parser as dateparser
-import subprocess
-import sys
-import csv
+# from qgis.gui import QgsMapCanvas, QgsLayerTreeMapCanvasBridge
+# from qgis.PyQt import QtGui
+# from PyQt5.QtGui import QColor, QFont
+# from PyQt5.QtCore import QDate, QTime, QDateTime
+# from dateutil import parser as dateparser
+# import subprocess
+# import sys
+# import csv
 import os
 
 def exportQgisLayout(arglist=None):
 
-    parser = ArgumentRecorder(description='Exports a layout from a QGIS file.',
+    parser = ArgumentRecorder(description='Exports a layout as PDF, SVG or image file from a QGIS project.',
                               fromfile_prefix_chars='@')
 
     parser.add_argument('-l', '--layout', type=str, default="Layout 1", help="Print layout to export")
-    parser.add_argument('-o', '--outpath', type=str, help="Name of PDF file or directory to export to, default is 'layout'.pdf")
+    parser.add_argument('-o', '--outpath', type=str, help="Name of output file or directory to export to, default is 'layout'.pdf")
 
-    parser.add_argument('-s', '--single',  action='store_true', help='Output atlas as a single file')
+    parser.add_argument('-S', '--single',  action='store_true', help='Output atlas as a single file')
     parser.add_argument('-t', '--theme',   type=str, help='Map theme to apply')
     parser.add_argument('-r', '--raster',  action='store_true', help='Export all layers as raster')
 
@@ -89,23 +89,39 @@ def exportQgisLayout(arglist=None):
                     if type(layer).__name__ == 'QgsVectorLayer':
                         layer.renderer().setForceRasterRender(True)
 
-    settings = QgsLayoutExporter.PdfExportSettings()
+    outext = os.path.splitext(args.outpath)[1].casefold()[1:]
+    if outext == 'pdf':
+        pdfsettings = QgsLayoutExporter.PdfExportSettings()
+    elif outext == 'svg':
+        svgsettings = QgsLayoutExporter.SvgExportSettings()
+    else:
+        imagesettings = QgsLayoutExporter.ImageExportSettings()
 
     if args.single:
         if args.outpath and os.path.exists(args.outpath) and not args.nobackup:
             os.rename(args.outpath, args.outpath + '.bak')
 
         exporter = QgsLayoutExporter(layout)
-        exporter.exportToPdf(layout.atlas(), args.outpath, settings)
+        if outext == 'pdf':
+            exporter.exportToPdf(layout.atlas(), args.outpath, pdfsettings)
+        elif outext == 'svg':
+            exporter.exportToSvg(layout.atlas(), args.outpath, svgsettings)
+        else:
+            exporter.exportToImage(layout.atlas(), args.outpath, outext, imagesettings)
     else:
         atlas =layout.atlas()
         atlas.beginRender()
         while atlas.next():
             exporter = QgsLayoutExporter(atlas.layout())
-            atlasitempath = os.path.join(args.outpath, atlas.currentFilename() + '.pdf')
-            if os.path.exists(atlasitempath) and not args.nobackup:
-                os.rename(atlasitempath, atlasitempath + '.bak')
-            exporter.exportToPdf(atlasitempath, settings)
+            outpath = os.path.join(args.outpath, atlas.currentFilename() + outext)
+            if os.path.exists(outpath) and not args.nobackup:
+                os.rename(outpath, outpath + '.bak')
+            if outext == 'pdf':
+                exporter.exportToPdf(outpath, pdfsettings)
+            elif outext == 'svg':
+                outpath = os.path.join(args.outpath, atlas.currentFilename() + '.svg')
+            else:
+                exporter.exportToSvg(outpath, imagesettings)
             
         atlas.endRender
         
