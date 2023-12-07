@@ -162,7 +162,7 @@ else
 
     psql --variable=ON_ERROR_STOP=1 \
         --command="${backupcommand}" \
-        --command="CREATE TABLE ${outtable} (id SERIAL PRIMARY KEY, geom geometry(Polygon))" \
+        --command="CREATE TABLE ${outtable} (id SERIAL PRIMARY KEY, geom geometry(Polygon,${SRID}))" \
         --command "CREATE INDEX ON ${outtable} USING gist (geom)"
         
     dumpcommand="SELECT ST_ExteriorRing((ST_DumpRings(geom)).geom) FROM (

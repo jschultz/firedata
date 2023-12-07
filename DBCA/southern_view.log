@@ -5,7 +5,6 @@
 #    --eventtable "dbca_fire_history_dbca_060;legislated_lands_and_waters_dbca_011;forest_blocks_dbca_025;native_veg_extent_dpird_005;land_management_unit;forest_ecosystem;forest_man_plan_2014_2023_dbca_041"
 #    --eventid object_id;;;object_id;extcode;extcode;
 #    --eventorder "fih_date1 DESC"
-#    --geometry ";;;;full_geom"
 #    --polycolumns "geom;id"
 #    --polyaliases ";poly_id"
 #    --eventcolumns "dbca_fire_history_dbca_060.object_id;legislated_lands_and_waters_dbca_011.id;forest_blocks_dbca_025.id;native_veg_extent_dpird_005.id;land_management_unit.extcode;forest_ecosystem.extcode;forest_man_plan_2014_2023_dbca_041.id"

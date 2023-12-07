@@ -17,14 +17,13 @@
 #
 set -e
 
-help='Produces a table or shapefile containing polygon ID and geometry and a selection of event columns. Requires event, polygon and junction tables. The last two can be generated from an event table by overlay_junction.sh'
+help='Produces a table or shapefile containing polygon columns and a selection of event columns. Requires event, polygon and junction tables. The last two can be generated from an event table by overlay_junction.sh'
 args=(
 # "-short:--long:variable:default:description:flags"
   ":--debug:::Debug execution:flag"
   "-e:--eventtable:::Semicolon-delimited name(s) of database table(s) containing event data":required
   ":--eventid:::Semicolon-delimited Id column(s) in event table(s). Default is 'id'"
   ":--eventorder:::Semicolon-separated list of sort order for event table(s); empty value means use 'eventid'"
-  "-g:--geometry::geom:Semicolon-delimited name(s) of geometry column(s) in event tables"
   "-b:--basename:::Table name base for output dump, polygon, point-in-polygon and junction output tables. Default is first event table name"
   "-j:--junction:::Semicolon-delimited junction table names. Default is 'eventtable'_junction"
   "-S:--suffix:::Suffix to append to first event table name to generate dump, polygon, point-in-polygon and junction table names:deprecated"
@@ -53,7 +52,6 @@ fi
 IFS=';' read -r -a eventtable_array <<< "${eventtable}"
 IFS=';' read -r -a eventid_array    <<< "${eventid}"
 IFS=';' read -r -a eventorder_array <<< "${eventorder}"
-IFS=';' read -r -a geometry_array   <<< "${geometry}"
 IFS=';' read -r -a junction_array   <<< "${junction}"
 IFS=';' read -r -a polycolumn_array <<< "${polycolumns}"
 IFS=';' read -r -a polyalias_array  <<< "${polyaliases}"
@@ -106,9 +104,6 @@ for ((tableidx=0; tableidx<${#eventtable_array[@]}; tableidx++)) do
     if [[ ! -n "${eventorder_array[tableidx]}" ]]; then
         eventorder_array[tableidx]="${eventtable_array[tableidx]}.${eventid_array[tableidx]}"
     fi
-    if [[ ! -n "${geometry_array[tableidx]}" ]]; then
-        geometry_array[tableidx]="geom"
-    fi
     if [[ ! -n "${junction_array[tableidx]}" ]]; then
         junction_array[tableidx]="${basename}_${eventtable_array[tableidx]}_junction"
     fi
@@ -122,6 +117,10 @@ for ((colidx=0; colidx<${#eventcolumn_array[@]}; colidx++)) do
     if [[ ! -n "${eventalias_array[colidx]}" ]]; then
         eventalias_array[colidx]="${eventcolumn_array[colidx]#*.}"
     fi
+    eventtype_array[colidx]=$(                                                   \
+        psql --quiet --tuples-only --no-align --command="\timing off"            \
+              --command="SELECT pg_typeof(${eventcolumn_array[colidx]}) FROM ${eventtable_array[colidx]} LIMIT 1" \
+    )
 done
 
 VIEW_QUERY="SELECT"
@@ -131,7 +130,7 @@ for ((colidx=0; colidx<${#polyalias_array[@]}; colidx++)) do
     separator=","
 done
 for ((colidx=0; colidx<${#eventalias_array[@]}; colidx++)) do
-    VIEW_QUERY+="${separator} ${eventcolumn_array[colidx]} AS ${eventalias_array[colidx]}"
+    VIEW_QUERY+="${separator} coalesce(${eventcolumn_array[colidx]}, '{}'::${eventtype_array[colidx]}[]) AS ${eventalias_array[colidx]}"
     separator=","
 done
 VIEW_QUERY+=" FROM ${polytable}"
