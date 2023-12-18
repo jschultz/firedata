@@ -28,13 +28,14 @@ def audioSplit(arglist=None):
     parser = ArgumentRecorder(description='Split an audio file into non-silect sections',
                               fromfile_prefix_chars='@')
 
-    parser.add_argument('-v', '--verbosity',  type=int, default=1, private=True)
+    parser.add_argument('-v', '--verbosity', type=int, default=1, private=True)
     
-    parser.add_argument('--logfile',      type=str, help="Logfile", private=True)
-    parser.add_argument('--nologfile',    action='store_true', help='Do not output a logfile')
-    parser.add_argument('--nobackup',     action='store_true', help='Do not back up existing output file')
+    parser.add_argument('--logfile',   type=str, help="Logfile", private=True)
+    parser.add_argument('--nologfile', action='store_true', help='Do not output a logfile')
 
-    parser.add_argument('infile',             type=str, help="Name of audio file to export", input=True)
+    parser.add_argument('--outdir',    type=str, help="Directory to output files (must exist)")
+
+    parser.add_argument('infile',      type=str, help="Name of audio file to export", input=True)
 
     args = parser.parse_args(arglist)
 
@@ -48,14 +49,18 @@ def audioSplit(arglist=None):
         parser.write_comments(args, logfile, incomments=ArgumentHelper.separator())
         logfile.close()
 
-    INFILE_REGEX = re.compile(R"(?P<prefix>.*)(?P<year>[0-9]{4})(?P<month>[0-9]{2})(?P<day>[0-9]{2})\-(?P<hour>[0-9]{2})(?P<minute>[0-9]{2})(?P<second>[0-9]{2}).*")
+    INFILE_REGEX = re.compile(R"(?P<prefix>.*)(?P<year>[0-9]{4})(?P<month>[0-9]{2})(?P<day>[0-9]{2})\-(?P<hour>[0-9]{2})(?P<minute>[0-9]{2})(?P<second>[0-9]{2})(\-(?P<volume>[0-9]{2}))?.*")
     
     infile_match = INFILE_REGEX.match(args.infile)
     if infile_match:
-        baseprefix = infile_match.group('prefix')
-        basedatetime = datetime(int(infile_match.group('year')), int(infile_match.group('month')), int(infile_match.group('day')), int(infile_match.group('hour')), int(infile_match.group('minute')), int(infile_match.group('second')))
+        prefix = infile_match.group('prefix')
+        if args.outdir:
+            prefix = os.path.join(args.outdir, os.path.basename(prefix))
         
-        print("basedatetime", basedatetime)
+        basedatetime = datetime(int(infile_match.group('year')), int(infile_match.group('month')), int(infile_match.group('day')), int(infile_match.group('hour')), int(infile_match.group('minute')), int(infile_match.group('second')))
+        if infile_match.group('volume'):
+            volume = int(infile_match.group('volume'))
+            basedatetime = basedatetime + (volume - 1) * timedelta(hours=18, minutes=38, seconds=28, milliseconds=860)
         
     command = [ FFMPEG_BIN, '-nostats',
                 '-i', args.infile,
@@ -77,17 +82,19 @@ def audioSplit(arglist=None):
             silence_end      = float(silence_end_match.group('silence_end'))
             silence_duration = float(silence_end_match.group('silence_duration'))
             
-            silence_start = silence_end - silence_duration
+            silence_start = round(silence_end - silence_duration, 4)
             
             if sound_start:
                 datetime_start = basedatetime + timedelta(seconds = sound_start)
+                print(sound_start, silence_start)
                 
-                replay_command = [ FFMPEG_BIN, '-nostats',
+                replay_command = [ FFMPEG_BIN, '-nostats', '-loglevel', 'quiet',
+                                '-y',
                                 '-i', args.infile,
                                 '-ss', str(sound_start),
                                 '-to', str(silence_start),
                                 '-c', 'copy',
-                                baseprefix + datetime_start.strftime("%Y%m%d-%H%M%S") + '.wav' ]
+                                prefix + datetime_start.strftime("%Y%m%d-%H%M%S") + '.wav' ]
             
                 subprocess.run(replay_command)
                 
