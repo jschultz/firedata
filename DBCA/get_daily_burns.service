@@ -1,0 +1,11 @@
+[Unit]
+Description=Email daily burn updates
+Before=multi-user.target
+
+[Service]
+Type=simple
+Restart=always
+ExecStart=/usr/bin/bash /home/jschultz/src/firedata/DBCA/get_daily_burns_daemon.sh
+
+[Install]
+WantedBy=default.target
