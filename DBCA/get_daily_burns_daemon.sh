@@ -16,6 +16,7 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 while :; do 
-  get_daily_burns.py --no-comments --csvfile ~/data/Fire/daily_burns.csv
-  cp -p ~/data/Fire/daily_burns.csv ~/data/Fire/daily_burns.$(date "+%Y-%m-%d_%H:%M:%S").csv
+  /home/jschultz/src/firedata/DBCA/get_daily_burns.py --no-comments --csvfile /home/jschultz/daily_burns/daily_burns.csv
+  cp -p /home/jschultz/daily_burns/daily_burns.csv /home/jschultz/daily_burns/daily_burns.$(date "+%Y-%m-%d_%H:%M:%S").csv
+  cat /home/jschultz/daily_burns/daily_burns.csv | /home/jschultz/src/firedata/common/sendmail.py
 done

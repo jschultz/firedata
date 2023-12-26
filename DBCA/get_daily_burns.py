@@ -51,6 +51,7 @@ def getDailyBurns(arglist=None):
     
     incomments = None
     infieldnames = []
+    indata = []
     if args.csvfile is not None and os.path.exists(args.csvfile):
         infile = open(args.csvfile, 'r')
         incomments = ArgumentHelper.read_comments(infile) or ArgumentHelper.separator()
@@ -70,8 +71,11 @@ def getDailyBurns(arglist=None):
 
     def decodeDailyBurns():
         rc = []
-        
-        img=wms.getmap( layers=[args.layer], bbox=(108.0,-45.0,155.0,-10.0), size=(768,571), srs='EPSG:4283', format='rss' )
+      
+        try:
+            img=wms.getmap( layers=[args.layer], bbox=(108.0,-45.0,155.0,-10.0), size=(768,571), srs='EPSG:4283', format='rss' )
+        except:
+            return None
         
         data = BeautifulSoup(img.read(), 'xml')
         # print(data.prettify())
@@ -119,24 +123,26 @@ def getDailyBurns(arglist=None):
     wms = WebMapService(args.server, version=args.version)
 
     while True:
-        outdata       = decodeDailyBurns()
-        outfieldnames = list(set(sum([list(item.keys()) for item in outdata], start=[])))
-        if set(outfieldnames) != set(infieldnames) or len(outdata) != len(indata):
-            break
+        outdata = decodeDailyBurns()
+        if outdata is not None:
+            outfieldnames = list(set(sum([list(item.keys()) for item in outdata], start=[])))
+            if set(outfieldnames) != set(infieldnames) or len(outdata) != len(indata):
+                break
 
-        for data in outdata:
-            for fieldname in outfieldnames:
-                data[fieldname] = data.get(fieldname, '')
-            
-        if not all((indata[idx] == outdata[idx] for idx in range(len(indata)))):
-            break
-        # innerbreak = False
-        # for idx in range(len(indata)):
-        #     if indata[idx] != outdata[idx]:
-        #         innerbreak = True
-        #         break
-        # if innerbreak:
-        #     break
+            for data in outdata:
+                for fieldname in outfieldnames:
+                    data[fieldname] = data.get(fieldname, '')
+                
+            if not all((indata[idx] == outdata[idx] for idx in range(len(indata)))):
+                break
+            # innerbreak = False
+            # for idx in range(len(indata)):
+            #     if indata[idx] != outdata[idx]:
+            #         print("DIFF ", indata[idx], outdata[idx])
+            #         innerbreak = True
+            #         break
+            # if innerbreak:
+            #     break
                                
         time.sleep(60)
         
