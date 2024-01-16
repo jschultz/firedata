@@ -28,7 +28,8 @@ import os
 import sys
 import shutil
 import csv
-from geo import sphere
+#from geo import sphere
+import geosphere
 import subprocess
 
 def trackHotspotSatellite(arglist=None):
@@ -115,7 +116,7 @@ def trackHotspotSatellite(arglist=None):
                                                   ADD COLUMN id SERIAL'],
                                 stdin=subprocess.PIPE, encoding='UTF-8')
     
-    satout = csv.DictWriter(psqlout.stdin, fieldnames = satcsv.fieldnames + ['pass_azimuth', 'pass_elevation', 'pass_bearing', 'pass_datetime', 'prev_azimuth', 'prev_elevation', 'prev_datetime', 'next_azimuth', 'next_elevation', 'next_datetime'])
+    satout = csv.DictWriter(psqlout.stdin, fieldnames = satcsv.fieldnames or [] + ['pass_azimuth', 'pass_elevation', 'pass_bearing', 'pass_datetime', 'prev_azimuth', 'prev_elevation', 'prev_datetime', 'next_azimuth', 'next_elevation', 'next_datetime'])
     
     minelevation = 90
     tleindexes = {}
@@ -172,7 +173,8 @@ def trackHotspotSatellite(arglist=None):
             (lon2, lat2, alt2) = orb.get_lonlatalt(max_elevation_time + timedelta(seconds = 30))
             point1 = (lon1, lat1)
             point2 = (lon2, lat2)
-            bearing = sphere.bearing(point1, point2)
+            # bearing = sphere.bearing(point1, point2)
+            bearing = geosphere.distance_bearing(lat1, lon1, lat2, lon2)[0]
             satline['pass_bearing'] = bearing
             
             if leastoffsetidx > 0:
