@@ -169,7 +169,8 @@ fi
 
 if [[ -n "${viewfile}" ]]; then
     echo "Creating shapefile ${viewfile}"
-    pgsql2shp -f ${viewfile} -u $PGUSER $PGDATABASE "${VIEW_QUERY}"
+    pgsql2shp -q -f ${viewfile} -u $PGUSER $PGDATABASE "${VIEW_QUERY}"
+    zip --move --junk-paths "${viewfile}".zip "${viewfile}".{cpg,dbf,prj,shp,shx}
 else
     if [[ "${append}" != "true" ]]; then
         echo "Creating table ${viewtable}"
