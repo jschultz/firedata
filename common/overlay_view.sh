@@ -119,7 +119,7 @@ for ((colidx=0; colidx<${#eventcolumn_array[@]}; colidx++)) do
     fi
     eventtype_array[colidx]=$(                                                   \
         psql --quiet --tuples-only --no-align --command="\timing off"            \
-              --command="SELECT pg_typeof(${eventcolumn_array[colidx]}) FROM ${eventtable_array[colidx]} LIMIT 1" \
+              --command="SELECT pg_typeof(${eventcolumn_array[colidx]}) FROM ${eventcolumn_array[colidx]%.*} LIMIT 1" \
     )
 done
 
