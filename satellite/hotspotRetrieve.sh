@@ -45,15 +45,28 @@ if [[ "${no_logfile}" != "true" ]]; then
     echo "${COMMENTS}" > ${logfile}
 fi
 
-days=$(( ( $(date -d "${end}" "+%s") - $(date -d "${start}" "+%s") ) / 86400 + 1 ))
-
-psql --command "CREATE TABLE IF NOT EXISTS ${table} ( ${geometry} geometry(Point,${srid}) GENERATED ALWAYS AS (ST_MakePoint(longitude, latitude)) STORED, latitude float, longitude float, brightness float, scan float, track float, ts timestamp, satellite text, instrument text, confidence text, version float, bright float, frp float, daynight char, type integer )"
+psql --command "CREATE TABLE IF NOT EXISTS ${table} ( ${geometry} geometry(Point,${srid}) GENERATED ALWAYS AS (ST_MakePoint(longitude, latitude)) STORED, latitude float, longitude float, brightness float, scan float, track float, satellite text, instrument text, confidence text, version text, bright_ti4 float, bright_ti5 float, bright_t31 float, frp float, daynight char, type integer, acq_date text, acq_time text, acq_datetime timestamp without time zone GENERATED ALWAYS AS (make_timestamp(substring(acq_date,1,4)::integer, substring(acq_date,6,2)::integer, substring(acq_date,9,2)::integer, acq_time::integer/100, acq_time::integer%100, 0)) STORED )"
 
 if [[ -n "${srid}" ]]; then
-    srid="-t_srs EPSG:${srid}"
+    sridoption="-t_srs EPSG:${srid}"
 fi
 
-curl --silent -X GET --header 'Accept: text/csv' "https://firms.modaps.eosdis.nasa.gov/api/area/csv/${key}/VIIRS_SNPP_SP/${area}/${days}/${start}" > viirs.csv
-ogr2ogr -f PostgreSQL "PG:dbname=$PGDATABASE user=$PGUSER" -lco geometry_name=${geometry} ${srid} -nln "${table}" -nlt POINT viirs.csv
-curl --silent -X GET --header 'Accept: text/csv' "https://firms.modaps.eosdis.nasa.gov/api/area/csv/${key}/MODIS_SP/${area}/${days}/${start}" > modis.csv
-ogr2ogr -f PostgreSQL "PG:dbname=$PGDATABASE user=$PGUSER" -lco geometry_name=${geometry} ${srid} -nln "${table}" -nlt POINT modis.csv
+startdays=$(( $(date -d "${start}" "+%s") ))
+enddays=$(( $(date -d "${end}" "+%s") ))
+daysremaining=$(( $enddays / 86400 - $startdays / 86400 + 1 ))
+while [[ $daysremaining -gt 0 ]]; do
+    start=$(date -d @$(( $startdays )) +%Y-%m-%d)
+    if [[ $daysremaining -gt 10 ]]; then
+        days=10
+        daysremaining=$(( $daysremaining - 10 ))
+    else
+        days=$daysremaining
+        daysremaining=0
+    fi
+    startdays=$(( $startdays + $days * 86400 ))
+    
+    curl --silent -X GET --header 'Accept: text/csv' "https://firms.modaps.eosdis.nasa.gov/api/area/csv/${key}/VIIRS_SNPP_SP/${area}/${days}/${start}" > viirs.csv
+    ogr2ogr -f PostgreSQL "PG:dbname=$PGDATABASE user=$PGUSER" -lco geometry_name=${geometry} ${sridoption} -nln "${table}" -nlt POINT viirs.csv
+    curl --silent -X GET --header 'Accept: text/csv' "https://firms.modaps.eosdis.nasa.gov/api/area/csv/${key}/MODIS_SP/${area}/${days}/${start}" > modis.csv
+    ogr2ogr -f PostgreSQL "PG:dbname=$PGDATABASE user=$PGUSER" -lco geometry_name=${geometry} ${sridoption} -nln "${table}" -nlt POINT modis.csv
+done

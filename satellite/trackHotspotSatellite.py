@@ -45,7 +45,7 @@ def trackHotspotSatellite(arglist=None):
     parser.add_argument('-l', '--limit',      type=int, help='Limit number of rows to process')
     
     parser.add_argument('-t', '--tlefile',    type=str, required=True, help='File containing TLE data')
-    parser.add_argument('-w', '--where',      type=str, required=True, help="'Where' clause to select hotspots")
+    parser.add_argument('-w', '--where',      type=str, default='True', help="'Where' clause to select hotspots")
     parser.add_argument('-H', '--hotspots',   type=str, default='hotspots', help="Hotspot table name")
     parser.add_argument('-s', '--suffix',     type=str, required=True, help="Suffix to append to 'hotspots' to get output table name")
     parser.add_argument('-D', '--drop-table', action='store_true', help='Drop output table if it exists')
@@ -88,14 +88,15 @@ def trackHotspotSatellite(arglist=None):
     psqlin = subprocess.Popen(['psql', args.database, args.user,
                                '--quiet',
                                '--command', r'\timing off',
-                               '--command', r'\copy (SELECT * FROM ' + args.hotspots + ' WHERE ' + args.where + ' ORDER BY acq_date + acq_time) TO STDOUT CSV HEADER'],
+                               '--command', '\\copy (SELECT * FROM ' + args.hotspots + ' WHERE ' + args.where + ' ORDER BY acq_datetime) TO STDOUT CSV HEADER'],
                                stdout=subprocess.PIPE, encoding='UTF-8')
 
     satcsv = csv.DictReader(psqlin.stdout)
     
     psqlout = subprocess.Popen(['psql', args.database, args.user,
                                 '--quiet',
-                                '--command', r'\timing off'] +
+                                '--command', r'\timing off',
+                                '--command', r'\set on_error_stop 1'] +
                               (['--command', 'DROP TABLE IF EXISTS ' + args.hotspots + '_' + args.suffix] if args.drop_table else []) +
                                ['--command', 'CREATE TABLE ' + args.hotspots + '_' + args.suffix + ' AS TABLE ' + args.hotspots + ' WITH NO DATA',
                                 '--command', 'ALTER TABLE ' + args.hotspots + '_' + args.suffix + '     \
@@ -108,15 +109,19 @@ def trackHotspotSatellite(arglist=None):
                                                   ADD COLUMN prev_datetime TIMESTAMP WITHOUT TIME ZONE, \
                                                   ADD COLUMN next_azimuth NUMERIC(8,5),                 \
                                                   ADD COLUMN next_elevation NUMERIC(8,5),               \
-                                                  ADD COLUMN next_datetime TIMESTAMP WITHOUT TIME ZONE, \
-                                                  DROP COLUMN IF EXISTS geometry,                       \
-                                                  ADD COLUMN geometry geometry GENERATED ALWAYS AS (ST_Rotate(ST_MakeEnvelope((ST_X(ST_Transform(ST_SetSRID(ST_MakePoint((longitude)::DOUBLE PRECISION, (latitude)::DOUBLE PRECISION), 4326), 28350)) - ((scan * (500)::NUMERIC))::DOUBLE PRECISION), (ST_Y(ST_Transform(ST_SetSRID(ST_MakePoint((longitude)::DOUBLE PRECISION, (latitude)::DOUBLE PRECISION), 4326), 28350)) - ((track * (500)::NUMERIC))::DOUBLE PRECISION), (ST_X(ST_Transform(ST_SetSRID(ST_MakePoint((longitude)::DOUBLE PRECISION, (latitude)::DOUBLE PRECISION), 4326), 28350)) + ((scan * (500)::NUMERIC))::DOUBLE PRECISION), (ST_Y(ST_Transform(ST_SetSRID(ST_MakePoint((longitude)::DOUBLE PRECISION, (latitude)::DOUBLE PRECISION), 4326), 28350)) + ((track * (500)::NUMERIC))::DOUBLE PRECISION), 28350), ((((- pass_bearing) * 3.1415926) / (180)::NUMERIC))::DOUBLE PRECISION, ST_Transform(ST_SetSRID(ST_MakePoint((longitude)::DOUBLE PRECISION, (latitude)::DOUBLE PRECISION), 4326), 28350))) STORED',
+                                                  ADD COLUMN next_datetime TIMESTAMP WITHOUT TIME ZONE',
                                 '--command', r'\copy ' + args.hotspots + '_' + args.suffix + ' FROM STDIN CSV HEADER',
+                                '--command', 'ALTER TABLE ' + args.hotspots + '_' + args.suffix + '     \
+                                                  DROP COLUMN IF EXISTS envelope,                       \
+                                                  ADD COLUMN envelope geometry GENERATED ALWAYS AS (ST_Rotate(ST_MakeEnvelope((ST_X(ST_Transform(ST_SetSRID(ST_MakePoint((longitude)::DOUBLE PRECISION, (latitude)::DOUBLE PRECISION), 4326), 28350)) - ((scan * (500)::NUMERIC))::DOUBLE PRECISION), (ST_Y(ST_Transform(ST_SetSRID(ST_MakePoint((longitude)::DOUBLE PRECISION, (latitude)::DOUBLE PRECISION), 4326), 28350)) - ((track * (500)::NUMERIC))::DOUBLE PRECISION), (ST_X(ST_Transform(ST_SetSRID(ST_MakePoint((longitude)::DOUBLE PRECISION, (latitude)::DOUBLE PRECISION), 4326), 28350)) + ((scan * (500)::NUMERIC))::DOUBLE PRECISION), (ST_Y(ST_Transform(ST_SetSRID(ST_MakePoint((longitude)::DOUBLE PRECISION, (latitude)::DOUBLE PRECISION), 4326), 28350)) + ((track * (500)::NUMERIC))::DOUBLE PRECISION), 28350), ((((- pass_bearing) * 3.1415926) / (180)::NUMERIC))::DOUBLE PRECISION, ST_Transform(ST_SetSRID(ST_MakePoint((longitude)::DOUBLE PRECISION, (latitude)::DOUBLE PRECISION), 4326), 28350))) STORED',
+                                '--command', 'ALTER TABLE ' + args.hotspots + '_' + args.suffix + '     \
+                                                  DROP COLUMN IF EXISTS envelope,                       \
+                                                  ADD COLUMN envelope geometry GENERATED ALWAYS AS (ST_Rotate(ST_MakeEnvelope((ST_X(ST_Transform(ST_SetSRID(ST_MakePoint((longitude)::DOUBLE PRECISION, (latitude)::DOUBLE PRECISION), 4326), 28350)) - ((scan * (500)::NUMERIC))::DOUBLE PRECISION), (ST_Y(ST_Transform(ST_SetSRID(ST_MakePoint((longitude)::DOUBLE PRECISION, (latitude)::DOUBLE PRECISION), 4326), 28350)) - ((track * (500)::NUMERIC))::DOUBLE PRECISION), (ST_X(ST_Transform(ST_SetSRID(ST_MakePoint((longitude)::DOUBLE PRECISION, (latitude)::DOUBLE PRECISION), 4326), 28350)) + ((scan * (500)::NUMERIC))::DOUBLE PRECISION), (ST_Y(ST_Transform(ST_SetSRID(ST_MakePoint((longitude)::DOUBLE PRECISION, (latitude)::DOUBLE PRECISION), 4326), 28350)) + ((track * (500)::NUMERIC))::DOUBLE PRECISION), 28350), ((((- pass_bearing) * 3.1415926) / (180)::NUMERIC))::DOUBLE PRECISION, ST_Transform(ST_SetSRID(ST_MakePoint((longitude)::DOUBLE PRECISION, (latitude)::DOUBLE PRECISION), 4326), 28350))) STORED',
                                 '--command', 'ALTER TABLE ' + args.hotspots + '_' + args.suffix + '     \
                                                   ADD COLUMN id SERIAL'],
                                 stdin=subprocess.PIPE, encoding='UTF-8')
     
-    satout = csv.DictWriter(psqlout.stdin, fieldnames = satcsv.fieldnames or [] + ['pass_azimuth', 'pass_elevation', 'pass_bearing', 'pass_datetime', 'prev_azimuth', 'prev_elevation', 'prev_datetime', 'next_azimuth', 'next_elevation', 'next_datetime'])
+    satout = csv.DictWriter(psqlout.stdin, fieldnames = (satcsv.fieldnames or []) + ['pass_azimuth', 'pass_elevation', 'pass_bearing', 'pass_datetime', 'prev_azimuth', 'prev_elevation', 'prev_datetime', 'next_azimuth', 'next_elevation', 'next_datetime'])
     
     minelevation = 90
     tleindexes = {}
@@ -125,10 +130,13 @@ def trackHotspotSatellite(arglist=None):
     lastline2 = None
     inrowcount = 0
     for satline in satcsv:
-        thisdatetime = dateparser.parse(satline['acq_date'] + ' ' + satline['acq_time'])
+        thisdatetime = dateparser.parse(satline['acq_datetime'])
         satcode = satcodes[satline['satellite']]
         tletuples = tledict[satcode]
         tleidx = tleindexes.get(satcode, 0)
+        # if not (thisdatetime >= lastdatetime):
+        #     print(thisdatetime)
+        #     print(lastdatetime)
         assert(thisdatetime >= lastdatetime)
         lastdatetime = thisdatetime
         while tletuples[tleidx+1][0] <= thisdatetime - timedelta(hours = 12):
