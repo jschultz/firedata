@@ -16,7 +16,7 @@
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##
 ################################################################################
-# psql
+# psql_command.sh
 #    --command "CREATE INDEX ON data.DBCA_Fire_History_DBCA_060_${datetime} (fih_date1)"
 ################################################################################
 #>datetime argreplay
