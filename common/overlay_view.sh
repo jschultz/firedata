@@ -24,13 +24,15 @@ args=(
   "-e:--eventtable:::Semicolon-delimited name(s) of database table(s) containing event data":required
   ":--eventid:::Semicolon-delimited Id column(s) in event table(s). Default is 'id'"
   ":--eventorder:::Semicolon-separated list of sort order for event table(s); empty value means use 'eventid'"
+  ":--eventlimit:::Semicolon-separated list of maximum number of events to retrieve from event table(s); empty valuemeans unlimited"
   "-b:--basename:::Table name base for output dump, polygon, point-in-polygon and junction output tables. Default is first event table name"
   "-j:--junction:::Semicolon-delimited junction table names. Default is 'eventtable'_junction"
   "-S:--suffix:::Suffix to append to first event table name to generate dump, polygon, point-in-polygon and junction table names:deprecated"
   ":--polycolumns:::Semicolon-separated list of columns to retrieve from polygon table"
   ":--polyaliases:::Semicolon-separated list of aliases for columns retrieved from polygon table"
-  "-c:--eventcolumns::id:Semicolon-separated list of fully specified columns (table and colume name) to retrieve from event table(s)"
+  "-c:--eventcolumns::id:Semicolon-separated list of fully specified columns (table and column name) to retrieve from event table(s)"
   ":--eventaliases:::Semicolon-separated list of aliases for columns retrieved from event table(s); empty value means use column name as alias"
+  ":--flatten:::Output event columns as separate columns instead of arrays:flag"
   ":--indexes:::Semicolon-separated list of indexes to create on view table"
   ":--using:::Semicolon-separated list of index methods"
   "-w:--where:::WHERE clause for selecting from polygon table"
@@ -52,6 +54,7 @@ fi
 IFS=';' read -r -a eventtable_array <<< "${eventtable}"
 IFS=';' read -r -a eventid_array    <<< "${eventid}"
 IFS=';' read -r -a eventorder_array <<< "${eventorder}"
+IFS=';' read -r -a eventlimit_array <<< "${eventlimit}"
 IFS=';' read -r -a junction_array   <<< "${junction}"
 IFS=';' read -r -a polycolumn_array <<< "${polycolumns}"
 IFS=';' read -r -a polyalias_array  <<< "${polyaliases}"
@@ -101,9 +104,6 @@ for ((tableidx=0; tableidx<${#eventtable_array[@]}; tableidx++)) do
     if [[ ! -n "${eventid_array[tableidx]}" ]]; then
         eventid_array[tableidx]="id"
     fi
-    if [[ ! -n "${eventorder_array[tableidx]}" ]]; then
-        eventorder_array[tableidx]="${eventtable_array[tableidx]}.${eventid_array[tableidx]}"
-    fi
     if [[ ! -n "${junction_array[tableidx]}" ]]; then
         junction_array[tableidx]="${basename}_${eventtable_array[tableidx]}_junction"
     fi
@@ -115,35 +115,88 @@ fi
 
 for ((colidx=0; colidx<${#eventcolumn_array[@]}; colidx++)) do
     if [[ ! -n "${eventalias_array[colidx]}" ]]; then
-        eventalias_array[colidx]="${eventcolumn_array[colidx]#*.}"
+        eventalias_array[colidx]="${eventcolumn_array[colidx]//./_}"
     fi
     eventtype_array[colidx]=$(                                                   \
         psql --quiet --tuples-only --no-align --command="\timing off"            \
-              --command="SELECT pg_typeof(${eventcolumn_array[colidx]}) FROM ${eventcolumn_array[colidx]%.*} LIMIT 1" \
+             --command="SELECT pg_typeof(${eventcolumn_array[colidx]}) FROM ${eventcolumn_array[colidx]%.*} LIMIT 1" \
     )
+done
+
+for ((tableidx=0; tableidx<${#eventtable_array[@]}; tableidx++)) do
+    if [[ ! -n "${eventlimit_array[tableidx]}" ]]; then
+        LIMIT_QUERY="SELECT coalesce(max(count),0)"
+        LIMIT_QUERY+=" FROM (SELECT count(*) AS count"
+        LIMIT_QUERY+=" FROM ${junction_array[tableidx]}"
+        LIMIT_QUERY+=" JOIN ${eventtable_array[tableidx]} ON ${eventtable_array[tableidx]}.${eventid_array[tableidx]}=${junction_array[tableidx]}.${eventid_array[tableidx]}"
+        if [[ -n "${where}" ]]; then
+            LIMIT_QUERY+=" JOIN ${polytable} ON ${polytable}.id = poly_id"
+            LIMIT_QUERY+=" WHERE ${where}"
+        fi
+        LIMIT_QUERY+=" GROUP BY ${junction_array[tableidx]}.poly_id) AS foo"
+        echo $LIMIT_QUERY
+        eventlimit_array[tableidx]=$(psql \
+                --quiet --tuples-only --no-align \
+                --command="\timing off" \
+                --command="${LIMIT_QUERY}")
+    fi
 done
 
 VIEW_QUERY="SELECT"
 separator=""
 for ((colidx=0; colidx<${#polyalias_array[@]}; colidx++)) do
-    VIEW_QUERY+="${separator} ${polytable}.${polycolumn_array[colidx]} AS ${polyalias_array[colidx]}"
+    VIEW_QUERY+="${separator} ${polytable}.${polycolumn_array[colidx]} AS \"${polyalias_array[colidx]}\""
     separator=","
 done
 for ((colidx=0; colidx<${#eventalias_array[@]}; colidx++)) do
-    VIEW_QUERY+="${separator} coalesce(${eventcolumn_array[colidx]}, '{}'::${eventtype_array[colidx]}[]) AS ${eventalias_array[colidx]}"
+    if [[ "${flatten}" != "true" ]]; then
+        VIEW_QUERY+="${separator} coalesce(${eventcolumn_array[colidx]}, '{}'::${eventtype_array[colidx]}[]) AS \"${eventalias_array[colidx]}\""
+        separator=","
+    else
+        for ((linkidx=1; linkidx<=${eventlimit_array[colidx]}; linkidx++)) do
+            VIEW_QUERY+="${separator} ${eventcolumn_array[colidx]}_${linkidx} AS \"${eventalias_array[colidx]}_${linkidx}\""
+            separator=","
+        done
+    fi
     separator=","
 done
 VIEW_QUERY+=" FROM ${polytable}"
+separator=""
 for ((tableidx=0; tableidx<${#eventtable_array[@]}; tableidx++)) do
-    VIEW_QUERY+=" LEFT OUTER JOIN (SELECT ${junction_array[tableidx]}.poly_id"
+    VIEW_QUERY+=" LEFT OUTER JOIN LATERAL (SELECT"
+    separator=""
     for ((colidx=0; colidx<${#eventcolumn_array[@]}; colidx++)) do
         if [[ "${eventcolumn_array[colidx]%.*}" == "${eventtable_array[tableidx]}" ]]; then
-            VIEW_QUERY+=", array_agg(${eventcolumn_array[colidx]} ORDER BY ${eventorder_array[tableidx]}) AS ${eventcolumn_array[colidx]#*.}"
+            if [[ "${flatten}" != "true" ]]; then
+                VIEW_QUERY+="${separator} array_agg(${eventcolumn_array[colidx]}) AS \"${eventcolumn_array[colidx]#*.}\""
+                separator=","
+            else
+                for ((linkidx=1; linkidx<=${eventlimit_array[colidx]}; linkidx++)) do
+                    VIEW_QUERY+="${separator} (array_agg(${eventcolumn_array[colidx]}))[${linkidx}] AS \"${eventcolumn_array[colidx]#*.}_${linkidx}\""
+                    separator=","
+                done
+            fi
         fi
     done
-    VIEW_QUERY+=" FROM ${junction_array[tableidx]}, ${eventtable_array[tableidx]} WHERE ${eventtable_array[tableidx]}.${eventid_array[tableidx]}=${junction_array[tableidx]}.${eventid_array[tableidx]}"
-    VIEW_QUERY+=" GROUP BY ${junction_array[tableidx]}.poly_id"
-    VIEW_QUERY+=") AS ${eventtable_array[tableidx]} ON ${eventtable_array[tableidx]}.poly_id = ${polytable}.id"
+    VIEW_QUERY+=" FROM (SELECT"
+    separator=""
+    for ((colidx=0; colidx<${#eventcolumn_array[@]}; colidx++)) do
+        if [[ "${eventcolumn_array[colidx]%.*}" == "${eventtable_array[tableidx]}" ]]; then
+            VIEW_QUERY+="${separator} ${eventcolumn_array[colidx]}"
+            separator=","
+        fi
+    done
+    VIEW_QUERY+=" FROM ${junction_array[tableidx]}, ${eventtable_array[tableidx]}"
+    VIEW_QUERY+=" WHERE ${junction_array[tableidx]}.poly_id = ${polytable}.id"
+    VIEW_QUERY+=" AND ${eventtable_array[tableidx]}.${eventid_array[tableidx]}=${junction_array[tableidx]}.${eventid_array[tableidx]}"
+    if [[ -n "${eventorder_array[tableidx]}" ]]; then
+        VIEW_QUERY+=" ORDER BY ${eventorder_array[tableidx]}"
+    fi
+    if [[ -n "${eventlimit_array[tableidx]}" ]]; then
+        VIEW_QUERY+=" LIMIT ${eventlimit_array[tableidx]}"
+    fi
+    VIEW_QUERY+=") AS ${eventtable_array[tableidx]}"
+    VIEW_QUERY+=") AS ${eventtable_array[tableidx]} ON true"
 done
 if [[ -n "${where}" ]]; then
     VIEW_QUERY+=" WHERE ${where}"
@@ -156,8 +209,15 @@ if [[ ${#polycolumn_array[@]} -gt 0 ]]; then
         separator=","
     done
     for ((colidx=0; colidx<${#eventcolumn_array[@]}; colidx++)) do
-        VIEW_QUERY+="${separator} ${eventcolumn_array[colidx]}"
-        separator=","
+        if [[ "${flatten}" != "true" ]]; then
+            VIEW_QUERY+="${separator} ${eventcolumn_array[colidx]}"
+            separator=","
+        else
+            for ((linkidx=1; linkidx<=${eventlimit_array[colidx]}; linkidx++)) do
+                VIEW_QUERY+="${separator} ${eventcolumn_array[colidx]}_${linkidx}"
+                separator=","
+            done
+        fi
     done
 fi
 
