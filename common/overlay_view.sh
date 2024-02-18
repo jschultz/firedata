@@ -175,9 +175,9 @@ for ((tableidx=0; tableidx<${#eventtable_array[@]}; tableidx++)) do
         if [[ "${eventcolumn_array[colidx]%.*}" == "${eventtable_array[tableidx]}" ]]; then
             if [[ "${flatten}" != "true" ]]; then
                 VIEW_QUERY+="${separator} array_agg(${eventcolumn_array[colidx]}"
-#                 if [[ -n "${eventorder_array[tableidx]}" ]]; then
-#                     VIEW_QUERY+=" ORDER BY ${eventorder_array[tableidx]}"
-#                 fi
+                if [[ -n "${eventorder_array[tableidx]}" ]]; then
+                    VIEW_QUERY+=" ORDER BY ${eventorder_array[tableidx]}"
+                fi
                 VIEW_QUERY+=") AS \"${eventcolumn_array[colidx]#*.}\""
                 separator=","
             else
@@ -204,9 +204,9 @@ for ((tableidx=0; tableidx<${#eventtable_array[@]}; tableidx++)) do
     if [[ -n "${eventorder_array[tableidx]}" ]]; then
         VIEW_QUERY+=" ORDER BY ${eventorder_array[tableidx]}"
     fi
-    if [[ -n "${eventlimit_array[tableidx]}" ]]; then
-        VIEW_QUERY+=" LIMIT ${eventlimit_array[tableidx]}"
-    fi
+#     if [[ -n "${eventlimit_array[tableidx]}" ]]; then
+#         VIEW_QUERY+=" LIMIT ${eventlimit_array[tableidx]}"
+#     fi
     VIEW_QUERY+=") AS ${eventtable_array[tableidx]}"
     VIEW_QUERY+=" GROUP BY ${eventtable_array[tableidx]}.poly_id"
     VIEW_QUERY+=") AS ${eventtable_array[tableidx]}"
