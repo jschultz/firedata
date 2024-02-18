@@ -124,7 +124,7 @@ for ((colidx=0; colidx<${#eventcolumn_array[@]}; colidx++)) do
 done
 
 for ((tableidx=0; tableidx<${#eventtable_array[@]}; tableidx++)) do
-    if [[ ! -n "${eventlimit_array[tableidx]}" ]]; then
+    if [[ "${flatten}" = "true" && ! -n "${eventlimit_array[tableidx]}" ]]; then
         LIMIT_QUERY="SELECT coalesce(max(count),0)"
         LIMIT_QUERY+=" FROM (SELECT count(*) AS count"
         LIMIT_QUERY+=" FROM ${junction_array[tableidx]}"
@@ -134,7 +134,6 @@ for ((tableidx=0; tableidx<${#eventtable_array[@]}; tableidx++)) do
             LIMIT_QUERY+=" WHERE ${where}"
         fi
         LIMIT_QUERY+=" GROUP BY ${junction_array[tableidx]}.poly_id) AS foo"
-        echo $LIMIT_QUERY
         eventlimit_array[tableidx]=$(psql \
                 --quiet --tuples-only --no-align \
                 --command="\timing off" \
@@ -163,12 +162,23 @@ done
 VIEW_QUERY+=" FROM ${polytable}"
 separator=""
 for ((tableidx=0; tableidx<${#eventtable_array[@]}; tableidx++)) do
-    VIEW_QUERY+=" LEFT OUTER JOIN LATERAL (SELECT"
+    VIEW_QUERY+=" LEFT OUTER JOIN"
+    if [[ -n "${eventlimit_array[tableidx]}" ]]; then
+        VIEW_QUERY+=" LATERAL"
+    fi
+    VIEW_QUERY+=" (SELECT"
+    if [[ ! -n "${eventlimit_array[tableidx]}" ]]; then
+        VIEW_QUERY+=" ${eventtable_array[tableidx]}.poly_id,"
+    fi
     separator=""
     for ((colidx=0; colidx<${#eventcolumn_array[@]}; colidx++)) do
         if [[ "${eventcolumn_array[colidx]%.*}" == "${eventtable_array[tableidx]}" ]]; then
             if [[ "${flatten}" != "true" ]]; then
-                VIEW_QUERY+="${separator} array_agg(${eventcolumn_array[colidx]}) AS \"${eventcolumn_array[colidx]#*.}\""
+                VIEW_QUERY+="${separator} array_agg(${eventcolumn_array[colidx]}"
+#                 if [[ -n "${eventorder_array[tableidx]}" ]]; then
+#                     VIEW_QUERY+=" ORDER BY ${eventorder_array[tableidx]}"
+#                 fi
+                VIEW_QUERY+=") AS \"${eventcolumn_array[colidx]#*.}\""
                 separator=","
             else
                 for ((linkidx=1; linkidx<=${eventlimit_array[colidx]}; linkidx++)) do
@@ -178,7 +188,7 @@ for ((tableidx=0; tableidx<${#eventtable_array[@]}; tableidx++)) do
             fi
         fi
     done
-    VIEW_QUERY+=" FROM (SELECT"
+    VIEW_QUERY+=" FROM (SELECT ${junction_array[tableidx]}.poly_id,"
     separator=""
     for ((colidx=0; colidx<${#eventcolumn_array[@]}; colidx++)) do
         if [[ "${eventcolumn_array[colidx]%.*}" == "${eventtable_array[tableidx]}" ]]; then
@@ -187,8 +197,10 @@ for ((tableidx=0; tableidx<${#eventtable_array[@]}; tableidx++)) do
         fi
     done
     VIEW_QUERY+=" FROM ${junction_array[tableidx]}, ${eventtable_array[tableidx]}"
-    VIEW_QUERY+=" WHERE ${junction_array[tableidx]}.poly_id = ${polytable}.id"
-    VIEW_QUERY+=" AND ${eventtable_array[tableidx]}.${eventid_array[tableidx]}=${junction_array[tableidx]}.${eventid_array[tableidx]}"
+    VIEW_QUERY+=" WHERE ${eventtable_array[tableidx]}.${eventid_array[tableidx]}=${junction_array[tableidx]}.${eventid_array[tableidx]}"
+    if [[ -n "${eventlimit_array[tableidx]}" ]]; then
+        VIEW_QUERY+=" AND ${junction_array[tableidx]}.poly_id = ${polytable}.id"
+    fi
     if [[ -n "${eventorder_array[tableidx]}" ]]; then
         VIEW_QUERY+=" ORDER BY ${eventorder_array[tableidx]}"
     fi
@@ -196,7 +208,13 @@ for ((tableidx=0; tableidx<${#eventtable_array[@]}; tableidx++)) do
         VIEW_QUERY+=" LIMIT ${eventlimit_array[tableidx]}"
     fi
     VIEW_QUERY+=") AS ${eventtable_array[tableidx]}"
-    VIEW_QUERY+=") AS ${eventtable_array[tableidx]} ON true"
+    VIEW_QUERY+=" GROUP BY ${eventtable_array[tableidx]}.poly_id"
+    VIEW_QUERY+=") AS ${eventtable_array[tableidx]}"
+    if [[ -n "${eventlimit_array[tableidx]}" ]]; then
+        VIEW_QUERY+=" ON true"
+    else
+        VIEW_QUERY+=" ON ${eventtable_array[tableidx]}.poly_id = ${polytable}.id"
+    fi
 done
 if [[ -n "${where}" ]]; then
     VIEW_QUERY+=" WHERE ${where}"
