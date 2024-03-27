@@ -21,8 +21,7 @@
 #    ${datetime}
 ################################################################################
 # psql_command.sh
-#    --command "DROP VIEW IF EXISTS ${table}"
-#    --command "CREATE VIEW ${table} AS SELECT * FROM ${schema}.${table}_${datetime}"
+#    --command "DROP VIEW IF EXISTS ${table}; CREATE VIEW ${table} AS SELECT * FROM ${schema}.${table}_${datetime}"
 ################################################################################
 #< load_file.sh
 #    --nologfile

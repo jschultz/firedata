@@ -1,0 +1,19 @@
+################################################################################
+# overlay_view.sh
+#    --nologfile
+#    --basename "open"
+#    --eventtable "dbca_fire_history_dbca_060;legislated_lands_and_waters_dbca_011;forest_blocks_dbca_025;native_veg_extent_dpird_005;forest_man_plan_2014_2023_dbca_041"
+#    --eventid object_id;;;object_id
+#    --eventorder "fih_date1 DESC"
+#    --polycolumns "geom;id"
+#    --polyaliases ";poly_id"
+#    --eventcolumns "dbca_fire_history_dbca_060.object_id;dbca_fire_history_dbca_060.fih_date1;legislated_lands_and_waters_dbca_011.id;forest_blocks_dbca_025.id;native_veg_extent_dpird_005.id;land_management_unit.extcode;forest_ecosystem.extcode;forest_man_plan_2014_2023_dbca_041.id"
+#    --indexes geom;poly_id
+#    --using gist
+################################################################################
+# overlay_junction.sh
+#    --nologfile
+#    --basename "open"
+#    --eventtable "dbca_fire_history_dbca_060;legislated_lands_and_waters_dbca_011;forest_blocks_dbca_025;native_veg_extent_dpird_005;forest_man_plan_2014_2023_dbca_041"
+#    --eventid object_id;;;object_id
+#    --area "SELECT ST_Union(geom) AS geom FROM dbca_region_boundaries_dbca_022 WHERE drg_region_name IN ('SOUTH COAST', 'SOUTH WEST', 'SWAN', 'WARREN')"
