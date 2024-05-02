@@ -55,7 +55,7 @@ FROM ${basename}_poly AS poly,
                LIMIT 1) AS event
       WHERE lmu.description = '${lmu}'
       AND   lmu_junction.extcode = lmu.extcode
-      AND   view.forest_man_plan_2014_2023_dbca_041_id IS NOT NULL
+      AND   view.forest_man_plan_2014_2023_dbca_041_id != '{}'
       AND   view.poly_id = lmu_junction.poly_id) AS polyevent
 WHERE poly.id = polyevent.poly_id
 GROUP BY year,
