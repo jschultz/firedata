@@ -52,7 +52,7 @@ FROM ${basename}_poly AS poly,
                WHERE fireseason(fih_date1) <= ${baseyear}
                LIMIT 1) AS event
       WHERE burn.burnid = '${burnid}'
-      AND   view.forest_man_plan_2014_2023_dbca_041_id IS NOT NULL
+      AND   view.forest_man_plan_2014_2023_dbca_041_id != '{}'
       AND   ST_Intersects(view.geom, burn.geom)) AS polyevent
 WHERE poly.id = polyevent.poly_id
 GROUP BY year,
