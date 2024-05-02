@@ -1,0 +1,8 @@
+################################################################################
+# argreplay
+#   --substitute
+#     basename:southern
+#     refyear:2023
+#     sinceyear:1994
+#   --
+#   numfires_since_year.arg

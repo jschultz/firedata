@@ -1,0 +1,14 @@
+################################################################################
+# exportQgisLayout.py
+#    --nologfile
+#    --layout "3 Year Burn Options Program"
+#             "FMP YSLB old palette"
+#             "FMP numfires since 1994"
+#             "Conservation Estate YSLB"
+#    --outpath "LMU Report/3 Year Burn Options Program.${format}"
+#             "LMU Report/FMP YSLB.${format}"
+#             "LMU Report/FMP numfires since 1994.${format}"
+#             "LMU Report/Conservation Estate YSLB.${format}"
+#    --single
+#    "/home/jschultz/src/firedata/DBCA/burn_overview.qgs"
+################################################################################
