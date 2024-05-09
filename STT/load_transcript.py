@@ -40,6 +40,9 @@ def loadTranscript(arglist=None):
     parser.add_argument('--no-comments',      action='store_true', help='Do not output descriptive comments')
     parser.add_argument('--no-header',        action='store_true', help='Do not output CSV header with column names')
 
+    parser.add_argument('--logfile',   type=str, help="Logfile", private=True)
+    parser.add_argument('--no-logfile', action='store_true', help='Do not output a logfile')
+
     parser.add_argument('infile',             type=str, help="Filename pattern to match", input=True)
 
     args = parser.parse_args(arglist)
@@ -54,9 +57,20 @@ def loadTranscript(arglist=None):
             parser.write_comments(args, csvfile, incomments=ArgumentHelper.separator())
 
         csvwriter=csv.DictWriter(csvfile, fieldnames=['name', 'channel', 'datetime', 'text'])
-        csvwriter.writeheader()
+        if not args.no_header:
+            csvwriter.writeheader()
         
     if args.database:
+        if not args.no_logfile:
+            if args.logfile:
+                logfilename = args.logfile
+            else:
+                logfilename = args.infile + '.log'
+
+            logfile = open(logfilename, 'w')
+            parser.write_comments(args, logfile, incomments=ArgumentHelper.separator())
+            logfile.close()
+
         database = create_engine(args.database)
         connection  = database.connect()
         metadata = MetaData()
@@ -73,7 +87,7 @@ def loadTranscript(arglist=None):
 
         transaction = connection.begin()
 
-    filenameregexp = re.compile(R"(?P<name>.+)-Chan(?P<channel>[0-9]+)-(?P<year>[0-9]{2})(?P<month>[0-9]{2})(?P<day>[0-9]{2})-(?P<hour>[0-9]{2})(?P<minute>[0-9]{2})(?P<second>[0-9]{2})-.+", re.UNICODE)
+    filenameregexp = re.compile(R"(?P<name>.+?)(-Chan(?P<channel>[0-9]+))?-(?P<year>[0-9]{2,4})(?P<month>[0-9]{2})(?P<day>[0-9]{2})-(?P<hour>[0-9]{2})(?P<minute>[0-9]{2})(?P<second>[0-9]{2}).+", re.UNICODE)
     lineregexp = re.compile(r"^\[(?P<minute>[0-9]{2}):(?P<second>[0-9]{2}).(?P<csec>[0-9]{2})\]\s*(?P<text>.*)$", re.UNICODE)
     
     for filename in glob.glob(args.infile):
@@ -81,8 +95,10 @@ def loadTranscript(arglist=None):
         filenamematch = filenameregexp.match(basename)
         if filenamematch:
             name      = filenamematch.group('name')
-            channel   = int(filenamematch.group('channel'))
-            year      = 2000 + int(filenamematch.group('year'))
+            channel   = int(filenamematch.group('channel') or 0)
+            year      = int(filenamematch.group('year'))
+            if year < 100:
+                year += 2000
             month     = int(filenamematch.group('month'))
             day       = int(filenamematch.group('day'))
             hour      = int(filenamematch.group('hour'))
