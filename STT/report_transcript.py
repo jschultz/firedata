@@ -42,10 +42,10 @@ def reportTranscript(arglist=None):
         metadata.reflect(bind=database)
         transcript = metadata.tables['Transcript']
         query = select(
-          transcript.c.Name,
-          transcript.c.DateTime,
-          transcript.c.Text).order_by(
-          transcript.c.DateTime)
+            transcript.c.Name,
+            transcript.c.DateTime,
+            transcript.c.Text).order_by(
+            transcript.c.DateTime)
 
         results = connection.execute(query).fetchall()
         lastName = None
