@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Copyright 2023 Jonathan Schultz
+# Copyright 2024 Jonathan Schultz
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -15,8 +15,13 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+DAILY_BURNS_DIR="$HOME/daily_burns"
 while :; do 
-  /home/jschultz/src/firedata/DBCA/get_daily_burns.py --no-comments --csvfile /home/jschultz/daily_burns/daily_burns.csv
-  cp -p /home/jschultz/daily_burns/daily_burns.csv /home/jschultz/daily_burns/daily_burns.$(date "+%Y-%m-%d_%H:%M:%S").csv
-  cat /home/jschultz/daily_burns/daily_burns.csv | /home/jschultz/src/firedata/common/sendmail.py
+  ./get_daily_burns.py --no-comments --csvfile "$DAILY_BURNS_DIR/daily_burns.csv"
+  if [ $(wc -c <"$DAILY_BURNS_DIR/daily_burns.csv") -gt 2 ]; then
+    DAILY_BURNS_FILE="daily_burns.$(date "+%Y-%m-%d_%H:%M:%S").csv"
+    cp -p "$DAILY_BURNS_DIR/daily_burns.csv" "$DAILY_BURNS_DIR"/"$DAILY_BURNS_FILE"
+    cat "$DAILY_BURNS_DIR"/"$DAILY_BURNS_FILE" | ../common/sendmail.py
+  fi
+  echo $DAILY_BURNS_FILE
 done
