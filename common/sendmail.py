@@ -25,7 +25,7 @@ import pandas
 port = 587  # For starttls
 smtp_server = "smtp.zoho.com.au"
 sender_email = "info@fabwa.org.au"
-recipients = ["jonathan@schultz.la"]
+recipients = ["someone@domain.tld"]
 password = "<change>"
 
 msg = MIMEMultipart('alternative')
