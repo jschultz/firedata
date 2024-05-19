@@ -17,11 +17,11 @@
 
 DAILY_BURNS_DIR="$HOME/daily_burns"
 while :; do 
-  ./get_daily_burns.py --no-comments --csvfile "$DAILY_BURNS_DIR/daily_burns.csv"
+  $(dirname "$0")/get_daily_burns.py --no-comments --csvfile "$DAILY_BURNS_DIR/daily_burns.csv"
   if [ $(wc -c <"$DAILY_BURNS_DIR/daily_burns.csv") -gt 2 ]; then
     DAILY_BURNS_FILE="daily_burns.$(date "+%Y-%m-%d_%H:%M:%S").csv"
     cp -p "$DAILY_BURNS_DIR/daily_burns.csv" "$DAILY_BURNS_DIR"/"$DAILY_BURNS_FILE"
-    cat "$DAILY_BURNS_DIR"/"$DAILY_BURNS_FILE" | ../common/sendmail.py
+    cat "$DAILY_BURNS_DIR"/"$DAILY_BURNS_FILE" | $(dirname "$0")/../common/sendmail.py
   fi
   echo $DAILY_BURNS_FILE
 done
