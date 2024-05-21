@@ -19,16 +19,19 @@
 import smtplib, ssl
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from email.mime.application import MIMEApplication
+from email.mime.base import MIMEBase
+from email import encoders
 from io import StringIO
 import pandas
 
 port = 587  # For starttls
-smtp_server = "smtp.zoho.com.au"
-sender_email = "info@fabwa.org.au"
+smtp_server = "server.tld"
+sender_email = "bot@server.tld"
 recipients = ["someone@domain.tld"]
-password = "<change>"
+password = "3kLtgQ8qLhvH"
 
-msg = MIMEMultipart('alternative')
+msg = MIMEMultipart()
 msg['Subject'] = "Daily burns"
 
 text = ""
@@ -54,8 +57,22 @@ html = """\
 # Attach parts into message container.
 # According to RFC 2046, the last part of a multipart message, in this case
 # the HTML message, is best and preferred.
-msg.attach(MIMEText(text, 'plain'))
+# msg.attach(MIMEText(text, 'plain'))
 msg.attach(MIMEText(html, 'html'))
+
+# part = MIMEApplication(
+#     text,
+#     Name='daily_burns.csv'
+# )
+# part['Content-Disposition'] = 'attachment; filename="%s"' % 'daily_burns.csv'
+# msg.attach(part)
+
+part = MIMEBase('application', "octet-stream")
+part.set_payload(text)
+encoders.encode_base64(part)
+part.add_header('Content-Disposition',
+                'attachment; filename=daily_burns.csv')
+msg.attach(part)
 
 context = ssl.create_default_context()
 with smtplib.SMTP(smtp_server, port) as server:
