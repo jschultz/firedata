@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# Copyright 2023 Jonathan Schultz
+# Copyright 2024 Jonathan Schultz
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -56,6 +56,7 @@ def audioSplit(arglist=None):
         if args.verbosity >= 1:
             print("Processing file: ", infile, file=sys.stderr)
             
+        infile_ext = os.path.splitext(infile)[1]
         infile_match = INFILE_REGEX.match(infile)
         if infile_match:
             prefix = infile_match.group('prefix')
@@ -81,6 +82,7 @@ def audioSplit(arglist=None):
         SILENCE_END_REGEX = re.compile(R".*silence_end: (?P<silence_end>[0-9]*(\.[0-9]*)?).*silence_duration: (?P<silence_duration>[0-9]*(\.[0-9]*)?)")
         
         sound_start = None
+        silence_end = None
         while True:
             line = pipe.stderr.readline().decode()
             if not line:
@@ -93,29 +95,28 @@ def audioSplit(arglist=None):
             
             if sound_start:
                 datetime_start = basedatetime + timedelta(seconds = sound_start)
-                print(sound_start, silence_start)
-                
                 silence_start = round(silence_end - silence_duration, 4)
+
+                print(sound_start, silence_start)
                 
                 if sound_start:
                     datetime_start = basedatetime + timedelta(seconds = sound_start)
                     if args.verbosity >= 2:
                         print("Found chunk: ", sound_start, silence_start, file=sys.stderr)
                     
-                    replay_command = [ FFMPEG_BIN, '-nostats', '-loglevel', 'quiet',
+                    subprocess.run( [ FFMPEG_BIN, '-nostats', '-loglevel', 'quiet',
                                     '-y',
                                     '-i', infile,
                                     '-ss', str(sound_start),
                                     '-to', str(silence_start),
                                     '-c', 'copy',
-                                    prefix + datetime_start.strftime("%Y%m%d-%H%M%S") + '.wav' ]
-                 
-                    subprocess.run(replay_command)
+                                    prefix + datetime_start.strftime("%Y%m%d-%H%M%S") + infile_ext ] )
+                    # subprocess.run( [ 'touch',
+                    #                 prefix + datetime_start.strftime("%Y%m%d-%H%M%S") + infile_ext ],
+                    #                 '--reference='+infile ]     )
                     
-                sound_start = silence_end
-                
             sound_start = silence_end
-                            
+            
             
     
         
