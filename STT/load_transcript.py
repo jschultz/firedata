@@ -17,74 +17,126 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from argrecord import ArgumentHelper, ArgumentRecorder
+import glob
 import re
 import datetime
 import sys
 import os
 import csv
 import shutil
+from sqlalchemy import *
 
 def loadTranscript(arglist=None):
-    parser = ArgumentRecorder(description='Read Daily Burns from DBCA WMS server, stopping when today''s burns have been retrieved',
+    parser = ArgumentRecorder(description='Read and process scanner transcript files',
                               fromfile_prefix_chars='@')
 
     parser.add_argument('-v', '--verbosity',  type=int, default=1, private=True)
     
     parser.add_argument('-c', '--csvfile',    type=str, 
-                                              help='Output CSV file, default is ''infile''.csv.', output=True)
+                                              help='Output CSV file', output=True)
+    parser.add_argument('-d', '--database',   type=str,
+                                              help='SQLAlchemy database specification')
     
     parser.add_argument('--no-comments',      action='store_true', help='Do not output descriptive comments')
 
-    parser.add_argument('infile',             type=str, help="Name of lrc transcript file to export", input=True)
+    parser.add_argument('--logfile',   type=str, help="Logfile", private=True)
+    parser.add_argument('--no-logfile', action='store_true', help='Do not output a logfile')
+
+    parser.add_argument('infile',             type=str, help="Filename pattern to match", input=True)
 
     args = parser.parse_args(arglist)
 
-    if args.csvfile is None:
-        args.csvfile = os.path.splitext(args.infile)[0] + '.csv'
 
-    if os.path.exists(args.csvfile):
-        shutil.move(args.csvfile, args.csvfile + '.bak')
+    if args.csvfile:
+        if os.path.exists(args.csvfile):
+            shutil.move(args.csvfile, args.csvfile + '.bak')
+        csvfile = open(args.csvfile, 'w')
 
-    csvfile = open(args.csvfile, 'w')
+        if not args.no_comments:
+            parser.write_comments(args, csvfile, incomments=ArgumentHelper.separator())
 
-    if not args.no_comments:
-        parser.write_comments(args, csvfile, incomments=ArgumentHelper.separator())
+        csvwriter=csv.DictWriter(csvfile, fieldnames=['name', 'channel', 'datetime', 'text'])
+        if not args.no_header:
+            csvwriter.writeheader()
+        
+    if args.database:
+        if not args.no_logfile:
+            if args.logfile:
+                logfilename = args.logfile
+            else:
+                logfilename = args.infile + '.log'
 
-    filenameregexp = re.compile(R"(?P<frequency>[0-9]+)-.+-Chan(?P<channel>[0-9]+)-(?P<year>[0-9]{2})(?P<month>[0-9]{2})(?P<day>[0-9]{2})-(?P<hour>[0-9]{2})(?P<minute>[0-9]{2})(?P<second>[0-9]{2})-.+", re.UNICODE)
+            logfile = open(logfilename, 'w')
+            parser.write_comments(args, logfile, incomments=ArgumentHelper.separator())
+            logfile.close()
 
-    filenamematch = filenameregexp.match(args.infile)
-    if filenamematch:
-        frequency = int(filenamematch.group('frequency'))
-        channel   = int(filenamematch.group('channel'))
-        year      = 2000 + int(filenamematch.group('year'))
-        month     = int(filenamematch.group('month'))
-        day       = int(filenamematch.group('day'))
-        hour      = int(filenamematch.group('hour'))
-        minute    = int(filenamematch.group('minute'))
-        second    = int(filenamematch.group('second'))
+        database = create_engine(args.database)
+        connection  = database.connect()
+        metadata = MetaData()
 
-        basetime=datetime.datetime(year, month, day, hour, minute, second)
-    else:
-        print("ERROR: Filename does not match pattern", file=sys.stderr)
-    
-    infile = open(args.infile, 'r')
-    csvwriter=csv.DictWriter(csvfile, fieldnames=['frequency', 'channel', 'datetime', 'text'])
-    csvwriter.writeheader()
+        # try:
+        #     transcript = Table('Transcript', metadata, autoload_with=database)
+        # except sqlalchemy.exc.NoSuchTableError:
+        transcript = Table('Transcript', metadata,
+            Column('Name',          String(256)),
+            Column('Channel',       Integer),
+            Column('DateTime',      DateTime,       unique=True),
+            Column('Text',          String(256)))
+        metadata.create_all(database)
 
+        transaction = connection.begin()
+
+    filenameregexp = re.compile(R"(?P<name>.+?)(-Chan(?P<channel>[0-9]+))?-(?P<year>[0-9]{2,4})(?P<month>[0-9]{2})(?P<day>[0-9]{2})-(?P<hour>[0-9]{2})(?P<minute>[0-9]{2})(?P<second>[0-9]{2}).+", re.UNICODE)
     lineregexp = re.compile(r"^\[(?P<minute>[0-9]{2}):(?P<second>[0-9]{2}).(?P<csec>[0-9]{2})\]\s*(?P<text>.*)$", re.UNICODE)
+    
+    for filename in glob.glob(args.infile):
+        basename = os.path.basename(filename)
+        filenamematch = filenameregexp.match(basename)
+        if filenamematch:
+            name      = filenamematch.group('name')
+            channel   = int(filenamematch.group('channel') or 0)
+            year      = int(filenamematch.group('year'))
+            if year < 100:
+                year += 2000
+            month     = int(filenamematch.group('month'))
+            day       = int(filenamematch.group('day'))
+            hour      = int(filenamematch.group('hour'))
+            minute    = int(filenamematch.group('minute'))
+            second    = int(filenamematch.group('second'))
 
-    for line in infile:
-        linematch = lineregexp.match(line)
-        if linematch:
-            minute = int(linematch.group('minute'))
-            second = int(linematch.group('second'))
-            csec   = int(linematch.group('csec'))
-            text   =     linematch.group('text')
-            
-            finaltime = basetime + datetime.timedelta(minutes=minute, seconds=second, milliseconds = csec*10)
-            csvwriter.writerow({'frequency':frequency, 'channel':channel, 'datetime':finaltime, 'text':text})
+            basetime=datetime.datetime(year, month, day, hour, minute, second)
+        else:
+            print("ERROR: Filename " + basename + " does not match pattern", file=sys.stderr)
+        
+        infile = open(filename, 'r')
 
-    csvfile.close()
+        for line in infile:
+            linematch = lineregexp.match(line)
+            if linematch:
+                minute = int(linematch.group('minute'))
+                second = int(linematch.group('second'))
+                csec   = int(linematch.group('csec'))
+                text   =     linematch.group('text')
+                
+                finaltime = basetime + datetime.timedelta(minutes=minute, seconds=second, milliseconds = csec*10)
+                
+                if args.csvfile:
+                    csvwriter.writerow({'name':name, 'channel':channel, 'datetime':finaltime, 'text':text})
+                if args.database:
+                    connection.execute(transcript.delete().where(transcript.c.DateTime == finaltime))
+                    connection.execute(transcript.insert().values({
+                        'Name': name,
+                        'Channel': channel,
+                        'DateTime': finaltime,
+                        'Text': text}))
+                    
+    
+    if args.csvfile:
+        csvfile.close()
+    if args.database:
+        transaction.commit()
+        connection.close()
+        database.dispose()
         
 if __name__ == '__main__':
     loadTranscript(None)

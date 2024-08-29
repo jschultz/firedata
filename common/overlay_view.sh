@@ -23,21 +23,23 @@ args=(
   ":--debug:::Debug execution:flag"
   ":--verbosity::1:Verbosity level"
   "-e:--eventtable:::Semicolon-delimited name(s) of database table(s) containing event data":required
-  ":--eventid:::Semicolon-delimited Id column(s) in event table(s). Default is 'id'"
-  ":--eventorder:::Semicolon-separated list of sort order for event table(s)"
-  ":--eventfilter:::WHERE clause for selecting from event table(s)"
-  ":--eventlimit:::Semicolon-separated list of maximum number of events to retrieve from event table(s); empty means unlimited"
   "-b:--basename:::Table name base for output dump, polygon, point-in-polygon and junction output tables. Default is first event table name"
   "-j:--junction:::Semicolon-delimited junction table names. Default is 'eventtable'_junction"
   "-S:--suffix:::Suffix to append to first event table name to generate dump, polygon, point-in-polygon and junction table names:deprecated"
-  ":--polyfilter:::WHERE clause for selecting from polygon table"
-  ":--polycolumns:::Semicolon-separated list of columns to retrieve from polygon table"
-  ":--polyaliases:::Semicolon-separated list of aliases for columns retrieved from polygon table"
-  "-c:--eventcolumns::id:Semicolon-separated list of fully specified columns (table and column name) to retrieve from event table(s)"
-  ":--eventaliases:::Semicolon-separated list of aliases for columns retrieved from event table(s); empty value means use column name as alias"
+  ":--eventid:::Semicolon-delimited Id column(s) in event table(s). Default is 'id'"
+  ":--eventorder:::Semicolon-delimited list of sort order for event table(s)"
+  ":--eventfilter:::WHERE clause for selecting from event table(s)"
+  ":--eventlimit:::Semicolon-delimited list of maximum number of events to retrieve from event table(s); empty means unlimited"
+  "-c:--eventcolumns:::Semicolon-delimited list of fully specified columns (table and column name) to retrieve from event table(s)"
+  ":--eventaliases:::Semicolon-delimited list of aliases for columns retrieved from event table(s); empty value means use column name as alias"
   ":--flatten:::Output event columns as separate columns instead of arrays:flag"
-  ":--indexes:::Semicolon-separated list of indexes to create on view table"
-  ":--using:::Semicolon-separated list of index methods"
+  ":--polyfilter:::WHERE clause for selecting from polygon table"
+  ":--polycolumns:::Semicolon-delimited list of columns to retrieve from polygon table"
+  ":--polyaliases:::Semicolon-delimited list of aliases for columns retrieved from polygon table"
+  ":--calccolumns:::Semicolon-delimited list of columns to calculate"
+  ":--calcaliases:::Semicolon-delimited list of aliases for calculated columns"
+  ":--indexes:::Semicolon-delimited list of indexes to create on view table"
+  ":--using:::Semicolon-delimited list of index methods"
   "-a:--append:::Append output to existing view table:flag"
   "-v:--viewtable:::Table to generate, defaults to \$eventtable + \$suffix + '_view'"
   "-S:--viewfile:::Shapefile to generate:output"
@@ -61,6 +63,8 @@ IFS=';' read -r -a eventlimit_array  <<< "${eventlimit}"
 IFS=';' read -r -a junction_array    <<< "${junction}"
 IFS=';' read -r -a polycolumn_array  <<< "${polycolumns}"
 IFS=';' read -r -a polyalias_array   <<< "${polyaliases}"
+IFS=';' read -r -a calccolumn_array  <<< "${calccolumns}"
+IFS=';' read -r -a calcalias_array   <<< "${calcaliases}"
 IFS=';' read -r -a eventcolumn_array <<< "${eventcolumns}"
 IFS=';' read -r -a eventalias_array  <<< "${eventaliases}"
 IFS=';' read -r -a index_array       <<< "${indexes}"
@@ -76,7 +80,7 @@ fi
 if [[ "${nologfile}" != "true" ]]; then
     if [[ ! -n "${logfile}" ]]; then
         if [[ -n "${viewfile}" ]]; then
-            logfile=$(basename ${viewfile})
+            logfile=$(basename "${viewfile}")
             logfile="${logfile%.*}.log"
         else
             logfile="${viewtable}.log"
@@ -93,6 +97,12 @@ fi
 for ((colidx=0; colidx<${#polycolumn_array[@]}; colidx++)) do
     if [[ ! -n "${polyalias_array[colidx]}" ]]; then
         polyalias_array[colidx]="${polycolumn_array[colidx]}"
+    fi
+done
+
+for ((colidx=0; colidx<${#calccolumn_array[@]}; colidx++)) do
+    if [[ ! -n "${calcalias_array[colidx]}" ]]; then
+        calcalias_array[colidx]="${calccolumn_array[colidx]}"
     fi
 done
 
@@ -179,14 +189,19 @@ for ((colidx=0; colidx<${#polyalias_array[@]}; colidx++)) do
     VIEW_QUERY+="${separator} ${polytable}.${polycolumn_array[colidx]} AS \"${polyalias_array[colidx]}\""
     separator=","
 done
+for ((colidx=0; colidx<${#calcalias_array[@]}; colidx++)) do
+    VIEW_QUERY+="${separator} ${calccolumn_array[colidx]} AS \"${calcalias_array[colidx]}\""
+    separator=","
+done
 for ((colidx=0; colidx<${#eventalias_array[@]}; colidx++)) do
     if [[ "${flatten}" != "true" ]]; then
         VIEW_QUERY+="${separator} coalesce(${eventcolumn_array[colidx]}, '{}'::${eventtype_array[colidx]}[]) AS \"${eventalias_array[colidx]}\""
         separator=","
     else
         for ((linkidx=1; linkidx<=${eventlimit_array[colidx]}; linkidx++)) do
-            VIEW_QUERY+="${separator} ${eventcolumn_array[colidx]}_${linkidx} AS \"${eventalias_array[colidx]}_${linkidx}\""
+            VIEW_QUERY+="${separator} ${eventcolumn_array[colidx]} AS \"${eventalias_array[colidx]}\""
             separator=","
+            VIEW_QUERY+="${separator} ${eventcolumn_array[colidx]}_${linkidx} AS \"${eventalias_array[colidx]}_${linkidx}\""
         done
     fi
     separator=","
@@ -207,7 +222,7 @@ for ((tableidx=0; tableidx<${#eventtable_array[@]}; tableidx++)) do
     for ((colidx=0; colidx<${#eventcolumn_array[@]}; colidx++)) do
         if [[ "${eventcolumn_array[colidx]%.*}" == "${eventtable_array[tableidx]}" ]]; then
             if [[ "${flatten}" == "true" ]]; then
-                for ((linkidx=1; linkidx<=${eventlimit_array[colidx]}; linkidx++)) do
+                for ((linkidx=0; linkidx<=${eventlimit_array[colidx]}; linkidx++)) do
                     VIEW_QUERY+="${separator} (array_agg(${eventcolumn_array[colidx]}))[${linkidx}] AS \"${eventcolumn_array[colidx]#*.}_${linkidx}\""
                     separator=","
                 done
@@ -285,7 +300,7 @@ if [[ -n "${viewfile}" ]]; then
     if [[ ${verbosity} -ge 1 ]]; then
         echo "Creating shapefile ${viewfile}"
     fi
-    pgsql2shp -q -f ${viewfile} -u $PGUSER $PGDATABASE "${VIEW_QUERY}"
+    pgsql2shp -q -f "${viewfile}" -u $PGUSER $PGDATABASE "${VIEW_QUERY}"
     zip --move --junk-paths "${viewfile}".zip "${viewfile}".{cpg,dbf,prj,shp,shx}
 else
     if [[ "${append}" != "true" ]]; then
