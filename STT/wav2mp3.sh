@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Copyright 2023 Jonathan Schultz
+# Copyright 2024 Jonathan Schultz
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,7 +17,7 @@
 #
 set -e
 
-help='Use lame to compress audio files to a mp3 file'
+help='Use lame to compress audio files to a mp3 file, checking for already existing file and optionally removing old file'
 args=(
 # "-short:--long:variable:default:description:flags"
   ":--debug:::Debug execution:flag"
@@ -29,7 +29,7 @@ args=(
   "-p:--preset::voice:lame preset to use"
   
   "-d:--directory:::Directory to place output file; otherwise same directory as audio file"
-  "-O:--overwrite:::OK to overwrite output file:flag"
+#   "-O:--overwrite:::OK to overwrite output file:flag"
 
   ":filename:::Name of audio file to transcribe:input,required"
   
@@ -56,10 +56,24 @@ else
     outfile="${filename%.*}.mp3"
 fi
 
-if [[ (! -f "${outfile}") || "$(date -r ${outfile})" != "$(date -r ${filename})" || "${overwrite}" == "true" ]]; then
-#     echo "Encoding file ${filename} to ${outfile}" > /dev/stderr
+if [[ -f "${outfile}" ]] \
+&& [[ "$(date -r "${outfile}")" == "$(date -r "${filename}")" ]] \
+&& (( $(echo $(mediainfo --inform="Audio;%Duration%" "${outfile}") '>=' $(mediainfo --inform="Audio;%Duration%" "${filename}") | bc -l) ));
+then
+    echo "Output file ${outfile} already exists" > /dev/stderr
+else
+    echo "Encoding file ${filename} to ${outfile}" > /dev/stderr
     lame --quiet --preset ${preset} ${filename} ${outfile}
     touch "${outfile}" --reference="${filename}"
-# else
-#     echo "WARNING: Output file ${outfile} already exists - encoding skipped" > /dev/stderr
+fi
+
+if [[ -f "${outfile}" ]] \
+&& [[ "$(date -r "${outfile}")" == "$(date -r "${filename}")" ]] \
+&& (( $(echo $(mediainfo --inform="Audio;%Duration%" "${outfile}") '>=' $(mediainfo --inform="Audio;%Duration%" "${filename}") | bc -l) ));
+then
+    echo "Moving file ${filename} to trash"
+    mv "${filename}" $HOME/Trash
+else
+    echo "ERROR: output file ${outfile} mismatch"
+    exit
 fi

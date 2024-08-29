@@ -34,7 +34,6 @@ def loadTranscript(arglist=None):
                                               help='Output CSV file, default is ''infile''.csv.', output=True)
     
     parser.add_argument('--no-comments',      action='store_true', help='Do not output descriptive comments')
-    parser.add_argument('--no-header',        action='store_true', help='Do not output CSV header with column names')
 
     parser.add_argument('infile',             type=str, help="Name of lrc transcript file to export", input=True)
 
