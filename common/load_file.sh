@@ -35,7 +35,7 @@ source $(dirname "$0")/argparse.sh
 
 if [[ ! -n "${table}" ]]; then
     if [[ -n "${filename}" ]]; then
-        table=$(basename ${filename})
+        table=$(basename "${filename}")
         table="${table%.*}"
     else
         echo "At least one of 'table' and 'filename' must be specified" > /dev/stderr
@@ -46,7 +46,7 @@ if [[ "${nologfile}" != "true" ]]; then
     if [[ ! -n "${logfile}" ]]; then
         logfile=${table}.log
     fi
-    echo "${COMMENTS}" > ${logfile}
+    echo "${COMMENTS}" > "${logfile}"
 fi
 
 if [[ "${debug}" == "true" ]]; then

@@ -16,7 +16,7 @@ FROM (
       JOIN southern_view AS view ON view.poly_id = lmu_junction.poly_id
       JOIN southern_poly AS poly ON poly.id = view.poly_id
       LEFT OUTER JOIN dbca_fire_history_dbca_060 AS event ON event.object_id = view.dbca_fire_history_dbca_060_object_id[1]
-      WHERE forest_man_plan_2014_2023_dbca_041_id IS NOT NULL) foo
+      WHERE forest_man_plan_2014_2023_dbca_041_id != '{}') foo
 GROUP BY description, fmp_geom"
 #    --csvfile "lmu_fmp_yslb_cumulative_${refyear}.csv"
 ################################################################################

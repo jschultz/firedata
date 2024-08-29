@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# Copyright 2023 Jonathan Schultz
+# Copyright 2024 Jonathan Schultz
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -135,14 +135,6 @@ def getDailyBurns(arglist=None):
                 
             if not all((indata[idx] == outdata[idx] for idx in range(len(indata)))):
                 break
-            # innerbreak = False
-            # for idx in range(len(indata)):
-            #     if indata[idx] != outdata[idx]:
-            #         print("DIFF ", indata[idx], outdata[idx])
-            #         innerbreak = True
-            #         break
-            # if innerbreak:
-            #     break
                                
         time.sleep(60)
         
