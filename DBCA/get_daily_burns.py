@@ -69,7 +69,7 @@ def getDailyBurns(arglist=None):
         except:
             return ''
 
-    def decodeDailyBurns():
+    def decodeDailyBurns(wms):
         rc = []
       
         try:
@@ -120,21 +120,27 @@ def getDailyBurns(arglist=None):
             
         return rc
 
-    wms = WebMapService(args.server, version=args.version)
-
+    wms = None
     while True:
-        outdata = decodeDailyBurns()
-        if outdata is not None:
-            outfieldnames = list(set(sum([list(item.keys()) for item in outdata], start=[])))
-            if set(outfieldnames) != set(infieldnames) or len(outdata) != len(indata):
-                break
+        if not wms:
+            try:
+                wms = WebMapService(args.server, version=args.version)
+            except:
+                pass
+            
+        if wms:
+            outdata = decodeDailyBurns(wms)
+            if outdata is not None:
+                outfieldnames = list(set(sum([list(item.keys()) for item in outdata], start=[])))
+                if set(outfieldnames) != set(infieldnames) or len(outdata) != len(indata):
+                    break
 
-            for data in outdata:
-                for fieldname in outfieldnames:
-                    data[fieldname] = data.get(fieldname, '')
-                
-            if not all((indata[idx] == outdata[idx] for idx in range(len(indata)))):
-                break
+                for data in outdata:
+                    for fieldname in outfieldnames:
+                        data[fieldname] = data.get(fieldname, '')
+                    
+                if not all((indata[idx] == outdata[idx] for idx in range(len(indata)))):
+                    break
                                
         time.sleep(60)
         
