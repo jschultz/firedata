@@ -22,6 +22,7 @@ from bs4 import BeautifulSoup
 from shapely.geometry import Polygon, MultiPolygon
 import csv
 from datetime import datetime
+import dateutil.parser
 import time
 import sys
 import os
@@ -34,13 +35,15 @@ def getDailyBurns(arglist=None):
     parser.add_argument('-v', '--verbosity',  type=int, default=1, private=True)
     
     parser.add_argument('-s', '--server',     type=str, 
-                                              default='https://kmi.dpaw.wa.gov.au/geoserver/public/wms?service=WMS&version=1.1.1')
+                                              default='https://kmi.dpaw.wa.gov.au/geoserver/public/wms')
     parser.add_argument('-V', '--version',    type=str,
                                               default='1.1.1')
     parser.add_argument('-l', '--layer',      type=str,
                                               default='public:todays_burns')
     parser.add_argument('-c', '--csvfile',    type=str, 
                                               help='Output CSV file, otherwise use stdout.', output=True)
+    parser.add_argument('-i', '--interval',   type=int, default=60,
+                                              help='Polling interval.')
     
     parser.add_argument('--no-comments',      action='store_true', help='Do not output descriptive comments')
     parser.add_argument('--no-header',        action='store_true', help='Do not output CSV header with column names')
@@ -97,14 +100,14 @@ def getDailyBurns(arglist=None):
                 for n in range(len(spans) // 2):
                     attributes[spans[2 * n].get_text()] = spans[2 * n + 1].get_text()
                     
-                attributes['burn_target_date'] = str(datetime.strptime(attributes.get('burn_target_date_raw'),'%m/%d/%y %I:%M %p').date())
+                attributes['burn_target_date'] = str(dateutil.parser.parse(attributes.get('burn_target_date_raw')).date())
                 del attributes['burn_target_date_raw']
                 attributes['indicative_area']  = float2str(attributes.get('indicative_area'))
                 attributes['burn_target_long'] = float2str(attributes.get('burn_target_long'))
                 attributes['burn_target_lat']  = float2str(attributes.get('burn_target_lat'))
                 attributes['burn_planned_area_today'] = float2str(attributes.get('burn_planned_area_today'))
                 try:
-                    attributes['burn_est_start'] = str(datetime.strptime(attributes.get('burn_est_start', ''),'%H:%M:%S').time())
+                    attributes['burn_est_start'] = str(dateutil.parser.parse(attributes.get('burn_est_start', '')).time())
                 except:
                     pass
                     
@@ -148,7 +151,10 @@ def getDailyBurns(arglist=None):
         if os.path.exists(args.csvfile):
             shutil.move(args.csvfile, args.csvfile + '.bak')
 
-    csvfile = open(args.csvfile, 'w')
+        csvfile = open(args.csvfile, 'w')
+    else:
+        csvfile = sys.stdout
+
     if not args.no_comments:
         parser.write_comments(args, csvfile, incomments=incomments)
 
@@ -157,7 +163,8 @@ def getDailyBurns(arglist=None):
     for item in outdata:
         csvwriter.writerow(item)
         
-    csvfile.close()
+    if args.csvfile is not None:
+        csvfile.close()
         
 if __name__ == '__main__':
     getDailyBurns(None)
