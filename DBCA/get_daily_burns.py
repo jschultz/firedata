@@ -128,8 +128,9 @@ def getDailyBurns(arglist=None):
         if not wms:
             try:
                 wms = WebMapService(args.server, version=args.version)
-            except:
-                pass
+            except Exception as e:
+                print(e)
+                wms = None
             
         if wms:
             outdata = decodeDailyBurns(wms)
