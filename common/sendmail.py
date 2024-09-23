@@ -26,9 +26,10 @@ from io import StringIO
 import pandas
 
 port = 587  # For starttls
-smtp_server = "server.tld"
-sender_email = "bot@server.tld"
-recipients = ["someone@domain.tld"]
+smtp_server = "smtp.zoho.com.au"
+sender_email = "info@fabwa.org.au"
+# recipients = ["jonathan@schultz.la", "segoluke@tutanota.com"]
+recipients = ["jonathan@schultz.la"]
 password = "3kLtgQ8qLhvH"
 
 msg = MIMEMultipart()
