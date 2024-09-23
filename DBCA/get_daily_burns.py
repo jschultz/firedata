@@ -145,7 +145,7 @@ def getDailyBurns(arglist=None):
                 if not all((indata[idx] == outdata[idx] for idx in range(len(indata)))):
                     break
                                
-        time.sleep(60)
+        time.sleep(args.interval)
         
     if args.csvfile is not None:
         if os.path.exists(args.csvfile):
