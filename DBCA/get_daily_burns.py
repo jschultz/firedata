@@ -17,7 +17,10 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 from argrecord import ArgumentHelper, ArgumentRecorder
+import urllib3
 from owslib.wms import WebMapService
+from owslib.util import Authentication
+from fp.fp import FreeProxy, FreeProxyException
 from bs4 import BeautifulSoup
 from shapely.geometry import Polygon, MultiPolygon
 import csv
@@ -38,6 +41,7 @@ def getDailyBurns(arglist=None):
                                               default='https://kmi.dpaw.wa.gov.au/geoserver/public/wms')
     parser.add_argument('-V', '--version',    type=str,
                                               default='1.1.1')
+    parser.add_argument('-p', '--proxy',      type=str, help='Proxy URL or "free" to use free-proxy'),
     parser.add_argument('-l', '--layer',      type=str,
                                               default='public:todays_burns')
     parser.add_argument('-c', '--csvfile',    type=str, 
@@ -65,6 +69,7 @@ def getDailyBurns(arglist=None):
             infile.close()
         except StopIteration:
             pass
+
 
     def float2str(s):
         try:
@@ -123,15 +128,34 @@ def getDailyBurns(arglist=None):
             
         return rc
 
-    wms = None
+    if args.proxy:
+        auth = Authentication(verify=False)
+        urllib3.disable_warnings()
+    else:
+        aut = Authentication()
+
+    proxy = None
     while True:
-        if not wms:
-            try:
-                wms = WebMapService(args.server, version=args.version)
-            except Exception as e:
-                print(e)
-                wms = None
-            
+
+        if args.proxy == 'free':
+            while not proxy:
+                try:
+                    proxy = FreeProxy(https=True).get()
+                except FreeProxyException:
+                    continue
+
+        else:
+            proxy = args.proxy
+
+        os.environ['http_proxy']  = proxy or ''
+        os.environ['https_proxy'] = proxy or ''
+
+        try:
+            wms = WebMapService(args.server, version=args.version, auth=auth)
+        except Exception as e:
+            print(e)
+            wms = None
+
         if wms:
             outdata = decodeDailyBurns(wms)
             if outdata is not None:
