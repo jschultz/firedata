@@ -5,7 +5,9 @@ Before=multi-user.target
 [Service]
 Type=simple
 Restart=always
-ExecStart=/usr/bin/bash /home/jschultz/src/firedata/DBCA/get_daily_burns_daemon.sh
+WorkingDirectory=/home/jschultz/src/firedata/DBCA
+Environment=PATH=/home/jschultz/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+ExecStart=/usr/bin/bash get_daily_burns_daemon.sh
 
 [Install]
 WantedBy=default.target

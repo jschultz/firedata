@@ -17,11 +17,11 @@
 
 DAILY_BURNS_DIR="$HOME/daily_burns"
 while :; do 
-  $(dirname "$0")/get_daily_burns.py --no-comments --csvfile "$DAILY_BURNS_DIR/daily_burns.csv"
+  argreplay get_daily_burns.log
   if [ $(wc -c <"$DAILY_BURNS_DIR/daily_burns.csv") -gt 2 ]; then
     DAILY_BURNS_FILE="daily_burns.$(date "+%Y-%m-%d_%H:%M:%S").csv"
     cp -p "$DAILY_BURNS_DIR/daily_burns.csv" "$DAILY_BURNS_DIR"/"$DAILY_BURNS_FILE"
-    cat "$DAILY_BURNS_DIR"/"$DAILY_BURNS_FILE" | $(dirname "$0")/../common/sendmail.py
+    argreplay sendmail.log
   fi
   echo $DAILY_BURNS_FILE
 done

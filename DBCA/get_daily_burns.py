@@ -132,7 +132,7 @@ def getDailyBurns(arglist=None):
         auth = Authentication(verify=False)
         urllib3.disable_warnings()
     else:
-        aut = Authentication()
+        auth = Authentication()
 
     proxy = None
     while True:
@@ -140,13 +140,14 @@ def getDailyBurns(arglist=None):
         if args.proxy == 'free':
             while not proxy:
                 try:
-                    proxy = FreeProxy(https=True).get()
+                    proxy = FreeProxy(https=True, rand=True).get()
                 except FreeProxyException:
                     continue
 
         else:
             proxy = args.proxy
 
+        print("proxy = ", proxy)
         os.environ['http_proxy']  = proxy or ''
         os.environ['https_proxy'] = proxy or ''
 
