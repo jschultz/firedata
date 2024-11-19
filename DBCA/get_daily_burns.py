@@ -36,26 +36,28 @@ def getDailyBurns(arglist=None):
                               fromfile_prefix_chars='@')
 
     parser.add_argument('-v', '--verbosity',  type=int, default=1, private=True)
-    
-    parser.add_argument('-s', '--server',     type=str, 
+
+    parser.add_argument('-s', '--server',     type=str,
                                               default='https://kmi.dpaw.wa.gov.au/geoserver/public/wms')
     parser.add_argument('-V', '--version',    type=str,
                                               default='1.1.1')
     parser.add_argument('-p', '--proxy',      type=str, help='Proxy URL or "free" to use free-proxy'),
     parser.add_argument('-l', '--layer',      type=str,
                                               default='public:todays_burns')
-    parser.add_argument('-c', '--csvfile',    type=str, 
+    parser.add_argument('-c', '--csvfile',    type=str,
                                               help='Output CSV file, otherwise use stdout.', output=True)
     parser.add_argument('-i', '--interval',   type=int, default=60,
                                               help='Polling interval.')
-    
+    parser.add_argument('-t', '--timeout',    type=int, default=30,
+                                              help='Timeout for WMS request.')
+
     parser.add_argument('--no-comments',      action='store_true', help='Do not output descriptive comments')
     parser.add_argument('--no-header',        action='store_true', help='Do not output CSV header with column names')
 
     args = parser.parse_args(arglist)
 
     csv.field_size_limit(sys.maxsize)
-    
+
     incomments = None
     infieldnames = []
     indata = []
@@ -79,12 +81,12 @@ def getDailyBurns(arglist=None):
 
     def decodeDailyBurns(wms):
         rc = []
-      
+
         try:
-            img=wms.getmap( layers=[args.layer], bbox=(108.0,-45.0,155.0,-10.0), size=(768,571), srs='EPSG:4283', format='rss' )
+            img=wms.getmap( layers=[args.layer], bbox=(108.0,-45.0,155.0,-10.0), size=(768,571), srs='EPSG:4283', format='rss', timeout=args.timeout )
         except:
             return None
-        
+
         data = BeautifulSoup(img.read(), 'xml')
         # print(data.prettify())
 
@@ -100,11 +102,11 @@ def getDailyBurns(arglist=None):
                     multipolygon = []
 
                     rc += [attributes]
-                    
+
                 attributes = {}
                 for n in range(len(spans) // 2):
                     attributes[spans[2 * n].get_text()] = spans[2 * n + 1].get_text()
-                    
+
                 attributes['burn_target_date'] = str(dateutil.parser.parse(attributes.get('burn_target_date_raw')).date())
                 del attributes['burn_target_date_raw']
                 attributes['indicative_area']  = float2str(attributes.get('indicative_area'))
@@ -115,7 +117,7 @@ def getDailyBurns(arglist=None):
                     attributes['burn_est_start'] = str(dateutil.parser.parse(attributes.get('burn_est_start', '')).time())
                 except:
                     pass
-                    
+
             valiter = iter([float(val) for val in item.find("georss:polygon").get_text().split(' ')])
             polygon = Polygon([(lat, lon) for lat, lon in zip(valiter, valiter)])
             multipolygon += [polygon]
@@ -123,38 +125,45 @@ def getDailyBurns(arglist=None):
         if multipolygon != []:
             # attributes['geom'] = multipolygon[0].wkt if len(multipolygon) == 1 else MultiPolygon(multipolygon).wkt
             multipolygon = []
-            
+
             rc += [attributes]
-            
+
         return rc
 
     if args.proxy:
         auth = Authentication(verify=False)
         urllib3.disable_warnings()
+        if args.proxy != 'free':
+            os.environ['http_proxy']  = args.proxy
+            os.environ['https_proxy'] = args.proxy
     else:
         auth = Authentication()
 
-    proxy = None
+    lastpolltime = None
+
     while True:
 
         if args.proxy == 'free':
-            while not proxy:
+            while True:
                 try:
+                    if args.verbosity >= 2:
+                        print("Looking for free proxy", file=sys.stderr)
                     proxy = FreeProxy(https=True, rand=True).get()
+                    os.environ['http_proxy']  = proxy
+                    os.environ['https_proxy'] = proxy
+                    if args.verbosity >= 2:
+                        print("Found free proxy", proxy, file=sys.stderr)
+                    break
                 except FreeProxyException:
+                    if args.verbosity >= 2:
+                        print("FreeProxyException occurred", file=sys.stderr)
                     continue
 
-        else:
-            proxy = args.proxy
-
-        print("proxy = ", proxy)
-        os.environ['http_proxy']  = proxy or ''
-        os.environ['https_proxy'] = proxy or ''
 
         try:
             wms = WebMapService(args.server, version=args.version, auth=auth)
         except Exception as e:
-            print(e)
+            print(e, file=sys.stderr)
             wms = None
 
         if wms:
@@ -167,12 +176,24 @@ def getDailyBurns(arglist=None):
                 for data in outdata:
                     for fieldname in outfieldnames:
                         data[fieldname] = data.get(fieldname, '')
-                    
+
                 if not all((indata[idx] == outdata[idx] for idx in range(len(indata)))):
                     break
-                               
-        time.sleep(args.interval)
-        
+
+            timenow = datetime.now()
+            if lastpolltime is not None:
+                remaininginterval = args.interval - (timenow - lastpolltime).total_seconds()
+            else:
+                remaininginterval = args.interval
+
+            if args.verbosity >= 2:
+                print("Remaining interval:", remaininginterval, file=sys.stderr)
+
+            if remaininginterval > 0:
+                time.sleep(remaininginterval)
+
+            lastpolltime = timenow
+
     if args.csvfile is not None:
         if os.path.exists(args.csvfile):
             shutil.move(args.csvfile, args.csvfile + '.bak')
@@ -188,10 +209,10 @@ def getDailyBurns(arglist=None):
     csvwriter.writeheader()
     for item in outdata:
         csvwriter.writerow(item)
-        
+
     if args.csvfile is not None:
         csvfile.close()
-        
+
 if __name__ == '__main__':
     getDailyBurns(None)
 
