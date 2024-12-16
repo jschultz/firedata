@@ -199,9 +199,8 @@ for ((colidx=0; colidx<${#eventalias_array[@]}; colidx++)) do
         separator=","
     else
         for ((linkidx=1; linkidx<=${eventlimit_array[colidx]}; linkidx++)) do
-            VIEW_QUERY+="${separator} ${eventcolumn_array[colidx]} AS \"${eventalias_array[colidx]}\""
-            separator=","
             VIEW_QUERY+="${separator} ${eventcolumn_array[colidx]}_${linkidx} AS \"${eventalias_array[colidx]}_${linkidx}\""
+            separator=","
         done
     fi
     separator=","
@@ -214,11 +213,8 @@ for ((tableidx=0; tableidx<${#eventtable_array[@]}; tableidx++)) do
         VIEW_QUERY+=" LATERAL"
     fi
     VIEW_QUERY+=" (SELECT"
-    separator=""
-    if [[ ! -n "${eventlimit_array[tableidx]}" ]]; then
-        VIEW_QUERY+=" ${eventtable_array[tableidx]}.poly_id"
-        separator=","
-    fi
+    VIEW_QUERY+=" ${eventtable_array[tableidx]}.poly_id"
+    separator=","
     for ((colidx=0; colidx<${#eventcolumn_array[@]}; colidx++)) do
         if [[ "${eventcolumn_array[colidx]%.*}" == "${eventtable_array[tableidx]}" ]]; then
             if [[ "${flatten}" == "true" ]]; then
