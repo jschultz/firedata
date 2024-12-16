@@ -20,7 +20,13 @@
 #    --command "CREATE INDEX ON data.DBCA_Fire_History_DBCA_060_${datetime} (fih_date1)"
 ################################################################################
 # psql_command.sh
+#    --command "CREATE VIEW DBCA_Fire_History_DBCA_060 AS SELECT * FROM data.DBCA_Fire_History_DBCA_060_${datetime}"
+################################################################################
+# psql_command.sh
 #    --command "ALTER TABLE data.DBCA_Fire_History_DBCA_060_${datetime} ALTER COLUMN fih_date1 TYPE date"
+################################################################################
+# psql_command.sh
+#    --command "DROP VIEW DBCA_Fire_History_DBCA_060"
 ################################################################################
 #>datetime argreplay
 #    --substitute table:DBCA_Fire_History_DBCA_060
