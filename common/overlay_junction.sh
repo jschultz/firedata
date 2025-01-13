@@ -27,8 +27,9 @@ args=(
   "-b:--basename:::Table name base for output dump, polygon, point-in-polygon and junction output tables. Default is first event table name"
   "-j:--junction:::Semicolon-delimited junction table names. Default is 'eventtable'_junction"
   "-S:--suffix:::Suffix to append to first event table name to generate dump, polygon, point-in-polygon and junction table names:deprecated"
-  "-w:--where:::WHERE clause(s) for selecting from event table(s); deprecated in favour of 'area':deprecated"
+  "-w:--where:::WHERE clause(s) for selecting from event table(s). Consider using 'area' or 'exclude' if simpler:"
   "-a:--area:::Area to constrain junction calculation"
+  "-e:--exclude:::Area to exclude from junction calculation"
   "-m:--merge:::Merge new with existing polygon table:flag"
   "-E:--existing:::Use existing tables where they exist:flag"
   "-K:--keep:::Keep tables for re-use:flag"
@@ -126,15 +127,56 @@ for ((tableidx=0; tableidx<${#eventtable_array[@]}; tableidx++)) do
         else
             backupcommand=
         fi
+        dumptable=""
+        withintro="WITH"
         if [[ -n "${area}" ]]; then
-            dumptable="WITH area as (${area})
-                        SELECT ${eventid_array[tableidx]}, (ST_Dump(ST_Intersection(area.geom,event.${geometry_array[tableidx]}))).geom AS geom FROM ${canonical_array[tableidx]} AS event, area WHERE ST_Intersects(area.geom,event.${geometry_array[tableidx]})"
-        elif [[ -n "${where}" ]]; then
-            dumptable="SELECT ${eventid_array[tableidx]}, (ST_Dump(${geometry_array[tableidx]})).geom AS geom FROM ${canonical_array[tableidx]} WHERE ${where}"
-        else
-            dumptable="SELECT ${eventid_array[tableidx]}, (ST_Dump(${geometry_array[tableidx]})).geom AS geom FROM ${canonical_array[tableidx]}"
+            dumptable+="${withintro} area as (${area})"
+            withintro=","
         fi
-        echo $dumptable
+        if [[ -n "${exclude}" ]]; then
+            dumptable+="${withintro} exclude as (${exclude})"
+            withintro=","
+        fi
+        dumptable+=" 
+            SELECT ${eventid_array[tableidx]},
+                   (ST_Dump("
+        if [[ -n "${area}" ]]; then
+            dumptable+="ST_Intersection("
+        fi
+        if [[ -n "${exclude}" ]]; then
+            dumptable+="ST_Difference("
+        fi
+        dumptable+="event.${geometry_array[tableidx]}"
+        if [[ -n "${exclude}" ]]; then
+            dumptable+=", exclude.geom)"
+        fi
+        if [[ -n "${area}" ]]; then
+            dumptable+=", area.geom)"
+        fi
+        dumptable+=")).geom FROM ${canonical_array[tableidx]} AS event"
+        if [[ -n "${area}" ]]; then
+            dumptable+=", area"
+        fi
+        if [[ -n "${exclude}" ]]; then
+            dumptable+=", exclude"
+        fi
+        whereintro="WHERE"
+        if [[ -n "${area}" ]]; then
+            dumptable+=" ${whereintro} ST_Intersects(event.${geometry_array[tableidx]}, area.geom)"
+            whereintro="AND"
+        fi
+        if [[ -n "${exclude}" ]]; then
+            dumptable+=" ${whereintro} NOT ST_Within(event.${geometry_array[tableidx]}, exclude.geom)"
+            whereintro="AND"
+        fi
+        if [[ -n "${where}" ]]; then
+            dumptable+=" ${whereintro} ${where}"
+            whereintro="AND"
+        fi
+        
+        if [[ "${debug}" == "true" ]]; then
+            echo $dumptable
+        fi
         psql --variable=ON_ERROR_STOP=1 \
             --command="${backupcommand}" \
             --command="CREATE TABLE ${canonical_array[tableidx]}_dump AS ${dumptable}" \

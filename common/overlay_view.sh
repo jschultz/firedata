@@ -133,6 +133,12 @@ if [[ ! -n "${viewtable}" ]]; then
 fi
 
 for ((colidx=0; colidx<${#eventcolumn_array[@]}; colidx++)) do
+    if [[ "${eventcolumn_array[colidx]%.*}" == "${eventcolumn_array[colidx]%.*}" ]]; then
+        eventcolumncorrelation_array[colidx]=""
+    else
+        eventcolumncorrelation_array[colidx]="${eventcolumn_array[colidx]%.*}"
+    fi
+    eventcolumnname_array[colidx]="${eventcolumn_array[colidx]#*.}"
     if [[ ! -n "${eventalias_array[colidx]}" ]]; then
         eventalias_array[colidx]="${eventcolumn_array[colidx]#*.}"
     fi
@@ -216,7 +222,8 @@ for ((tableidx=0; tableidx<${#eventtable_array[@]}; tableidx++)) do
     VIEW_QUERY+=" ${eventtable_array[tableidx]}.poly_id"
     separator=","
     for ((colidx=0; colidx<${#eventcolumn_array[@]}; colidx++)) do
-        if [[ "${eventcolumn_array[colidx]%.*}" == "${eventtable_array[tableidx]}" ]]; then
+        if [[ "${eventcolumncorrelation_array[colidx]}" == ""
+           || "${eventcolumncorrelation_array[colidx]}" == "${eventtable_array[tableidx]}" ]]; then
             if [[ "${flatten}" == "true" ]]; then
                 for ((linkidx=0; linkidx<=${eventlimit_array[colidx]}; linkidx++)) do
                     VIEW_QUERY+="${separator} (array_agg(${eventcolumn_array[colidx]}))[${linkidx}] AS \"${eventcolumn_array[colidx]#*.}_${linkidx}\""
@@ -234,7 +241,8 @@ for ((tableidx=0; tableidx<${#eventtable_array[@]}; tableidx++)) do
     done
     VIEW_QUERY+=" FROM (SELECT ${junction_array[tableidx]}.poly_id"
     for ((colidx=0; colidx<${#eventcolumn_array[@]}; colidx++)) do
-        if [[ "${eventcolumn_array[colidx]%.*}" == "${eventtable_array[tableidx]}" ]]; then
+        if [[ "${eventcolumncorrelation_array[colidx]}" == ""
+           || "${eventcolumncorrelation_array[colidx]}" == "${eventtable_array[tableidx]}" ]]; then
             VIEW_QUERY+=", ${eventcolumn_array[colidx]}"
         fi
     done
@@ -309,7 +317,7 @@ else
             backupcommand=
         fi
         if [[ "${nocomments}" != "true" ]]; then
-            commentcommand="COMMENT ON TABLE \"${viewtable}\" IS '${COMMENTS//\'/\'\'}'"
+            commentcommand="COMMENT ON TABLE ${viewtable} IS '${COMMENTS//\'/\'\'}'"
         else
             commentcommand=
         fi
@@ -317,6 +325,7 @@ else
              --command="${backupcommand}" \
              --command="CREATE TABLE ${viewtable} AS ${VIEW_QUERY}" \
              --command="${commentcommand}"
+
         for ((indexidx=0; indexidx<${#index_array[@]}; indexidx++)) do
             if [[ -n "${using_array[indexidx]}" ]]; then
                 using="USING ${using_array[indexidx]}"
@@ -333,7 +342,7 @@ else
         if [[ "${nocomments}" != "true" ]]; then
             INCOMMENTS=$(psql --csv --tuples-only --no-align --quiet --command="\timing off" --command "SELECT obj_description('${viewtable}'::regclass, 'pg_class')")
             NEWCOMMENTS="${COMMENTS}${INCOMMENTS}"
-            commentcommand="COMMENT ON TABLE \"${viewtable}\" IS '${NEWCOMMENTS//\'/\'\'}'"
+            commentcommand="COMMENT ON TABLE ${viewtable} IS '${NEWCOMMENTS//\'/\'\'}'"
         else
             commentcommand=
         fi
