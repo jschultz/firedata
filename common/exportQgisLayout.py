@@ -40,23 +40,30 @@ def exportQgisLayout(arglist=None):
     parser.add_argument('-r', '--raster',  action='store_true', help='Export all layers as raster')
 
     parser.add_argument('-v', '--variable', nargs='+', type=str, help='List of variable:value pairs to define as project variables')
-    
+
     parser.add_argument('--logfile',      type=str, help="Logfile", private=True)
     parser.add_argument('--nologfile',    action='store_true', help='Do not output a logfile')
     parser.add_argument('--nobackup',     action='store_true', help='Do not back up existing output file')
-    
+
     parser.add_argument('qgisfile', type=str, help="Name of QGIS file")
 
     args = parser.parse_args(arglist)
 
+    if not args.outpath:
+        args.outpath = [''] * len(args.layout)
+    if len(args.outpath) < len(args.layout):
+        args.outpath.extend([''] * len(args.layout) - len(args.outpath))
+
+    for idx in range(len(args.layout)):
+        if idx >= len(args.outpath) or not args.outpath[idx]:
+            args.outpath[idx] = args.layout[idx] + '.pdf'
+
     if not args.nologfile:
         if args.logfile:
             logfilename = args.logfile
-        elif args.outpath[0]:
-            logfilename = args.outpath[0].split('/')[-1].rsplit('.',1)[0] + '.log'
         else:
-            logfilename = args.qgisfile.split('/')[-1].rsplit('.',1)[0] + '.log'
-                
+            logfilename = args.outpath[0].split('/')[-1].rsplit('.',1)[0] + '.log'
+
         logfile = open(logfilename, 'w')
         parser.write_comments(args, logfile, incomments=ArgumentHelper.separator())
         logfile.close()
@@ -70,7 +77,7 @@ def exportQgisLayout(arglist=None):
     if args.variable:
         for var in args.variable:
             QgsExpressionContextUtils.setProjectVariable(project, var.split(':')[0], var.split(':')[1])
-    
+
     manager = QgsProject.instance().layoutManager()
     index = 0
     for layoutname in args.layout:
@@ -94,20 +101,28 @@ def exportQgisLayout(arglist=None):
         else:
             imagesettings = QgsLayoutExporter.ImageExportSettings()
 
-        if args.single:
+        atlas = layout.atlas()
+        if not atlas.enabled() or args.single:
             if args.outpath[index] and os.path.exists(args.outpath[index]) and not args.nobackup:
                 os.rename(args.outpath[index], args.outpath[index] + '.bak')
 
             exporter = QgsLayoutExporter(layout)
-            if outext == 'pdf':
-                exporter.exportToPdf(layout.atlas(), args.outpath[index], pdfsettings)
-            elif outext == 'svg':
-                exporter.exportToSvg(layout.atlas(), args.outpath[index], svgsettings)
+            if not atlas.enabled():
+                if outext == 'pdf':
+                    exporter.exportToPdf(args.outpath[index], pdfsettings)
+                elif outext == 'svg':
+                    exporter.exportToSvg(args.outpath[index], svgsettings)
+                else:
+                    exporter.exportToImage(args.outpath[index], imagesettings)
             else:
-                layout.atlas().setFilenameExpression("'" + outroot + "'")   #Who knows?
-                exporter.exportToImage(layout.atlas(), args.outpath[index], outext, imagesettings)
+                if outext == 'pdf':
+                    exporter.exportToPdf(atlas, args.outpath[index], pdfsettings)
+                elif outext == 'svg':
+                    exporter.exportToSvg(atlas, args.outpath[index], svgsettings)
+                else:
+                    atlas.setFilenameExpression("'" + outroot + "'")   #Who knows?
+                    exporter.exportToImage(atlas, args.outpath[index], outext, imagesettings)
         else:
-            atlas =layout.atlas()
             atlas.beginRender()
             while atlas.next():
                 exporter = QgsLayoutExporter(atlas.layout())
@@ -120,11 +135,11 @@ def exportQgisLayout(arglist=None):
                     outpath = os.path.join(args.outpath[index], atlas.currentFilename() + '.svg')
                 else:
                     exporter.exportToSvg(outpath, imagesettings)
-                
+
             atlas.endRender
-            
+
         index += 1
-        
+
     qgs.exitQgis()
 
 if __name__ == '__main__':
