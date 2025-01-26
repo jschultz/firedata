@@ -39,7 +39,7 @@ if [[ ! -n "${table}" ]]; then
         table="${table%.*}"
     else
         echo "At least one of 'table' and 'filename' must be specified" > /dev/stderr
-        return 1
+        exit 1
     fi
 fi
 if [[ "${nologfile}" != "true" ]]; then

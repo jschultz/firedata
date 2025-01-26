@@ -25,7 +25,7 @@ args=(
   "-e:--eventtable:::Semicolon-delimited name(s) of database table(s) containing event data":required
   "-b:--basename:::Table name base for output dump, polygon, point-in-polygon and junction output tables. Default is first event table name"
   "-j:--junction:::Semicolon-delimited junction table names. Default is 'eventtable'_junction"
-  "-S:--suffix:::Suffix to append to first event table name to generate dump, polygon, point-in-polygon and junction table names:deprecated"
+  "-S:--suffix:::Suffix to append to first event table name to generate dump, polygon, point-in-polygon and junction table names"
   ":--eventid:::Semicolon-delimited Id column(s) in event table(s). Default is 'id'"
   ":--eventorder:::Semicolon-delimited list of sort order for event table(s)"
   ":--eventfilter:::WHERE clause for selecting from event table(s)"
@@ -72,9 +72,6 @@ IFS=';' read -r -a using_array       <<< "${using}"
 
 if [[ ! -n "${basename}" ]]; then
     basename=${eventtable_array[0]}
-    if [[ ! -n "${suffix}" ]]; then
-        basename=${basename}_${suffix}
-    fi
 fi
 
 if [[ "${nologfile}" != "true" ]]; then
@@ -108,10 +105,10 @@ done
 
 if [[ "${append}" == "true" && -n "${viewfile}" ]]; then
     echo "'append' option cannot be used when producing a shapefile" > /dev/stderr
-    return 1
+    exit 1
 fi
 
-polytable=${basename}_poly
+polytable=${basename}_${suffix}_poly
 
 for ((tableidx=0; tableidx<${#eventtable_array[@]}; tableidx++)) do
     canonical_array[tableidx]=$(psql --variable=ON_ERROR_STOP=1 \
@@ -124,16 +121,16 @@ for ((tableidx=0; tableidx<${#eventtable_array[@]}; tableidx++)) do
         eventid_array[tableidx]="id"
     fi
     if [[ ! -n "${junction_array[tableidx]}" ]]; then
-        junction_array[tableidx]="${basename}_${eventtable_array[tableidx]}_junction"
+        junction_array[tableidx]="${basename}_${suffix}_${eventtable_array[tableidx]}_junction"
     fi
 done
 
 if [[ ! -n "${viewtable}" ]]; then
-    viewtable=${basename}_view
+    viewtable=${basename}_${suffix}_view
 fi
 
 for ((colidx=0; colidx<${#eventcolumn_array[@]}; colidx++)) do
-    if [[ "${eventcolumn_array[colidx]%.*}" == "${eventcolumn_array[colidx]%.*}" ]]; then
+    if [[ "${eventcolumn_array[colidx]%.*}" == "${eventcolumn_array[colidx]}" ]]; then
         eventcolumncorrelation_array[colidx]=""
     else
         eventcolumncorrelation_array[colidx]="${eventcolumn_array[colidx]%.*}"
@@ -191,9 +188,13 @@ done
 
 VIEW_QUERY="SELECT"
 separator=""
+foreignkeycommand=""
 for ((colidx=0; colidx<${#polyalias_array[@]}; colidx++)) do
     VIEW_QUERY+="${separator} ${polytable}.${polycolumn_array[colidx]} AS \"${polyalias_array[colidx]}\""
     separator=","
+    if [[ "${polycolumn_array[colidx]}" == "id" ]];
+        foreignkeycommand=" ADD CONSTRAINT fk_poly_id FOREIGN KEY (${polyalias_array[colidx]}) REFERENCES ${polytable}(id)"
+    fi
 done
 for ((colidx=0; colidx<${#calcalias_array[@]}; colidx++)) do
     VIEW_QUERY+="${separator} ${calccolumn_array[colidx]} AS \"${calcalias_array[colidx]}\""
@@ -321,10 +322,14 @@ else
         else
             commentcommand=
         fi
+        if [[ "${foreignkeycommand}" != "" ]]; then
+            foreignkeycommand="ALTER TABLE ${viewtable} ${foreignkeycommand}"
+        fi
         psql --quiet \
              --command="${backupcommand}" \
              --command="CREATE TABLE ${viewtable} AS ${VIEW_QUERY}" \
-             --command="${commentcommand}"
+             --command="${commentcommand}" \
+             --command="${foreignkeycommand}"
 
         for ((indexidx=0; indexidx<${#index_array[@]}; indexidx++)) do
             if [[ -n "${using_array[indexidx]}" ]]; then
