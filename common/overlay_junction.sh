@@ -111,76 +111,6 @@ for ((tableidx=0; tableidx<${#eventtable_array[@]}; tableidx++)) do
     fi
 done
 
-for ((tableidx=0; tableidx<${#eventtable_array[@]}; tableidx++)) do
-    if [[ "${existing}" == "true" && $(table_exists "${canonical_array[tableidx]}_${suffix}_dump") == 1 ]]; then
-        echo "Dump table ${canonical_array[tableidx]}_${suffix}_dump exists - skipping"
-        continue
-    else
-        force=true
-        echo "Creating dump table ${canonical_array[tableidx]}_${suffix}_dump"
-
-        if [[ "${nobackup}" != "true" ]]; then  
-            backupcommand="CALL cycle_table('${canonical_array[tableidx]}_${suffix}_dump')"
-        else
-            backupcommand=
-        fi
-        dumptable=""
-        withintro="WITH"
-        if [[ -n "${area}" ]]; then
-            dumptable+="${withintro} area as (${area})"
-            withintro=","
-        fi
-        if [[ -n "${exclude}" ]]; then
-            dumptable+="${withintro} exclude as (${exclude})"
-            withintro=","
-        fi
-        dumptable+=" 
-            SELECT ${eventid_array[tableidx]},
-                   (ST_Dump("
-        if [[ -n "${area}" ]]; then
-            dumptable+="ST_Intersection("
-        fi
-        if [[ -n "${exclude}" ]]; then
-            dumptable+="ST_Difference("
-        fi
-        dumptable+="event.${geometry_array[tableidx]}"
-        if [[ -n "${exclude}" ]]; then
-            dumptable+=", exclude.geom)"
-        fi
-        if [[ -n "${area}" ]]; then
-            dumptable+=", area.geom)"
-        fi
-        dumptable+=")).geom FROM ${canonical_array[tableidx]} AS event"
-        if [[ -n "${area}" ]]; then
-            dumptable+=", area"
-        fi
-        if [[ -n "${exclude}" ]]; then
-            dumptable+=", exclude"
-        fi
-        whereintro="WHERE"
-        if [[ -n "${area}" ]]; then
-            dumptable+=" ${whereintro} ST_Intersects(event.${geometry_array[tableidx]}, area.geom)"
-            whereintro="AND"
-        fi
-        if [[ -n "${exclude}" ]]; then
-            dumptable+=" ${whereintro} NOT ST_Within(event.${geometry_array[tableidx]}, exclude.geom)"
-            whereintro="AND"
-        fi
-        if [[ -n "${where}" ]]; then
-            dumptable+=" ${whereintro} ${where}"
-            whereintro="AND"
-        fi
-        
-        if [[ "${debug}" == "true" ]]; then
-            echo $dumptable
-        fi
-        psql --variable=ON_ERROR_STOP=1 \
-            --command="${backupcommand}" \
-            --command="CREATE TABLE ${canonical_array[tableidx]}_${suffix}_dump AS ${dumptable}" \
-            --command "CREATE INDEX ON ${canonical_array[tableidx]}_${suffix}_dump USING gist (geom)"
-    fi
-done
-
 if [[ "${merge}" == "true" ]]; then
     mergetable=${basename}_${suffix}_merge
     outtable=${mergetable}
@@ -191,6 +121,77 @@ fi
 if [[ "${force}" != "true" && "${existing}" == "true" && $(table_exists "${outtable}") == 1 ]]; then
     echo "Table ${outtable} exists - skipping"
 else
+
+    for ((tableidx=0; tableidx<${#eventtable_array[@]}; tableidx++)) do
+        if [[ "${existing}" == "true" && $(table_exists "${canonical_array[tableidx]}_${suffix}_dump") == 1 ]]; then
+            echo "Dump table ${canonical_array[tableidx]}_${suffix}_dump exists - skipping"
+            continue
+        else
+            force=true
+            echo "Creating dump table ${canonical_array[tableidx]}_${suffix}_dump"
+
+            if [[ "${nobackup}" != "true" ]]; then  
+                backupcommand="CALL cycle_table('${canonical_array[tableidx]}_${suffix}_dump')"
+            else
+                backupcommand=
+            fi
+            dumptable=""
+            withintro="WITH"
+            if [[ -n "${area}" ]]; then
+                dumptable+="${withintro} area as (${area})"
+                withintro=","
+            fi
+            if [[ -n "${exclude}" ]]; then
+                dumptable+="${withintro} exclude as (${exclude})"
+                withintro=","
+            fi
+            dumptable+=" 
+                SELECT ${eventid_array[tableidx]},
+                    (ST_Dump("
+            if [[ -n "${area}" ]]; then
+                dumptable+="ST_Intersection("
+            fi
+            if [[ -n "${exclude}" ]]; then
+                dumptable+="ST_Difference("
+            fi
+            dumptable+="event.${geometry_array[tableidx]}"
+            if [[ -n "${exclude}" ]]; then
+                dumptable+=", exclude.geom)"
+            fi
+            if [[ -n "${area}" ]]; then
+                dumptable+=", area.geom)"
+            fi
+            dumptable+=")).geom FROM ${canonical_array[tableidx]} AS event"
+            if [[ -n "${area}" ]]; then
+                dumptable+=", area"
+            fi
+            if [[ -n "${exclude}" ]]; then
+                dumptable+=", exclude"
+            fi
+            whereintro="WHERE"
+            if [[ -n "${area}" ]]; then
+                dumptable+=" ${whereintro} ST_Intersects(event.${geometry_array[tableidx]}, area.geom)"
+                whereintro="AND"
+            fi
+            if [[ -n "${exclude}" ]]; then
+                dumptable+=" ${whereintro} NOT ST_Within(event.${geometry_array[tableidx]}, exclude.geom)"
+                whereintro="AND"
+            fi
+            if [[ -n "${where}" ]]; then
+                dumptable+=" ${whereintro} ${where}"
+                whereintro="AND"
+            fi
+            
+            if [[ "${debug}" == "true" ]]; then
+                echo $dumptable
+            fi
+            psql --variable=ON_ERROR_STOP=1 \
+                --command="${backupcommand}" \
+                --command="CREATE TABLE ${canonical_array[tableidx]}_${suffix}_dump AS ${dumptable}" \
+                --command "CREATE INDEX ON ${canonical_array[tableidx]}_${suffix}_dump USING gist (geom)"
+        fi
+    done
+
     force=true
     echo "Creating table ${outtable}" >> /dev/stderr
     if [[ "${existing}" != "true" && "${nobackup}" != "true" ]]; then  

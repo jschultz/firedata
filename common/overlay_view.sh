@@ -192,7 +192,7 @@ foreignkeycommand=""
 for ((colidx=0; colidx<${#polyalias_array[@]}; colidx++)) do
     VIEW_QUERY+="${separator} ${polytable}.${polycolumn_array[colidx]} AS \"${polyalias_array[colidx]}\""
     separator=","
-    if [[ "${polycolumn_array[colidx]}" == "id" ]];
+    if [[ "${polycolumn_array[colidx]}" == "id" ]]; then
         foreignkeycommand=" ADD CONSTRAINT fk_poly_id FOREIGN KEY (${polyalias_array[colidx]}) REFERENCES ${polytable}(id)"
     fi
 done

@@ -143,7 +143,7 @@ $$
     DECLARE
         result timestamp;
     BEGIN
-        EXECUTE 'SELECT pg_xact_commit_timestamp(t.xmin) AS modified_ts FROM ' || name || ' AS t ORDER BY modified_ts DESC NULLS LAST LIMIT  1'
+        EXECUTE 'SELECT pg_xact_commit_timestamp(t.xmin) AS modified_ts FROM ' || LEFT(name, 63) || ' AS t ORDER BY modified_ts DESC NULLS LAST LIMIT  1'
         INTO result;
         RETURN result;
     END;
@@ -162,6 +162,7 @@ $$
             tablen := schema;
             schema := 'public';
         END IF;
+        tablen := LEFT(tablen, 63);
         IF EXISTS (SELECT 1 FROM pg_tables WHERE schemaname = schema AND tablename = tablen) THEN
             IF EXISTS (SELECT 1 FROM pg_tables WHERE schemaname = 'backup' AND tablename = tablen) THEN  
                 EXECUTE 'DROP TABLE backup.' || tablen || ' CASCADE';
@@ -184,6 +185,7 @@ $$
             tablen := schema;
             schema := 'public';
         END IF;
+        tablen := LEFT(tablen, 63);
         IF EXISTS (SELECT 1 FROM pg_tables WHERE schemaname = schema AND tablename = tablen) THEN
             IF EXISTS (SELECT 1 FROM pg_tables WHERE schemaname = 'backup' AND tablename = tablen) THEN  
                 EXECUTE 'DROP TABLE backup.' || tablen || ' CASCADE';
@@ -205,7 +207,7 @@ $$
     DECLARE
         result boolean;
     BEGIN
-        RETURN EXISTS (SELECT 1 FROM pg_tables WHERE schemaname = 'public' AND tablename = name);
+        RETURN EXISTS (SELECT 1 FROM pg_tables WHERE schemaname = 'public' AND tablename = LEFT(name, 63));
     END;
 $$"
 #    --command "
@@ -215,6 +217,6 @@ LANGUAGE plpgsql
 AS
 $$
     BEGIN
-        RETURN (regexp_match(pg_get_viewdef(name), 'FROM\\s(.+);'))[1];
+        RETURN (regexp_match(pg_get_viewdef(LEFT(name, 63)), 'FROM\\s(.+);'))[1];
     END;
 $$"
