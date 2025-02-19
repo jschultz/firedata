@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Copyright 2023 Jonathan Schultz
+# Copyright 2025 Jonathan Schultz
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -205,9 +205,11 @@ for ((colidx=0; colidx<${#eventalias_array[@]}; colidx++)) do
         VIEW_QUERY+="${separator} coalesce(${eventcolumn_array[colidx]}, '{}'::${eventtype_array[colidx]}[]) AS \"${eventalias_array[colidx]}\""
         separator=","
     else
-        for ((linkidx=1; linkidx<=${eventlimit_array[colidx]}; linkidx++)) do
-            VIEW_QUERY+="${separator} ${eventcolumn_array[colidx]}_${linkidx} AS \"${eventalias_array[colidx]}_${linkidx}\""
-            separator=","
+        for ((tableidx=0; tableidx<${#eventtable_array[@]}; tableidx++)) do
+            for ((linkidx=1; linkidx<=${eventlimit_array[tableidx]}; linkidx++)) do
+                VIEW_QUERY+="${separator} ${eventcolumn_array[colidx]}_${linkidx} AS \"${eventalias_array[colidx]}_${linkidx}\""
+                separator=","
+            done
         done
     fi
     separator=","
@@ -226,7 +228,7 @@ for ((tableidx=0; tableidx<${#eventtable_array[@]}; tableidx++)) do
         if [[ "${eventcolumncorrelation_array[colidx]}" == ""
            || "${eventcolumncorrelation_array[colidx]}" == "${eventtable_array[tableidx]}" ]]; then
             if [[ "${flatten}" == "true" ]]; then
-                for ((linkidx=0; linkidx<=${eventlimit_array[colidx]}; linkidx++)) do
+                for ((linkidx=1; linkidx<=${eventlimit_array[tableidx]}; linkidx++)) do
                     VIEW_QUERY+="${separator} (array_agg(${eventcolumn_array[colidx]}))[${linkidx}] AS \"${eventcolumn_array[colidx]#*.}_${linkidx}\""
                     separator=","
                 done
@@ -289,9 +291,11 @@ if [[ ${#polycolumn_array[@]} -gt 0 ]]; then
             VIEW_QUERY+="${separator} ${eventcolumn_array[colidx]}"
             separator=","
         else
-            for ((linkidx=1; linkidx<=${eventlimit_array[colidx]}; linkidx++)) do
-                VIEW_QUERY+="${separator} ${eventcolumn_array[colidx]}_${linkidx}"
-                separator=","
+            for ((tableidx=0; tableidx<${#eventtable_array[@]}; tableidx++)) do
+                for ((linkidx=1; linkidx<=${eventlimit_array[tableidx]}; linkidx++)) do
+                    VIEW_QUERY+="${separator} ${eventcolumn_array[colidx]}_${linkidx}"
+                    separator=","
+                done
             done
         fi
     done

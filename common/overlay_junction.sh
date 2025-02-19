@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Copyright 2023 Jonathan Schultz
+# Copyright 2025 Jonathan Schultz
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -62,7 +62,7 @@ fi
 
 table_exists() {
     psql --variable=ON_ERROR_STOP=1 --quiet --tuples-only --no-align \
-    --command="\timing off" \
+    --command "\timing off" \
     --command "SELECT table_exists('$1')::int"
 }
 
@@ -119,16 +119,16 @@ else
 fi
 
 if [[ "${force}" != "true" && "${existing}" == "true" && $(table_exists "${outtable}") == 1 ]]; then
-    echo "Table ${outtable} exists - skipping"
+    echo "Table ${outtable} exists - skipping" >> /dev/stderr
 else
 
     for ((tableidx=0; tableidx<${#eventtable_array[@]}; tableidx++)) do
         if [[ "${existing}" == "true" && $(table_exists "${canonical_array[tableidx]}_${suffix}_dump") == 1 ]]; then
-            echo "Dump table ${canonical_array[tableidx]}_${suffix}_dump exists - skipping"
+            echo "Dump table ${canonical_array[tableidx]}_${suffix}_dump exists - skipping" >> /dev/stderr
             continue
         else
             force=true
-            echo "Creating dump table ${canonical_array[tableidx]}_${suffix}_dump"
+            echo "Creating dump table ${canonical_array[tableidx]}_${suffix}_dump" >> /dev/stderr
 
             if [[ "${nobackup}" != "true" ]]; then  
                 backupcommand="CALL cycle_table('${canonical_array[tableidx]}_${suffix}_dump')"
@@ -183,7 +183,7 @@ else
             fi
             
             if [[ "${debug}" == "true" ]]; then
-                echo $dumptable
+                echo $dumptable >> /dev/stderr
             fi
             psql --variable=ON_ERROR_STOP=1 \
                 --command="${backupcommand}" \
@@ -225,7 +225,7 @@ fi
 if [[ "${merge}" == "true" ]]; then
     mergepolyjunction=${basename}_${suffix}_merge_poly_junction
     if [[ "${force}" != "true" && "${existing}" == "true" && $(table_exists "${mergepolyjunction}") == 1 ]]; then
-        echo "Junction table ${mergepolyjunction} exists - skipping"
+        echo "Junction table ${mergepolyjunction} exists - skipping" >> /dev/stderr
     else
         psql --variable=ON_ERROR_STOP=1 \
             --command="\echo Creating junction table ${mergepolyjunction}"
@@ -276,7 +276,7 @@ WHERE poly.id = poly_id"
 fi
 
 if [[ "${force}" != "true" && "${existing}" == "true" && $(table_exists "${pointtable}") == 1 ]]; then
-    echo "Point in polygon table ${pointtable} exists - skipping"
+    echo "Point in polygon table ${pointtable} exists - skipping" >> /dev/stderr
 else
     echo "Creating point in polygon table ${pointtable}" >> /dev/stderr
     psql --variable=ON_ERROR_STOP=1 \
@@ -289,7 +289,7 @@ fi
 
 for ((tableidx=0; tableidx<${#eventtable_array[@]}; tableidx++)) do
     if [[ "${force}" != "true" && "${existing}" == "true" && $(table_exists "${junction_array[tableidx]}") == 1 ]]; then
-        echo "Junction table ${junction_array[tableidx]} exists - skipping"
+        echo "Junction table ${junction_array[tableidx]} exists - skipping" >> /dev/stderr
     else
         echo "Creating junction table ${junction_array[tableidx]}" >> /dev/stderr
         if [[ "${nobackup}" != "true" ]]; then  
