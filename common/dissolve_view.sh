@@ -146,9 +146,9 @@ else
                       --command "\timing off" \
                       --command "UPDATE ${maptable}
                                  SET   map_id  = (SELECT min(map_id) FROM ${jointable}, ${maptable} AS ref
-                                                  WHERE ref.poly_id = poly_id_2 AND ${maptable}.map_id = poly_id_1)
+                                                  WHERE ref.poly_id = poly_id_2 AND ${maptable}.poly_id = poly_id_1)
                                  WHERE map_id != (SELECT min(map_id) FROM ${jointable}, ${maptable} AS ref
-                                                  WHERE ref.poly_id = poly_id_2 AND ${maptable}.map_id = poly_id_1)" \
+                                                  WHERE ref.poly_id = poly_id_2 AND ${maptable}.poly_id = poly_id_1)" \
                 | grep UPDATE)
         echo ${result}
         if [[ "${result}" == "UPDATE 0" ]]; then
