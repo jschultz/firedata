@@ -144,13 +144,21 @@ else
     while true; do
         result=$(psql --variable=ON_ERROR_STOP=1 --tuples-only --no-align \
                       --command "\timing off" \
-                      --command "UPDATE ${maptable}
-                                 SET   map_id  = (SELECT min(map_id) FROM ${jointable}, ${maptable} AS ref
-                                                  WHERE ref.poly_id = poly_id_2 AND ${maptable}.poly_id = poly_id_1)
-                                 WHERE map_id != (SELECT min(map_id) FROM ${jointable}, ${maptable} AS ref
-                                                  WHERE ref.poly_id = poly_id_2 AND ${maptable}.poly_id = poly_id_1)" \
+                      --command="DROP TABLE IF EXISTS ${maptable}_new" \
+                      --command "CREATE TABLE ${maptable}_new AS
+                                    SELECT map.poly_id, MIN(map_inner.map_id) AS map_id
+                                    FROM ${maptable} AS map, ${jointable}, ${maptable} AS map_inner
+                                    WHERE map_inner.poly_id = poly_id_2 AND map.poly_id = poly_id_1
+                                    GROUP BY map.poly_id" \
+                      --command="CREATE INDEX ON ${maptable}_new(poly_id)" \
+                      --command="CREATE INDEX ON ${maptable}_new(map_id)" \
+                      --command="SELECT 'UPDATE ' || COUNT(*)::TEXT FROM ${maptable}_new AS map_new, ${maptable} AS map WHERE map_new.poly_id=map.poly_id and map_new.map_id != map.map_id" \
+                      --command="DROP TABLE ${maptable}" \
+                      --command="ALTER TABLE ${maptable}_new RENAME TO ${maptable}" \
                 | grep UPDATE)
-        echo ${result}
+        if [[ ${verbosity} -ge 2 ]]; then
+            echo ${result}
+        fi
         if [[ "${result}" == "UPDATE 0" ]]; then
             break
         fi

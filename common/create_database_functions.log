@@ -163,12 +163,8 @@ $$
             schema := 'public';
         END IF;
         tablen := LEFT(tablen, 63);
-        IF EXISTS (SELECT 1 FROM pg_tables WHERE schemaname = schema AND tablename = tablen) THEN
-            IF EXISTS (SELECT 1 FROM pg_tables WHERE schemaname = 'backup' AND tablename = tablen) THEN  
-                EXECUTE 'DROP TABLE backup.' || tablen || ' CASCADE';
-            END IF;
-            EXECUTE 'ALTER TABLE ' || fullname || ' SET SCHEMA backup';
-        END IF;
+        EXECUTE 'DROP TABLE IF EXISTS backup.' || tablen || ' CASCADE';
+        EXECUTE 'ALTER TABLE IF EXISTS ' || fullname || ' SET SCHEMA backup';
     END;
 $$"
 #    --command "
@@ -187,9 +183,7 @@ $$
         END IF;
         tablen := LEFT(tablen, 63);
         IF EXISTS (SELECT 1 FROM pg_tables WHERE schemaname = schema AND tablename = tablen) THEN
-            IF EXISTS (SELECT 1 FROM pg_tables WHERE schemaname = 'backup' AND tablename = tablen) THEN  
-                EXECUTE 'DROP TABLE backup.' || tablen || ' CASCADE';
-            END IF;
+            EXECUTE 'DROP TABLE IF EXISTS backup.' || tablen || ' CASCADE';
             EXECUTE 'CREATE TABLE backup.' || tablen || ' AS TABLE fullname';
             comment := obj_description((schema || '.' || tablen)::regclass);
             IF comment IS NOT NULL THEN
