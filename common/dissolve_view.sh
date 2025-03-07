@@ -111,7 +111,8 @@ else
                     FROM ${touchestable}, ${viewtable} as view_1, ${viewtable} as view_2
                     WHERE view_1.poly_id=poly_id_1 AND view_2.poly_id=poly_id_2"
     for ((matchidx=0; matchidx<${#match_array[@]}; matchidx++)) do
-        JOIN_QUERY+=" AND view_1.${match_array[matchidx]} = view_2.${match_array[matchidx]}"
+        JOIN_QUERY+=" AND (view_1.${match_array[matchidx]} = view_2.${match_array[matchidx]}"
+        JOIN_QUERY+=" OR  (view_1.${match_array[matchidx]} IS NULL AND view_2.${match_array[matchidx]} IS NULL))"
     done
 
     psql --variable=ON_ERROR_STOP=1 \
@@ -143,18 +144,15 @@ else
     echo "Updating map table ${maptable}" >> /dev/stderr
     while true; do
         result=$(psql --variable=ON_ERROR_STOP=1 --tuples-only --no-align \
-                      --command "\timing off" \
-                      --command="DROP TABLE IF EXISTS ${maptable}_new" \
-                      --command "CREATE TABLE ${maptable}_new AS
+                      --command "CREATE TEMPORARY TABLE ${maptable}_new AS
                                     SELECT map.poly_id, MIN(map_inner.map_id) AS map_id
                                     FROM ${maptable} AS map, ${jointable}, ${maptable} AS map_inner
                                     WHERE map_inner.poly_id = poly_id_2 AND map.poly_id = poly_id_1
                                     GROUP BY map.poly_id" \
                       --command="CREATE INDEX ON ${maptable}_new(poly_id)" \
                       --command="CREATE INDEX ON ${maptable}_new(map_id)" \
-                      --command="SELECT 'UPDATE ' || COUNT(*)::TEXT FROM ${maptable}_new AS map_new, ${maptable} AS map WHERE map_new.poly_id=map.poly_id and map_new.map_id != map.map_id" \
-                      --command="DROP TABLE ${maptable}" \
-                      --command="ALTER TABLE ${maptable}_new RENAME TO ${maptable}" \
+                      --command="UPDATE ${maptable} SET map_id = ${maptable}_new.map_id FROM ${maptable}_new WHERE ${maptable}_new.poly_id = ${maptable}.poly_id AND ${maptable}.map_id != ${maptable}_new.map_id" \
+                | tee /dev/tty \
                 | grep UPDATE)
         if [[ ${verbosity} -ge 2 ]]; then
             echo ${result}
