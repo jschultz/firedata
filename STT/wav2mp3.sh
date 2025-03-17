@@ -21,18 +21,18 @@ help='Use lame to compress audio files to a mp3 file, checking for already exist
 args=(
 # "-short:--long:variable:default:description:flags"
   ":--debug:::Debug execution:flag"
-  
+
   "-l:--logfile:::Log file to record processing, defaults to filename with extension '.log':private"
   ":--nologfile:::Don't write a log file:private,flag"
-  ":--nobackup:::Don't back up existing output file:private,flag"
-  
+  ":--trash:::Trash original file on success:private,flag"
+
   "-p:--preset::voice:lame preset to use"
-  
+
   "-d:--directory:::Directory to place output file; otherwise same directory as audio file"
 #   "-O:--overwrite:::OK to overwrite output file:flag"
 
   ":filename:::Name of audio file to transcribe:input,required"
-  
+
 )
 
 source $(dirname "$0")/argparse.sh
@@ -71,8 +71,10 @@ if [[ -f "${outfile}" ]] \
 && [[ "$(date -r "${outfile}")" == "$(date -r "${filename}")" ]] \
 && (( $(echo $(mediainfo --inform="Audio;%Duration%" "${outfile}") '>=' $(mediainfo --inform="Audio;%Duration%" "${filename}") | bc -l) ));
 then
-    echo "Moving file ${filename} to trash"
-    mv "${filename}" $HOME/Trash
+    if [[ "${trash}" == "true" ]]; then
+        echo "Moving file ${filename} to trash"
+        mv "${filename}" $HOME/Trash
+    fi
 else
     echo "ERROR: output file ${outfile} mismatch"
     exit
