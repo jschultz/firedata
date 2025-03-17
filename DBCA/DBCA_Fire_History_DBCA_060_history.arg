@@ -20,15 +20,14 @@
 #    --nologfile
 #    --eventtable "dbca_fire_history_dbca_060"
 #    --suffix "${suffix}"
-#    --polycolumns "poly.geom;poly.id"
-#    --polyaliases "geom;poly_id"
-#    --eventcolumns "event.id"
-#    --eventaliases "id"
-#    --where "${where}"
+#    --polycolumns "id;geom"
+#    --polyaliases "poly_id"
+#    --eventcolumns "dbca_fire_history_dbca_060.object_id"
 #    --viewtable "dbca_fire_history_dbca_060_${suffix}_history"
 ################################################################################
 # overlay_junction.sh
 #    --nologfile
 #    --eventtable "dbca_fire_history_dbca_060"
+#    --eventid "object_id"
 #    --suffix "${suffix}"
-#    --where "ST_Intersects(geom, ${area})"
+#    --area "${area}"
