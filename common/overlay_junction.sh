@@ -94,7 +94,7 @@ echo "Testing SRIDs" >> /dev/stderr
 SRID=$(psql --variable=ON_ERROR_STOP=1 \
             --quiet --tuples-only --no-align --command="\timing off" \
             --command "SELECT ST_SRID(${geometry_array[0]}) AS srid FROM ${eventtable_array[0]} LIMIT 1" )
-            
+
 if [[ $SRID -eq 0 ]]; then
     echo "ERROR: Missing SRID in shape table geometries" >> /dev/stderr
     exit 1
@@ -130,7 +130,7 @@ else
             force=true
             echo "Creating dump table ${canonical_array[tableidx]}_${suffix}_dump" >> /dev/stderr
 
-            if [[ "${nobackup}" != "true" ]]; then  
+            if [[ "${nobackup}" != "true" ]]; then
                 backupcommand="CALL cycle_table('${canonical_array[tableidx]}_${suffix}_dump')"
             else
                 backupcommand=
@@ -145,7 +145,7 @@ else
                 dumptable+="${withintro} exclude as (${exclude})"
                 withintro=","
             fi
-            dumptable+=" 
+            dumptable+="
                 SELECT ${eventid_array[tableidx]},
                     (ST_Dump("
             if [[ -n "${area}" ]]; then
@@ -181,7 +181,7 @@ else
                 dumptable+=" ${whereintro} ${where}"
                 whereintro="AND"
             fi
-            
+
             if [[ "${debug}" == "true" ]]; then
                 echo $dumptable >> /dev/stderr
             fi
@@ -194,7 +194,7 @@ else
 
     force=true
     echo "Creating table ${outtable}" >> /dev/stderr
-    if [[ "${existing}" != "true" && "${nobackup}" != "true" ]]; then  
+    if [[ "${existing}" != "true" && "${nobackup}" != "true" ]]; then
         backupcommand="CALL cycle_table('${outtable}')"
     else
         backupcommand=
@@ -204,7 +204,7 @@ else
         --command="${backupcommand}" \
         --command="CREATE TABLE ${outtable} (id SERIAL PRIMARY KEY, geom geometry(Polygon,${SRID}))" \
         --command "CREATE INDEX ON ${outtable} USING gist (geom)"
-        
+
     dumpcommand="SELECT ST_ExteriorRing((ST_DumpRings(geom)).geom) FROM (
         SELECT geom FROM ${canonical_array[0]}_${suffix}_dump"
     for ((tableidx=1; tableidx<${#eventtable_array[@]}; tableidx++)) do
@@ -237,9 +237,9 @@ if [[ "${merge}" == "true" ]]; then
     psql --variable=ON_ERROR_STOP=1 \
         --command="\echo Inserting difference between merged and old polygons" \
         --command="
-INSERT INTO ${polytable} AS poly (geom) 
-(SELECT geom 
-    FROM (SELECT 
+INSERT INTO ${polytable} AS poly (geom)
+(SELECT geom
+    FROM (SELECT
             (ST_Dump(ST_Difference(merge.geom, ST_Union(poly.geom)))).geom
           FROM ${mergepolyjunction} AS junction, ${polytable} AS poly, ${mergetable} AS merge
           WHERE  poly.id = junction.poly_id
@@ -248,9 +248,9 @@ INSERT INTO ${polytable} AS poly (geom)
     WHERE ST_GeometryType(geom) = 'ST_Polygon'::text)" \
         --command="\echo Inserting difference between old and merged polygons" \
         --command="
-INSERT INTO ${polytable} AS poly (geom) 
-(SELECT geom 
-    FROM (SELECT 
+INSERT INTO ${polytable} AS poly (geom)
+(SELECT geom
+    FROM (SELECT
             (ST_Dump(ST_Difference(poly.geom, ST_Union(merge.geom)))).geom
           FROM ${mergepolyjunction} AS junction, ${mergetable} AS merge, ${polytable} AS poly
           WHERE merge.id = junction.merge_id
@@ -259,19 +259,19 @@ INSERT INTO ${polytable} AS poly (geom)
     WHERE ST_GeometryType(geom) = 'ST_Polygon'::text)" \
         --command="\echo Inserting intersection between merged and old polygons" \
         --command="
-INSERT INTO ${polytable} AS poly (geom) 
-(SELECT geom 
-    FROM (SELECT 
-            (ST_Dump(ST_Intersection(poly.geom, merge.geom))).geom 
-          FROM ${mergepolyjunction} AS junction, ${polytable} AS poly, ${mergetable} AS merge 
+INSERT INTO ${polytable} AS poly (geom)
+(SELECT geom
+    FROM (SELECT
+            (ST_Dump(ST_Intersection(poly.geom, merge.geom))).geom
+          FROM ${mergepolyjunction} AS junction, ${polytable} AS poly, ${mergetable} AS merge
           WHERE  poly.id = junction.poly_id
-            AND merge.id = junction.merge_id) AS foo 
+            AND merge.id = junction.merge_id) AS foo
     WHERE ST_GeometryType(geom) = 'ST_Polygon'::text)" \
         --command="\echo Deleting old polygons" \
         --command="
-DELETE FROM ${polytable} AS poly 
-USING (SELECT DISTINCT poly_id 
-         FROM ${mergepolyjunction} AS junction) foo 
+DELETE FROM ${polytable} AS poly
+USING (SELECT DISTINCT poly_id
+         FROM ${mergepolyjunction} AS junction) foo
 WHERE poly.id = poly_id"
 fi
 
@@ -281,7 +281,7 @@ else
     echo "Creating point in polygon table ${pointtable}" >> /dev/stderr
     psql --variable=ON_ERROR_STOP=1 \
         --command="DROP TABLE IF EXISTS ${pointtable}" \
-        --command="CREATE TABLE ${pointtable} AS 
+        --command="CREATE TABLE ${pointtable} AS
                     SELECT id, ST_PointOnSurface(geom) AS point
                     FROM ${polytable}" \
         --command "CREATE INDEX ON ${pointtable} USING gist (point)"
@@ -292,13 +292,13 @@ for ((tableidx=0; tableidx<${#eventtable_array[@]}; tableidx++)) do
         echo "Junction table ${junction_array[tableidx]} exists - skipping" >> /dev/stderr
     else
         echo "Creating junction table ${junction_array[tableidx]}" >> /dev/stderr
-        if [[ "${nobackup}" != "true" ]]; then  
+        if [[ "${nobackup}" != "true" ]]; then
             backupcommand="CALL cycle_table('${junction_array[tableidx]}')"
         else
             backupcommand=
         fi
         if [[ -n "${area}" ]]; then
-            junctioncommand="CREATE TABLE ${junction_array[tableidx]} AS 
+            junctioncommand="CREATE TABLE ${junction_array[tableidx]} AS
                                 WITH area as (${area})
                                 SELECT DISTINCT point.id AS poly_id, event.${eventid_array[tableidx]}
                                 FROM area,
@@ -307,7 +307,7 @@ for ((tableidx=0; tableidx<${#eventtable_array[@]}; tableidx++)) do
                                 WHERE ST_Intersects(area.geom, event.${geometry_array[tableidx]})
                                 AND   ST_Contains(event.${geometry_array[tableidx]}, point.point)"
         else
-            junctioncommand="CREATE TABLE ${junction_array[tableidx]} AS 
+            junctioncommand="CREATE TABLE ${junction_array[tableidx]} AS
                                 SELECT DISTINCT point.id AS poly_id, event.${eventid_array[tableidx]}
                                 FROM ${canonical_array[tableidx]} AS event,
                                      ${pointtable} AS point
@@ -323,13 +323,13 @@ for ((tableidx=0; tableidx<${#eventtable_array[@]}; tableidx++)) do
     fi
 done
 
-if [[ "${keep}" != "true" ]]; then  
+if [[ "${keep}" != "true" ]]; then
     echo "Dropping point in polygon table ${pointtable}" >> /dev/stderr
     psql --variable=ON_ERROR_STOP=1 \
         --command="DROP TABLE ${pointtable}"
     for ((tableidx=0; tableidx<${#eventtable_array[@]}; tableidx++)) do
         echo "Dropping dump table ${canonical_array[tableidx]}_${suffix}_dump" >> /dev/stderr
         psql --variable=ON_ERROR_STOP=1 \
-            --command="DROP TABLE ${canonical_array[tableidx]}_${suffix}_dump"
+            --command="DROP TABLE IF EXISTS ${canonical_array[tableidx]}_${suffix}_dump"
     done
 fi
