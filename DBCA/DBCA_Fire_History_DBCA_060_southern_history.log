@@ -18,5 +18,5 @@
 ################################################################################
 # argreplay
 #    --substitute suffix:southern
-#                 area:(SELECT ST_Union(geom) FROM dbca_region_boundaries_dbca_022 WHERE drg_region_name IN ('SOUTH COAST', 'SOUTH WEST', 'SWAN', 'WARREN'))
+#                 area:(SELECT ST_Union(geom) AS geom FROM dbca_region_boundaries_dbca_022 WHERE drg_region_name IN ('SOUTH COAST', 'SOUTH WEST', 'SWAN', 'WARREN'))
 #    -- DBCA_Fire_History_DBCA_060_history.arg

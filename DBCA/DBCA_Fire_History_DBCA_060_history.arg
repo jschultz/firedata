@@ -1,6 +1,6 @@
 ################################################################################
 ##
-## Copyright 2022 Jonathan Schultz
+## Copyright 2025 Jonathan Schultz
 ##
 ## This program is free software: you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
@@ -19,6 +19,8 @@
 # overlay_view.sh
 #    --nologfile
 #    --eventtable "dbca_fire_history_dbca_060"
+#    --eventid "object_id"
+#    --eventorder "fih_date1 DESC"
 #    --suffix "${suffix}"
 #    --polycolumns "id;geom"
 #    --polyaliases "poly_id"

@@ -27,6 +27,7 @@ args=(
   "-m:--match:::Semicolon-delimited list of columns to match"
   ":--viewtable:::View table to dissolve:required"
   ":--polytable:::Polygon table referenced from view table:required"
+  ":--touches:::Create a touches table:"
   "-E:--existing:::Use existing tables where they exist:flag"
   "-K:--keep:::Keep tables for re-use:flag"
   "-l:--logfile:::Log file to record processing, defaults to \$outtable or \$outfile with extension replaced by '.log':private"
@@ -75,24 +76,26 @@ touchestable="${polytable}_touches"
 jointable="${viewtable}_join"
 maptable="${viewtable}_map"
 
-if [[ "${force}" != "true" && "${existing}" == "true" && $(table_exists "${touchestable}") == 1 ]]; then
-    echo "Table ${touchestable} exists - skipping" >> /dev/stderr
-else
-    force=true
-    echo "Creating table ${touchestable}" >> /dev/stderr
-    if [[ "${nobackup}" != "true" ]]; then
-        backupcommand="CALL cycle_table('${touchestable}')"
+if [[ "${touches}" == "true"  ]]; then
+    if [[ "${force}" != "true" && "${existing}" == "true" && $(table_exists "${touchestable}") == 1 ]]; then
+        echo "Table ${touchestable} exists - skipping" >> /dev/stderr
     else
-        backupcommand=
-    fi
+        force=true
+        echo "Creating table ${touchestable}" >> /dev/stderr
+        if [[ "${nobackup}" != "true" ]]; then
+            backupcommand="CALL cycle_table('${touchestable}')"
+        else
+            backupcommand=
+        fi
 
-    psql --variable=ON_ERROR_STOP=1 \
-        --command="${backupcommand}" \
-        --command="CREATE TABLE ${touchestable} AS
-                       SELECT poly_1.id AS poly_id_1, poly_2.id AS poly_id_2
-                       FROM ${polytable} AS poly_1, ${polytable} AS poly_2
-                       WHERE poly_1.id = poly_2.id OR (ST_Touches(poly_1.geom, poly_2.geom)
-                       AND ST_RelateMatch(ST_Relate(poly_1.geom, poly_2.geom),'****1****'))"
+        psql --variable=ON_ERROR_STOP=1 \
+            --command="${backupcommand}" \
+            --command="CREATE TABLE ${touchestable} AS
+                           SELECT poly_1.id AS poly_id_1, poly_2.id AS poly_id_2
+                           FROM ${polytable} AS poly_1, ${polytable} AS poly_2
+                           WHERE poly_1.id = poly_2.id OR (ST_Touches(poly_1.geom, poly_2.geom)
+                           AND ST_RelateMatch(ST_Relate(poly_1.geom, poly_2.geom),'****1****'))"
+    fi
 fi
 
 if [[ "${force}" != "true" && "${existing}" == "true" && $(table_exists "${jointable}") == 1 ]]; then
@@ -106,14 +109,24 @@ else
         backupcommand=
     fi
 
-    JOIN_QUERY="CREATE TABLE ${jointable} AS
-                    SELECT poly_id_1, poly_id_2
-                    FROM ${touchestable}, ${viewtable} as view_1, ${viewtable} as view_2
-                    WHERE view_1.poly_id=poly_id_1 AND view_2.poly_id=poly_id_2"
-    for ((matchidx=0; matchidx<${#match_array[@]}; matchidx++)) do
-        JOIN_QUERY+=" AND (view_1.${match_array[matchidx]} = view_2.${match_array[matchidx]}"
-        JOIN_QUERY+=" OR  (view_1.${match_array[matchidx]} IS NULL AND view_2.${match_array[matchidx]} IS NULL))"
-    done
+    if [[ $(table_exists "${touchestable}") == 1 ]]; then
+        JOIN_QUERY="CREATE TABLE ${jointable} AS
+                        SELECT poly_id_1, poly_id_2
+                        FROM ${touchestable}, ${viewtable} as view_1, ${viewtable} as view_2"
+        JOIN_QUERY+=WHERE" view_1.poly_id = poly_id_1 AND view_2.poly_id = poly_id_2"
+        for ((matchidx=0; matchidx<${#match_array[@]}; matchidx++)) do
+            JOIN_QUERY+=" AND view_1.${match_array[matchidx]} IS NOT DISTINCT FROM view_2.${match_array[matchidx]}"
+        done
+    else
+        JOIN_QUERY="CREATE TABLE ${jointable} AS
+                        SELECT view_1.poly_id AS poly_id_1, view_2.poly_id AS poly_id_2
+                        FROM ${viewtable} as view_1, ${viewtable} as view_2
+                        WHERE"
+                        for ((matchidx=0; matchidx<${#match_array[@]}; matchidx++)) do
+                            JOIN_QUERY+=" view_1.${match_array[matchidx]} IS NOT DISTINCT FROM view_2.${match_array[matchidx]} AND"
+                        done
+                        JOIN_QUERY+=" (view_1.poly_id = view_2.poly_id OR (ST_Touches(view_1.geom, view_2.geom) AND ST_RelateMatch(ST_Relate(view_1.geom, view_2.geom),'****1****')))"
+    fi
 
     psql --variable=ON_ERROR_STOP=1 \
         --command="${backupcommand}" \
