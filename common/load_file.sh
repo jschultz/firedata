@@ -69,10 +69,10 @@ else
 fi
 
 if [[ -n "${geometry}" ]]; then
-    ogr2ogr ${overwrite} -f PostgreSQL "PG:dbname=$PGDATABASE user=$PGUSER" -lco geometry_name=${geometry} ${srid} -nln "${table}" -nlt PROMOTE_TO_MULTI "${filename}" ${layer}
+    ogr2ogr ${overwrite} -f PostgreSQL "PG:dbname=$PGDATABASE user=${PGUSER-$USER}" -lco geometry_name=${geometry} ${srid} -nln "${table}" -nlt PROMOTE_TO_MULTI "${filename}" ${layer}
 #     psql \
 #         --quiet --command="\timing off" \
 #         --command="CREATE INDEX ON ${table} USING gist (${geometry})"
 else
-    ogr2ogr -overwrite -f PostgreSQL "PG:dbname=$PGDATABASE user=$PGUSER" -nln "${table}" -nlt PROMOTE_TO_MULTI "${filename}" ${layer}
+    ogr2ogr -overwrite -f PostgreSQL "PG:dbname=$PGDATABASE user=${PGUSER-$USER}" -nln "${table}" -nlt PROMOTE_TO_MULTI "${filename}" ${layer}
 fi

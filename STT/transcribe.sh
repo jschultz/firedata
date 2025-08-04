@@ -65,7 +65,7 @@ then
 else
     echo "Transcribing file ${filename} to ${outfile}.lrc" >> /dev/stderr
     ffmpeg -y -hide_banner -loglevel quiet -i "${filename}" -ac 1 -ar 16000 "${filename%.*}.16k.wav"
-    ${executable} --threads ${threads} --output-lrc --model $HOME/src/whisper.cpp/models/${model} --output-file "${outfile}" "${filename%.*}.16k.wav" 2> /dev/null
+    ${executable} --threads ${threads} --output-lrc --model "${model}" --output-file "${outfile}" "${filename%.*}.16k.wav" 2> /dev/null
     rm "${filename%.*}.16k.wav"
     touch "${outfile}.lrc" --reference="${filename}"
 fi
