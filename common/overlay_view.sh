@@ -108,7 +108,8 @@ if [[ "${append}" == "true" && -n "${viewfile}" ]]; then
     exit 1
 fi
 
-polytable=${basename}_${suffix}_poly
+TEMPSCHEMA=temp
+polytable=${TEMPSCHEMA}.${basename}_${suffix}_poly
 
 for ((tableidx=0; tableidx<${#eventtable_array[@]}; tableidx++)) do
     canonical_array[tableidx]=$(psql --variable=ON_ERROR_STOP=1 \
@@ -156,11 +157,12 @@ for ((colidx=0; colidx<${#eventcolumn_array[@]}; colidx++)) do
 done
 
 for ((tableidx=0; tableidx<${#eventtable_array[@]}; tableidx++)) do
+    junctiontable=${TEMPSCHEMA}.${junction_array[tableidx]}
     if [[ "${flatten}" == "true" && ! -n "${eventlimit_array[tableidx]}" ]]; then
         LIMIT_QUERY="SELECT coalesce(max(count),0)"
         LIMIT_QUERY+=" FROM (SELECT count(*) AS count"
-        LIMIT_QUERY+=" FROM ${junction_array[tableidx]}"
-        LIMIT_QUERY+=" JOIN ${canonical_array[tableidx]} AS ${eventtable_array[tableidx]} ON ${eventtable_array[tableidx]}.${eventid_array[tableidx]}=${junction_array[tableidx]}.${eventid_array[tableidx]}"
+        LIMIT_QUERY+=" FROM ${junctiontable}"
+        LIMIT_QUERY+=" JOIN ${canonical_array[tableidx]} AS ${eventtable_array[tableidx]} ON ${eventtable_array[tableidx]}.${eventid_array[tableidx]}=${junctiontable}.${eventid_array[tableidx]}"
         if [[ -n "${polyfilter}" ]]; then
             LIMIT_QUERY+=" JOIN ${polytable} ON ${polytable}.id = poly_id"
             LIMIT_QUERY+=" WHERE (${polyfilter})"
@@ -172,7 +174,7 @@ for ((tableidx=0; tableidx<${#eventtable_array[@]}; tableidx++)) do
                 LIMIT_QUERY+=" WHERE (${eventfilter[tableidx]})"
             fi
         fi
-        LIMIT_QUERY+=" GROUP BY ${junction_array[tableidx]}.poly_id) AS foo"
+        LIMIT_QUERY+=" GROUP BY ${junctiontable}.poly_id) AS foo"
         if [[ ${verbosity} -ge 2 ]]; then
             echo $LIMIT_QUERY
         fi
@@ -217,6 +219,7 @@ done
 VIEW_QUERY+=" FROM ${polytable}"
 separator=""
 for ((tableidx=0; tableidx<${#eventtable_array[@]}; tableidx++)) do
+    junctiontable=${TEMPSCHEMA}.${junction_array[tableidx]}
     VIEW_QUERY+=" LEFT OUTER JOIN"
     if [[ -n "${eventlimit_array[tableidx]}" ]]; then
         VIEW_QUERY+=" LATERAL"
@@ -239,19 +242,19 @@ for ((tableidx=0; tableidx<${#eventtable_array[@]}; tableidx++)) do
             fi
         fi
     done
-    VIEW_QUERY+=" FROM (SELECT ${junction_array[tableidx]}.poly_id"
+    VIEW_QUERY+=" FROM (SELECT ${junctiontable}.poly_id"
     for ((colidx=0; colidx<${#eventcolumn_array[@]}; colidx++)) do
         if [[ "${eventcolumncorrelation_array[colidx]}" == ""
            || "${eventcolumncorrelation_array[colidx]}" == "${eventtable_array[tableidx]}" ]]; then
             VIEW_QUERY+=", ${eventcolumn_array[colidx]}"
         fi
     done
-    VIEW_QUERY+=" FROM ${junction_array[tableidx]}"
+    VIEW_QUERY+=" FROM ${junctiontable}"
     VIEW_QUERY+=" JOIN ${canonical_array[tableidx]} AS ${eventtable_array[tableidx]}"
-    VIEW_QUERY+=" ON ${eventtable_array[tableidx]}.${eventid_array[tableidx]}=${junction_array[tableidx]}.${eventid_array[tableidx]}"
+    VIEW_QUERY+=" ON ${eventtable_array[tableidx]}.${eventid_array[tableidx]}=${junctiontable}.${eventid_array[tableidx]}"
     separator="WHERE"
     if [[ -n "${eventlimit_array[tableidx]}" ]]; then
-        VIEW_QUERY+=" ${separator} ${junction_array[tableidx]}.poly_id = ${polytable}.id"
+        VIEW_QUERY+=" ${separator} ${junctiontable}.poly_id = ${polytable}.id"
         separator="AND"
     fi
     if [[ -n "${eventfilter_array[tableidx]}" ]]; then

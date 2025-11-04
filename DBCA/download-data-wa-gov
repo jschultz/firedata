@@ -67,6 +67,8 @@ def download_data_wa_gov(arglist=None):
     tokenRequestUrl = "https://sso.slip.wa.gov.au/as/token.oauth2"
     tokenRequestHeaders = { 'Authorization' : 'Basic ZGlyZWN0LWRvd25sb2Fk'}
     tokenRequestForm={"grant_type": "password", "username":args.user, "password":args.password}
+    if args.verbosity >= 1:
+        print("Requesting token from URL: " + tokenRequestUrl, file=sys.stderr)
     tokenResponse = requests.post(tokenRequestUrl, data=tokenRequestForm, headers=tokenRequestHeaders)
     accessToken=json.loads(tokenResponse.text)["access_token"]
     if tokenResponse.status_code == 200:

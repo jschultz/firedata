@@ -66,8 +66,9 @@ table_exists() {
     --command "SELECT table_exists('$1')::int"
 }
 
-polytable=${basename}_${suffix}_poly
-pointtable=${basename}_${suffix}_point
+TEMPSCHEMA=temp
+polytable=${TEMPSCHEMA}.${basename}_${suffix}_poly
+pointtable=${TEMPSCHEMA}.${basename}_${suffix}_point
 
 for ((tableidx=0; tableidx<${#eventtable_array[@]}; tableidx++)) do
     canonical_array[tableidx]=$(psql --variable=ON_ERROR_STOP=1 \
@@ -76,6 +77,7 @@ for ((tableidx=0; tableidx<${#eventtable_array[@]}; tableidx++)) do
     if [[ ! -n "${canonical_array[tableidx]}" ]]; then
         canonical_array[tableidx]="${eventtable_array[tableidx]}"
     fi
+    dumptable[tableidx]=${TEMPSCHEMA}.${canonical_array[tableidx]##*.}_${suffix}_dump
     if [[ ! -n "${eventid_array[tableidx]}" ]]; then
         eventid_array[tableidx]="id"
     fi
@@ -85,6 +87,7 @@ for ((tableidx=0; tableidx<${#eventtable_array[@]}; tableidx++)) do
     if [[ ! -n "${junction_array[tableidx]}" ]]; then
         junction_array[tableidx]="${basename}_${suffix}_${eventtable_array[tableidx]}_junction"
     fi
+
 done
 
 force=false
@@ -112,7 +115,7 @@ for ((tableidx=0; tableidx<${#eventtable_array[@]}; tableidx++)) do
 done
 
 if [[ "${merge}" == "true" ]]; then
-    mergetable=${basename}_${suffix}_merge
+    mergetable=${TEMPSCHEMA}.${basename}_${suffix}_merge
     outtable=${mergetable}
 else
     outtable=${polytable}
@@ -123,72 +126,72 @@ if [[ "${force}" != "true" && "${existing}" == "true" && $(table_exists "${outta
 else
 
     for ((tableidx=0; tableidx<${#eventtable_array[@]}; tableidx++)) do
-        if [[ "${existing}" == "true" && $(table_exists "${canonical_array[tableidx]}_${suffix}_dump") == 1 ]]; then
-            echo "Dump table ${canonical_array[tableidx]}_${suffix}_dump exists - skipping" >> /dev/stderr
+        if [[ "${existing}" == "true" && $(table_exists "${dumptable[tableidx]}") == 1 ]]; then
+            echo "Dump table ${dumptable[tableidx]} exists - skipping" >> /dev/stderr
             continue
         else
             force=true
-            echo "Creating dump table ${canonical_array[tableidx]}_${suffix}_dump" >> /dev/stderr
+            echo "Creating dump table ${dumptable[tableidx]}" >> /dev/stderr
 
             if [[ "${nobackup}" != "true" ]]; then
-                backupcommand="CALL cycle_table('${canonical_array[tableidx]}_${suffix}_dump')"
+                backupcommand="CALL cycle_table('${dumptable[tableidx]}')"
             else
                 backupcommand=
             fi
-            dumptable=""
+            DUMP_QUERY=""
             withintro="WITH"
             if [[ -n "${area}" ]]; then
-                dumptable+="${withintro} area as (${area})"
+                DUMP_QUERY+="${withintro} area as (${area})"
                 withintro=","
             fi
             if [[ -n "${exclude}" ]]; then
-                dumptable+="${withintro} exclude as (${exclude})"
+                DUMP_QUERY+="${withintro} exclude as (${exclude})"
                 withintro=","
             fi
-            dumptable+="
+            DUMP_QUERY+="
                 SELECT ${eventid_array[tableidx]},
                     (ST_Dump("
             if [[ -n "${area}" ]]; then
-                dumptable+="ST_Intersection("
+                DUMP_QUERY+="ST_Intersection("
             fi
             if [[ -n "${exclude}" ]]; then
-                dumptable+="ST_Difference("
+                DUMP_QUERY+="ST_Difference("
             fi
-            dumptable+="event.${geometry_array[tableidx]}"
+            DUMP_QUERY+="event.${geometry_array[tableidx]}"
             if [[ -n "${exclude}" ]]; then
-                dumptable+=", exclude.geom)"
+                DUMP_QUERY+=", exclude.geom)"
             fi
             if [[ -n "${area}" ]]; then
-                dumptable+=", area.geom)"
+                DUMP_QUERY+=", area.geom)"
             fi
-            dumptable+=")).geom FROM ${canonical_array[tableidx]} AS event"
+            DUMP_QUERY+=")).geom FROM ${canonical_array[tableidx]} AS event"
             if [[ -n "${area}" ]]; then
-                dumptable+=", area"
+                DUMP_QUERY+=", area"
             fi
             if [[ -n "${exclude}" ]]; then
-                dumptable+=", exclude"
+                DUMP_QUERY+=", exclude"
             fi
             whereintro="WHERE"
             if [[ -n "${area}" ]]; then
-                dumptable+=" ${whereintro} ST_Intersects(event.${geometry_array[tableidx]}, area.geom)"
+                DUMP_QUERY+=" ${whereintro} ST_Intersects(event.${geometry_array[tableidx]}, area.geom)"
                 whereintro="AND"
             fi
             if [[ -n "${exclude}" ]]; then
-                dumptable+=" ${whereintro} NOT ST_Within(event.${geometry_array[tableidx]}, exclude.geom)"
+                DUMP_QUERY+=" ${whereintro} NOT ST_Within(event.${geometry_array[tableidx]}, exclude.geom)"
                 whereintro="AND"
             fi
             if [[ -n "${where}" ]]; then
-                dumptable+=" ${whereintro} ${where}"
+                DUMP_QUERY+=" ${whereintro} ${where}"
                 whereintro="AND"
             fi
 
             if [[ "${debug}" == "true" ]]; then
-                echo $dumptable >> /dev/stderr
+                echo $DUMP_QUERY >> /dev/stderr
             fi
             psql --variable=ON_ERROR_STOP=1 \
                 --command="${backupcommand}" \
-                --command="CREATE TABLE ${canonical_array[tableidx]}_${suffix}_dump AS ${dumptable}" \
-                --command "CREATE INDEX ON ${canonical_array[tableidx]}_${suffix}_dump USING gist (geom)"
+                --command="CREATE TABLE ${dumptable[tableidx]} AS ${DUMP_QUERY}" \
+                --command "CREATE INDEX ON ${dumptable[tableidx]} USING gist (geom)"
         fi
     done
 
@@ -208,7 +211,7 @@ else
     dumpcommand="SELECT ST_ExteriorRing((ST_DumpRings(geom)).geom) FROM (
         SELECT geom FROM ${canonical_array[0]}_${suffix}_dump"
     for ((tableidx=1; tableidx<${#eventtable_array[@]}; tableidx++)) do
-        dumpcommand+=" UNION SELECT geom FROM ${canonical_array[tableidx]}_${suffix}_dump"
+        dumpcommand+=" UNION SELECT geom FROM ${dumptable[tableidx]}"
     done
     dumpcommand+=") foo"
 
@@ -223,7 +226,7 @@ else
 fi
 
 if [[ "${merge}" == "true" ]]; then
-    mergepolyjunction=${basename}_${suffix}_merge_poly_junction
+    mergepolyjunction=${TEMPSCHEMA}.${basename}_${suffix}_merge_poly_junction
     if [[ "${force}" != "true" && "${existing}" == "true" && $(table_exists "${mergepolyjunction}") == 1 ]]; then
         echo "Junction table ${mergepolyjunction} exists - skipping" >> /dev/stderr
     else
@@ -288,17 +291,18 @@ else
 fi
 
 for ((tableidx=0; tableidx<${#eventtable_array[@]}; tableidx++)) do
-    if [[ "${force}" != "true" && "${existing}" == "true" && $(table_exists "${junction_array[tableidx]}") == 1 ]]; then
-        echo "Junction table ${junction_array[tableidx]} exists - skipping" >> /dev/stderr
+    junctiontable=${TEMPSCHEMA}.${junction_array[tableidx]}
+    if [[ "${force}" != "true" && "${existing}" == "true" && $(table_exists "${junctiontable}") == 1 ]]; then
+        echo "Junction table ${junctiontable} exists - skipping" >> /dev/stderr
     else
-        echo "Creating junction table ${junction_array[tableidx]}" >> /dev/stderr
+        echo "Creating junction table ${junctiontable}" >> /dev/stderr
         if [[ "${nobackup}" != "true" ]]; then
-            backupcommand="CALL cycle_table('${junction_array[tableidx]}')"
+            backupcommand="CALL cycle_table('${junctiontable}')"
         else
             backupcommand=
         fi
         if [[ -n "${area}" ]]; then
-            junctioncommand="CREATE TABLE ${junction_array[tableidx]} AS
+            junctioncommand="CREATE TABLE ${junctiontable} AS
                                 WITH area as (${area})
                                 SELECT DISTINCT point.id AS poly_id, event.${eventid_array[tableidx]}
                                 FROM area,
@@ -307,7 +311,7 @@ for ((tableidx=0; tableidx<${#eventtable_array[@]}; tableidx++)) do
                                 WHERE ST_Intersects(area.geom, event.${geometry_array[tableidx]})
                                 AND   ST_Contains(event.${geometry_array[tableidx]}, point.point)"
         else
-            junctioncommand="CREATE TABLE ${junction_array[tableidx]} AS
+            junctioncommand="CREATE TABLE ${junctiontable} AS
                                 SELECT DISTINCT point.id AS poly_id, event.${eventid_array[tableidx]}
                                 FROM ${canonical_array[tableidx]} AS event,
                                      ${pointtable} AS point
@@ -316,10 +320,10 @@ for ((tableidx=0; tableidx<${#eventtable_array[@]}; tableidx++)) do
         psql --variable=ON_ERROR_STOP=1 \
             --command="${backupcommand}" \
             --command="${junctioncommand}" \
-            --command="CREATE INDEX ON ${junction_array[tableidx]} (poly_id)" \
-            --command="ALTER TABLE ${junction_array[tableidx]} ADD CONSTRAINT fk_poly FOREIGN KEY (poly_id) REFERENCES ${polytable}(id)" \
-            --command="CREATE INDEX ON ${junction_array[tableidx]} (${eventid_array[tableidx]})" \
-            --command="ALTER TABLE ${junction_array[tableidx]} ADD CONSTRAINT fk_${eventtable_array[tableidx]} FOREIGN KEY (${eventid_array[tableidx]}) REFERENCES ${canonical_array[tableidx]}(${eventid_array[tableidx]})"
+            --command="CREATE INDEX ON ${junctiontable} (poly_id)" \
+            --command="ALTER TABLE ${junctiontable} ADD CONSTRAINT fk_poly FOREIGN KEY (poly_id) REFERENCES ${polytable}(id)" \
+            --command="CREATE INDEX ON ${junctiontable} (${eventid_array[tableidx]})" \
+            --command="ALTER TABLE ${junctiontable} ADD CONSTRAINT fk_${eventtable_array[tableidx]} FOREIGN KEY (${eventid_array[tableidx]}) REFERENCES ${canonical_array[tableidx]}(${eventid_array[tableidx]})"
     fi
 done
 
@@ -328,8 +332,8 @@ if [[ "${keep}" != "true" ]]; then
     psql --variable=ON_ERROR_STOP=1 \
         --command="DROP TABLE ${pointtable}"
     for ((tableidx=0; tableidx<${#eventtable_array[@]}; tableidx++)) do
-        echo "Dropping dump table ${canonical_array[tableidx]}_${suffix}_dump" >> /dev/stderr
+        echo "Dropping dump table ${dumptable[tableidx]}" >> /dev/stderr
         psql --variable=ON_ERROR_STOP=1 \
-            --command="DROP TABLE IF EXISTS ${canonical_array[tableidx]}_${suffix}_dump"
+            --command="DROP TABLE IF EXISTS ${dumptable[tableidx]}"
     done
 fi
