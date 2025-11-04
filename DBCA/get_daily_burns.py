@@ -136,6 +136,8 @@ def getDailyBurns(arglist=None):
         if args.proxy != 'free':
             os.environ['http_proxy']  = args.proxy
             os.environ['https_proxy'] = args.proxy
+        else:
+            fp = FreeProxy(https=True, rand=True, timeout=2)
     else:
         auth = Authentication()
 
@@ -148,17 +150,29 @@ def getDailyBurns(arglist=None):
                 try:
                     if args.verbosity >= 2:
                         print("Looking for free proxy", file=sys.stderr)
-                    proxy = FreeProxy(https=True, rand=True).get()
+                    proxy = fp.get()
                     os.environ['http_proxy']  = proxy
                     os.environ['https_proxy'] = proxy
                     if args.verbosity >= 2:
                         print("Found free proxy", proxy, file=sys.stderr)
                     break
-                except FreeProxyException:
+                except FreeProxyException as e:
                     if args.verbosity >= 2:
-                        print("FreeProxyException occurred", file=sys.stderr)
+                        # print("FreeProxyException occurred", file=sys.stderr)
+                        print(e, file=sys.stderr)
                     continue
 
+        timenow = datetime.now()
+        if lastpolltime is not None:
+            remaininginterval = args.interval - (timenow - lastpolltime).total_seconds()
+        else:
+            remaininginterval = 0
+
+        if args.verbosity >= 2:
+            print("Remaining interval:", remaininginterval, file=sys.stderr)
+
+        if remaininginterval > 0:
+            time.sleep(remaininginterval)
 
         try:
             wms = WebMapService(args.server, version=args.version, auth=auth)
@@ -167,6 +181,8 @@ def getDailyBurns(arglist=None):
             wms = None
 
         if wms:
+            lastpolltime = timenow
+
             outdata = decodeDailyBurns(wms)
             if outdata is not None:
                 outfieldnames = list(set(sum([list(item.keys()) for item in outdata], start=[])))
@@ -178,21 +194,9 @@ def getDailyBurns(arglist=None):
                         data[fieldname] = data.get(fieldname, '')
 
                 if not all((indata[idx] == outdata[idx] for idx in range(len(indata)))):
+                    if args.verbosity >= 2:
+                        print([(indata[idx], outdata[idx]) for idx in range(len(indata)) if indata[idx] != outdata[idx]], file=sys.stderr)
                     break
-
-            timenow = datetime.now()
-            if lastpolltime is not None:
-                remaininginterval = args.interval - (timenow - lastpolltime).total_seconds()
-            else:
-                remaininginterval = args.interval
-
-            if args.verbosity >= 2:
-                print("Remaining interval:", remaininginterval, file=sys.stderr)
-
-            if remaininginterval > 0:
-                time.sleep(remaininginterval)
-
-            lastpolltime = timenow
 
     if args.csvfile is not None:
         if os.path.exists(args.csvfile):
