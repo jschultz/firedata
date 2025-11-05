@@ -49,8 +49,23 @@ IFS=';' read -r -a eventid_array    <<< "${eventid}"
 IFS=';' read -r -a geometry_array   <<< "${geometry}"
 IFS=';' read -r -a junction_array   <<< "${junction}"
 
+table_exists() {
+    psql --variable=ON_ERROR_STOP=1 --quiet --tuples-only --no-align \
+    --command "\timing off" \
+    --command "SELECT table_exists('$1')::int"
+}
+
+for ((tableidx=0; tableidx<${#eventtable_array[@]}; tableidx++)) do
+    canonical_array[tableidx]=$(psql --variable=ON_ERROR_STOP=1 \
+        --quiet --tuples-only --no-align --command="\timing off" \
+        --command="SELECT canonical_table('${eventtable_array[tableidx]}')")
+    if [[ ! -n "${canonical_array[tableidx]}" ]]; then
+        canonical_array[tableidx]="${eventtable_array[tableidx]}"
+    fi
+done
+
 if [[ ! -n "${basename}" ]]; then
-    basename=${eventtable_array[0]}
+    basename=${canonical_array[0]##*.}
 fi
 
 if [[ "${nologfile}" != "true" ]]; then
@@ -60,23 +75,11 @@ if [[ "${nologfile}" != "true" ]]; then
     echo "${COMMENTS}" > ${logfile}
 fi
 
-table_exists() {
-    psql --variable=ON_ERROR_STOP=1 --quiet --tuples-only --no-align \
-    --command "\timing off" \
-    --command "SELECT table_exists('$1')::int"
-}
-
 TEMPSCHEMA=temp
 polytable=${TEMPSCHEMA}.${basename}_${suffix}_poly
 pointtable=${TEMPSCHEMA}.${basename}_${suffix}_point
 
 for ((tableidx=0; tableidx<${#eventtable_array[@]}; tableidx++)) do
-    canonical_array[tableidx]=$(psql --variable=ON_ERROR_STOP=1 \
-        --quiet --tuples-only --no-align --command="\timing off" \
-        --command="SELECT canonical_table('${eventtable_array[tableidx]}')")
-    if [[ ! -n "${canonical_array[tableidx]}" ]]; then
-        canonical_array[tableidx]="${eventtable_array[tableidx]}"
-    fi
     dumptable[tableidx]=${TEMPSCHEMA}.${canonical_array[tableidx]##*.}_${suffix}_dump
     if [[ ! -n "${eventid_array[tableidx]}" ]]; then
         eventid_array[tableidx]="id"

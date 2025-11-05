@@ -70,8 +70,17 @@ IFS=';' read -r -a eventalias_array  <<< "${eventaliases}"
 IFS=';' read -r -a index_array       <<< "${indexes}"
 IFS=';' read -r -a using_array       <<< "${using}"
 
+for ((tableidx=0; tableidx<${#eventtable_array[@]}; tableidx++)) do
+    canonical_array[tableidx]=$(psql --variable=ON_ERROR_STOP=1 \
+        --quiet --tuples-only --no-align --command="\timing off" \
+        --command="SELECT canonical_table('${eventtable_array[tableidx]}')")
+    if [[ ! -n "${canonical_array[tableidx]}" ]]; then
+        canonical_array[tableidx]="${eventtable_array[tableidx]}"
+    fi
+done
+
 if [[ ! -n "${basename}" ]]; then
-    basename=${eventtable_array[0]}
+    basename=${canonical_array[0]}
 fi
 
 if [[ "${nologfile}" != "true" ]]; then
@@ -112,12 +121,6 @@ TEMPSCHEMA=temp
 polytable=${TEMPSCHEMA}.${basename}_${suffix}_poly
 
 for ((tableidx=0; tableidx<${#eventtable_array[@]}; tableidx++)) do
-    canonical_array[tableidx]=$(psql --variable=ON_ERROR_STOP=1 \
-        --quiet --tuples-only --no-align --command="\timing off" \
-        --command="SELECT canonical_table('${eventtable_array[tableidx]}')")
-    if [[ ! -n "${canonical_array[tableidx]}" ]]; then
-        canonical_array[tableidx]="${eventtable_array[tableidx]}"
-    fi
     if [[ ! -n "${eventid_array[tableidx]}" ]]; then
         eventid_array[tableidx]="id"
     fi
