@@ -212,7 +212,7 @@ else
         --command "CREATE INDEX ON ${outtable} USING gist (geom)"
 
     dumpcommand="SELECT ST_ExteriorRing((ST_DumpRings(geom)).geom) FROM (
-        SELECT geom FROM ${canonical_array[0]}_${suffix}_dump"
+        SELECT geom FROM ${dumptable[0]}"
     for ((tableidx=1; tableidx<${#eventtable_array[@]}; tableidx++)) do
         dumpcommand+=" UNION SELECT geom FROM ${dumptable[tableidx]}"
     done
