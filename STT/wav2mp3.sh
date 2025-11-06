@@ -26,7 +26,8 @@ args=(
   ":--nologfile:::Don't write a log file:private,flag"
   ":--trash:::Trash original file on success:private,flag"
 
-  "-p:--preset::voice:lame preset to use"
+#   "-p:--preset::voice:lame preset to use"
+  "-b:--bitrate::64k:Output bitrate"
 
   "-d:--directory:::Directory to place output file; otherwise same directory as audio file"
 #   "-O:--overwrite:::OK to overwrite output file:flag"
@@ -63,7 +64,9 @@ then
     echo "Output file ${outfile} already exists" > /dev/stderr
 else
     echo "Encoding file ${filename} to ${outfile}" > /dev/stderr
-    lame --quiet --preset ${preset} ${filename} ${outfile}
+# 2025-11-06 lame seems to have gone buggy. Complaints about ReplayGain
+#     lame --quiet --preset ${preset} ${filename} ${outfile}
+    ffmpeg -i ${filename} -b:a ${bitrate} -y ${outfile}
     touch "${outfile}" --reference="${filename}"
 fi
 
@@ -72,7 +75,7 @@ if [[ -f "${outfile}" ]] \
 && (( $(echo $(mediainfo --inform="Audio;%Duration%" "${outfile}") '>=' $(mediainfo --inform="Audio;%Duration%" "${filename}") | bc -l) ));
 then
     if [[ "${trash}" == "true" ]]; then
-        echo "Moving file ${filename} to trash"
+        echo "Moving file ${filename} to $HOME/Trash"
         mv "${filename}" $HOME/Trash
     fi
 else
