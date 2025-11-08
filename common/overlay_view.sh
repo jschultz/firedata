@@ -80,7 +80,7 @@ for ((tableidx=0; tableidx<${#eventtable_array[@]}; tableidx++)) do
 done
 
 if [[ ! -n "${basename}" ]]; then
-    basename=${canonical_array[0]}
+    basename=${canonical_array[0]##*.}
 fi
 
 if [[ "${nologfile}" != "true" ]]; then
