@@ -163,23 +163,19 @@ else
         --command="CREATE INDEX ON ${maptable}(map_id)"
 
     echo "Updating map table ${maptable}" >> /dev/stderr
-    newmaptable=${maptable##*.} # Temporary table has no schema
+    newmaptable=${maptable##*.}_new # Temporary table has no schema
     while true; do
-        result=$(psql --variable=ON_ERROR_STOP=1 --tuples-only --no-align \
-                      --command "CREATE TEMPORARY TABLE ${newmaptable} AS
-                                    SELECT map.poly_id, MIN(map_inner.map_id) AS map_id
-                                    FROM ${maptable} AS map, ${jointable}, ${maptable} AS map_inner
-                                    WHERE map_inner.poly_id = poly_id_2 AND map.poly_id = poly_id_1
-                                    GROUP BY map.poly_id" \
-                      --command="CREATE INDEX ON ${newmaptable}(poly_id)" \
-                      --command="CREATE INDEX ON ${newmaptable}(map_id)" \
-                      --command="UPDATE ${maptable} SET map_id = ${newmaptable}.map_id FROM ${newmaptable} WHERE ${newmaptable}.poly_id = ${maptable}.poly_id AND ${maptable}.map_id != ${newmaptable}.map_id" \
-                | tee /dev/tty \
-                | grep UPDATE)
-        if [[ ${verbosity} -ge 2 ]]; then
-            echo ${result}
-        fi
-        if [[ "${result}" == "UPDATE 0" ]]; then
+        psql --variable=ON_ERROR_STOP=1 --tuples-only --no-align \
+             --command "CREATE TEMPORARY TABLE ${newmaptable} AS
+                            SELECT map.poly_id, MIN(map_inner.map_id) AS map_id
+                            FROM ${maptable} AS map, ${jointable}, ${maptable} AS map_inner
+                            WHERE map_inner.poly_id = poly_id_2 AND map.poly_id = poly_id_1
+                            GROUP BY map.poly_id" \
+             --command="CREATE INDEX ON ${newmaptable}(poly_id)" \
+             --command="CREATE INDEX ON ${newmaptable}(map_id)" \
+             --command="UPDATE ${maptable} SET map_id = ${newmaptable}.map_id FROM ${newmaptable} WHERE ${newmaptable}.poly_id = ${maptable}.poly_id AND ${maptable}.map_id != ${newmaptable}.map_id" \
+        | tee /tmp/dissolve_view.txt
+        if [[ "$(grep UPDATE /tmp/dissolve_view.txt)" == "UPDATE 0" ]]; then
             break
         fi
     done
