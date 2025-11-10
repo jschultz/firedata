@@ -75,9 +75,9 @@ TEMPSCHEMA=temp
 CALCSCHEMA=calc
 
 force=false
-touchestable="${CALCSCHEMA}.${polytable}_touches"
-jointable="${TEMPSCHEMA}.${viewtable}_join"
-maptable="${TEMPSCHEMA}.${viewtable}_map"
+touchestable="${CALCSCHEMA}.${polytable##*.}_touches"
+jointable="${TEMPSCHEMA}.${viewtable##*.}_join"
+maptable="${TEMPSCHEMA}.${viewtable##*.}_map"
 
 if [[ "${force}" != "true" && "${existing}" == "true" && $(table_exists "${touchestable}") == 1 ]]; then
     echo "Touches table ${touchestable} exists - skipping" >> /dev/stderr
@@ -94,7 +94,7 @@ else
         --command="${backupcommand}" \
         --command="CREATE TABLE ${touchestable} AS
                         SELECT poly_1.id AS poly_id_1, poly_2.id AS poly_id_2
-                        FROM ${CALCSCHEMA}.${polytable} AS poly_1, ${CALCSCHEMA}.${polytable} AS poly_2
+                        FROM ${polytable} AS poly_1, ${polytable} AS poly_2
                         WHERE poly_1.id = poly_2.id OR (ST_Touches(poly_1.geom, poly_2.geom)
                         AND ST_RelateMatch(ST_Relate(poly_1.geom, poly_2.geom),'****1****'))"
 fi
@@ -200,7 +200,7 @@ else
         DISSOLVE_QUERY+=", ${match_array[matchidx]}"
     done
     DISSOLVE_QUERY+=" FROM (SELECT map_id, ST_Union(geom) AS geom
-                            FROM ${maptable} AS map, ${CALCSCHEMA}.${polytable} AS poly
+                            FROM ${maptable} AS map, ${polytable} AS poly
                             WHERE poly.id = map.poly_id
                             GROUP BY map_id) AS unionq,
                             ${viewtable} AS view"
