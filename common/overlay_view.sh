@@ -41,7 +41,7 @@ args=(
   ":--indexes:::Semicolon-delimited list of indexes to create on view table"
   ":--using:::Semicolon-delimited list of index methods"
   "-a:--append:::Append output to existing view table:flag"
-  "-v:--viewtable:::Table to generate, defaults to \$eventtable + \$suffix + '_view'"
+  "-v:--viewtable:::Table to generate, defaults to 'eventtable'_'suffix'_'view'"
   "-S:--viewfile:::Shapefile to generate:output"
   "-l:--logfile:::Log file to record processing, defaults to \$viewtable or \$viewfile with extension replaced by '.log', or \$eventtable + \$suffix' + '.log' if neither \$viewtable nor \$viewfile is defined:private"
   ":--nologfile:::Don't write a log file:private,flag"
@@ -132,7 +132,7 @@ for ((tableidx=0; tableidx<${#eventtable_array[@]}; tableidx++)) do
 done
 
 if [[ ! -n "${viewtable}" ]]; then
-    viewtable=${basename}_${suffix}_view
+    viewtable=${CALCSCHEMA}.${basename}_${suffix}_view
 fi
 
 for ((colidx=0; colidx<${#eventcolumn_array[@]}; colidx++)) do

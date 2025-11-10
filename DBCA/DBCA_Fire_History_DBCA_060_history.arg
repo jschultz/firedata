@@ -25,7 +25,6 @@
 #    --polycolumns "id;geom"
 #    --polyaliases "poly_id"
 #    --eventcolumns "dbca_fire_history_dbca_060.object_id"
-#    --viewtable "dbca_fire_history_dbca_060_${suffix}_history"
 ################################################################################
 # overlay_junction.sh
 #    --nologfile
