@@ -199,9 +199,22 @@ LANGUAGE plpgsql
 AS
 $$
     DECLARE
-        result boolean;
+        split_name  text[];
+        schemamatch text;
+        tablematch  text;
     BEGIN
-        RETURN EXISTS (SELECT 1 FROM pg_tables WHERE schemaname = 'public' AND tablename = LEFT(name, 63));
+        split_name := regexp_split_to_array(name, '\\.');
+        --RAISE NOTICE 'split_name: %', split_name;
+        IF ARRAY_LENGTH(split_name,1) = 1 THEN
+            schemamatch := 'public';
+            tablematch  := split_name[1];
+        ELSE
+            schemamatch := split_name[1];
+            tablematch  := split_name[2];
+        END IF;
+        --RAISE NOTICE 'schema: %', schemamatch;
+        --RAISE NOTICE 'table: %', tablematch;
+        RETURN EXISTS (SELECT 1 FROM pg_tables WHERE schemaname = schemamatch AND tablename = LEFT(tablematch, 63));
     END;
 $$"
 #    --command "

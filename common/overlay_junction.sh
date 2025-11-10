@@ -76,7 +76,9 @@ if [[ "${nologfile}" != "true" ]]; then
 fi
 
 TEMPSCHEMA=temp
-polytable=${TEMPSCHEMA}.${basename}_${suffix}_poly
+CALCSCHEMA=calc
+
+polytable=${CALCSCHEMA}.${basename}_${suffix}_poly
 pointtable=${TEMPSCHEMA}.${basename}_${suffix}_point
 
 for ((tableidx=0; tableidx<${#eventtable_array[@]}; tableidx++)) do
@@ -229,7 +231,7 @@ else
 fi
 
 if [[ "${merge}" == "true" ]]; then
-    mergepolyjunction=${TEMPSCHEMA}.${basename}_${suffix}_merge_poly_junction
+    mergepolyjunction=${CALCSCHEMA}.${basename}_${suffix}_merge_poly_junction
     if [[ "${force}" != "true" && "${existing}" == "true" && $(table_exists "${mergepolyjunction}") == 1 ]]; then
         echo "Junction table ${mergepolyjunction} exists - skipping" >> /dev/stderr
     else
@@ -294,7 +296,7 @@ else
 fi
 
 for ((tableidx=0; tableidx<${#eventtable_array[@]}; tableidx++)) do
-    junctiontable=${TEMPSCHEMA}.${junction_array[tableidx]}
+    junctiontable=${CALCSCHEMA}.${junction_array[tableidx]}
     if [[ "${force}" != "true" && "${existing}" == "true" && $(table_exists "${junctiontable}") == 1 ]]; then
         echo "Junction table ${junctiontable} exists - skipping" >> /dev/stderr
     else

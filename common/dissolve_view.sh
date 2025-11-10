@@ -27,7 +27,7 @@ args=(
   "-m:--match:::Semicolon-delimited list of columns to match"
   ":--viewtable:::View table to dissolve:required"
   ":--polytable:::Polygon table referenced from view table:required"
-  ":--touches:::Create a touches table:"
+  ":--eventtable:::Event table referenced from view table:"
   "-E:--existing:::Use existing tables where they exist:flag"
   "-K:--keep:::Keep tables for re-use:flag"
   "-l:--logfile:::Log file to record processing, defaults to \$outtable or \$outfile with extension replaced by '.log':private"
@@ -71,63 +71,71 @@ table_exists() {
     --command "SELECT table_exists('$1')::int"
 }
 
+TEMPSCHEMA=temp
+CALCSCHEMA=calc
+
 force=false
-touchestable="${polytable}_touches"
-jointable="${viewtable}_join"
-maptable="${viewtable}_map"
+touchestable="${CALCSCHEMA}.${polytable}_touches"
+jointable="${TEMPSCHEMA}.${viewtable}_join"
+maptable="${viewtable}_map" # Temporary table so no schema
 
-if [[ "${touches}" == "true"  ]]; then
-    if [[ "${force}" != "true" && "${existing}" == "true" && $(table_exists "${touchestable}") == 1 ]]; then
-        echo "Table ${touchestable} exists - skipping" >> /dev/stderr
-    else
-        force=true
-        echo "Creating table ${touchestable}" >> /dev/stderr
-        if [[ "${nobackup}" != "true" ]]; then
-            backupcommand="CALL cycle_table('${touchestable}')"
-        else
-            backupcommand=
-        fi
-
-        psql --variable=ON_ERROR_STOP=1 \
-            --command="${backupcommand}" \
-            --command="CREATE TABLE ${touchestable} AS
-                           SELECT poly_1.id AS poly_id_1, poly_2.id AS poly_id_2
-                           FROM ${polytable} AS poly_1, ${polytable} AS poly_2
-                           WHERE poly_1.id = poly_2.id OR (ST_Touches(poly_1.geom, poly_2.geom)
-                           AND ST_RelateMatch(ST_Relate(poly_1.geom, poly_2.geom),'****1****'))"
-    fi
-fi
-
-if [[ "${force}" != "true" && "${existing}" == "true" && $(table_exists "${jointable}") == 1 ]]; then
-    echo "Table ${jointable} exists - skipping" >> /dev/stderr
+if [[ "${force}" != "true" && "${existing}" == "true" && $(table_exists "${touchestable}") == 1 ]]; then
+    echo "Touches table ${touchestable} exists - skipping" >> /dev/stderr
 else
     force=true
-    echo "Creating table ${jointable}" >> /dev/stderr
+    echo "Creating touches table ${touchestable}" >> /dev/stderr
+    if [[ "${nobackup}" != "true" ]]; then
+        backupcommand="CALL cycle_table('${touchestable}')"
+    else
+        backupcommand=
+    fi
+
+    psql --variable=ON_ERROR_STOP=1 \
+        --command="${backupcommand}" \
+        --command="CREATE TABLE ${touchestable} AS
+                        SELECT poly_1.id AS poly_id_1, poly_2.id AS poly_id_2
+                        FROM ${CALCSCHEMA}.${polytable} AS poly_1, ${CALCSCHEMA}.${polytable} AS poly_2
+                        WHERE poly_1.id = poly_2.id OR (ST_Touches(poly_1.geom, poly_2.geom)
+                        AND ST_RelateMatch(ST_Relate(poly_1.geom, poly_2.geom),'****1****'))"
+fi
+if [[ "${force}" != "true" && "${existing}" == "true" && $(table_exists "${jointable}") == 1 ]]; then
+    echo "Join table ${jointable} exists - skipping" >> /dev/stderr
+else
+    echo "Creating join table ${jointable}" >> /dev/stderr
     if [[ "${nobackup}" != "true" ]]; then
         backupcommand="CALL cycle_table('${jointable}')"
     else
         backupcommand=
     fi
 
-    if [[ $(table_exists "${touchestable}") == 1 ]]; then
-        JOIN_QUERY="CREATE TABLE ${jointable} AS
-                        SELECT poly_id_1, poly_id_2
-                        FROM ${touchestable}, ${viewtable} as view_1, ${viewtable} as view_2"
-        JOIN_QUERY+=WHERE" view_1.poly_id = poly_id_1 AND view_2.poly_id = poly_id_2"
-        for ((matchidx=0; matchidx<${#match_array[@]}; matchidx++)) do
-            JOIN_QUERY+=" AND view_1.${match_array[matchidx]} IS NOT DISTINCT FROM view_2.${match_array[matchidx]}"
-        done
-    else
-        JOIN_QUERY="CREATE TABLE ${jointable} AS
-                        SELECT view_1.poly_id AS poly_id_1, view_2.poly_id AS poly_id_2
-                        FROM ${viewtable} as view_1, ${viewtable} as view_2
-                        WHERE"
-                        for ((matchidx=0; matchidx<${#match_array[@]}; matchidx++)) do
-                            JOIN_QUERY+=" view_1.${match_array[matchidx]} IS NOT DISTINCT FROM view_2.${match_array[matchidx]} AND"
-                        done
-                        JOIN_QUERY+=" (view_1.poly_id = view_2.poly_id OR (ST_Touches(view_1.geom, view_2.geom) AND ST_RelateMatch(ST_Relate(view_1.geom, view_2.geom),'****1****')))"
+    JOIN_QUERY="CREATE TABLE ${jointable} AS
+                    SELECT poly_id_1, poly_id_2 FROM ${touchestable} AS touches, "
+    JOIN_QUERY+="(SELECT poly_id"
+    for ((matchidx=0; matchidx<${#match_array[@]}; matchidx++)) do
+        JOIN_QUERY+=", ${match_array[matchidx]} AS match_${matchidx}"
+    done
+    JOIN_QUERY+=" FROM ${viewtable} AS view"
+    if [[ -n "${eventtable}" ]]; then
+        JOIN_QUERY+=", ${eventtable} AS event WHERE event.object_id = view.object_id[1]"
     fi
+    JOIN_QUERY+=") AS event_1, "
+    JOIN_QUERY+="(SELECT poly_id"
+    for ((matchidx=0; matchidx<${#match_array[@]}; matchidx++)) do
+        JOIN_QUERY+=", ${match_array[matchidx]} AS match_${matchidx}"
+    done
+    JOIN_QUERY+=" FROM ${viewtable} AS view"
+    if [[ -n "${eventtable}" ]]; then
+        JOIN_QUERY+=", ${eventtable} AS event WHERE event.object_id = view.object_id[1]"
+    fi
+    JOIN_QUERY+=") AS event_2 "
+    JOIN_QUERY+="WHERE event_1.poly_id = poly_id_1 AND event_2.poly_id = poly_id_2"
+    for ((matchidx=0; matchidx<${#match_array[@]}; matchidx++)) do
+        JOIN_QUERY+=" AND event_1.match_${matchidx} IS NOT DISTINCT FROM event_1.match_${matchidx}"
+    done
 
+    if [[ ${verbosity} -ge 2 ]]; then
+        echo "$JOIN_QUERY" > /dev/stderr
+    fi
     psql --variable=ON_ERROR_STOP=1 \
         --command="${backupcommand}" \
         --command="${JOIN_QUERY}" \
@@ -136,7 +144,7 @@ else
 fi
 
 if [[ "${force}" != "true" && "${existing}" == "true" && $(table_exists "${maptable}") == 1 ]]; then
-    echo "Table ${maptable} exists - skipping" >> /dev/stderr
+    echo "Map table ${maptable} exists - skipping" >> /dev/stderr
 else
     force=true
     echo "Creating map table ${maptable}" >> /dev/stderr
@@ -191,25 +199,30 @@ else
         DISSOLVE_QUERY+=", ${match_array[matchidx]}"
     done
     DISSOLVE_QUERY+=" FROM (SELECT map_id, ST_Union(geom) AS geom
-                            FROM ${maptable}, ${polytable}
-                            WHERE id = poly_id
+                            FROM ${maptable} AS map, ${CALCSCHEMA}.${polytable} AS poly
+                            WHERE poly.id = map.poly_id
                             GROUP BY map_id) AS unionq,
-                            ${viewtable}
-                    WHERE poly_id = map_id"
-
+                            ${viewtable} AS view"
+    if [[ -n "${eventtable}" ]]; then
+        DISSOLVE_QUERY+=", ${eventtable} AS event"
+    fi
+    DISSOLVE_QUERY+=" WHERE poly_id = map_id"
+    if [[ -n "${eventtable}" ]]; then
+        DISSOLVE_QUERY+=" AND event.object_id = view.object_id[1]"
+    fi
     if [[ ${verbosity} -ge 2 ]]; then
         echo "$DISSOLVE_QUERY" > /dev/stderr
     fi
 
     if [[ -n "${outfile}" ]]; then
         if [[ ${verbosity} -ge 1 ]]; then
-            echo "Creating shapefile ${outfile}"
+            echo "Creating dissolve shapefile ${outfile}"
         fi
         pgsql2shp -q -f "${outfile}" -u $PGUSER $PGDATABASE "${DISSOLVE_QUERY}"
         zip --move --junk-paths "${outfile}".zip "${outfile}".{cpg,dbf,prj,shp,shx}
     else
         if [[ ${verbosity} -ge 1 ]]; then
-            echo "Creating table ${outtable}"
+            echo "Creating dissolve table ${outtable}"
         fi
         if [[ "${nobackup}" != "true" ]]; then
             backupcommand="CALL cycle_table('${outtable}')"
@@ -226,4 +239,14 @@ else
                 --command="CREATE TABLE ${outtable} AS ${DISSOLVE_QUERY}" \
                 --command="${commentcommand}"
     fi
+fi
+
+if [[ "${keep}" != "true" ]]; then
+    echo "Dropping join table ${jointable}" >> /dev/stderr
+    psql --variable=ON_ERROR_STOP=1 \
+         --command="DROP TABLE ${jointable}"
+
+    echo "Dropping map table ${maptable}" >> /dev/stderr
+    psql --variable=ON_ERROR_STOP=1 \
+         --command="DROP TABLE ${maptable}"
 fi

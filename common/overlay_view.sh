@@ -118,7 +118,9 @@ if [[ "${append}" == "true" && -n "${viewfile}" ]]; then
 fi
 
 TEMPSCHEMA=temp
-polytable=${TEMPSCHEMA}.${basename}_${suffix}_poly
+CALCSCHEMA=calc
+
+polytable=${CALCSCHEMA}.${basename}_${suffix}_poly
 
 for ((tableidx=0; tableidx<${#eventtable_array[@]}; tableidx++)) do
     if [[ ! -n "${eventid_array[tableidx]}" ]]; then
@@ -160,7 +162,7 @@ for ((colidx=0; colidx<${#eventcolumn_array[@]}; colidx++)) do
 done
 
 for ((tableidx=0; tableidx<${#eventtable_array[@]}; tableidx++)) do
-    junctiontable=${TEMPSCHEMA}.${junction_array[tableidx]}
+    junctiontable=${CALCSCHEMA}.${junction_array[tableidx]}
     if [[ "${flatten}" == "true" && ! -n "${eventlimit_array[tableidx]}" ]]; then
         LIMIT_QUERY="SELECT coalesce(max(count),0)"
         LIMIT_QUERY+=" FROM (SELECT count(*) AS count"
@@ -222,7 +224,7 @@ done
 VIEW_QUERY+=" FROM ${polytable}"
 separator=""
 for ((tableidx=0; tableidx<${#eventtable_array[@]}; tableidx++)) do
-    junctiontable=${TEMPSCHEMA}.${junction_array[tableidx]}
+    junctiontable=${CALCSCHEMA}.${junction_array[tableidx]}
     VIEW_QUERY+=" LEFT OUTER JOIN"
     if [[ -n "${eventlimit_array[tableidx]}" ]]; then
         VIEW_QUERY+=" LATERAL"
