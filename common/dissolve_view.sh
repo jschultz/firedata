@@ -130,7 +130,7 @@ else
     JOIN_QUERY+=") AS event_2 "
     JOIN_QUERY+="WHERE event_1.poly_id = poly_id_1 AND event_2.poly_id = poly_id_2"
     for ((matchidx=0; matchidx<${#match_array[@]}; matchidx++)) do
-        JOIN_QUERY+=" AND event_1.match_${matchidx} IS NOT DISTINCT FROM event_1.match_${matchidx}"
+        JOIN_QUERY+=" AND event_1.match_${matchidx} IS NOT DISTINCT FROM event_2.match_${matchidx}"
     done
 
     if [[ ${verbosity} -ge 2 ]]; then
