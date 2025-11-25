@@ -22,6 +22,7 @@ import re
 import os
 import sys
 from datetime import datetime, timedelta
+from pymediainfo import MediaInfo
 
 FFMPEG_BIN = "ffmpeg"
 
@@ -50,7 +51,7 @@ def audioSplit(arglist=None):
         parser.write_comments(args, logfile, incomments=ArgumentHelper.separator())
         logfile.close()
 
-    INFILE_REGEX = re.compile(R"(?P<prefix>.*)(?P<year>[0-9]{4})(?P<month>[0-9]{2})(?P<day>[0-9]{2})\-(?P<hour>[0-9]{2})(?P<minute>[0-9]{2})(?P<second>[0-9]{2})(\-(?P<volume>[0-9]{2}))?.*")
+    INFILE_REGEX = re.compile(R"(?P<prefix>.*)(?P<year>(20)?[0-9]{2})(?P<month>[0-9]{2})(?P<day>[0-9]{2})\-(?P<hour>[0-9]{2})(?P<minute>[0-9]{2})(?P<second>[0-9]{2})(\-(?P<volume>[0-9]{2}))?.*")
     
     for infile in args.infiles:
         if args.verbosity >= 1:
@@ -63,7 +64,10 @@ def audioSplit(arglist=None):
             if args.outdir:
                 prefix = os.path.join(args.outdir, os.path.basename(prefix))
             
-            basedatetime = datetime(int(infile_match.group('year')), int(infile_match.group('month')), int(infile_match.group('day')), int(infile_match.group('hour')), int(infile_match.group('minute')), int(infile_match.group('second')))
+            year = int(infile_match.group('year'))
+            if year < 100:
+                year += 2000
+            basedatetime = datetime(year, int(infile_match.group('month')), int(infile_match.group('day')), int(infile_match.group('hour')), int(infile_match.group('minute')), int(infile_match.group('second')))
             if infile_match.group('volume'):
                 volume = int(infile_match.group('volume'))
                 basedatetime = basedatetime + (volume - 1) * timedelta(hours=18, minutes=38, seconds=28, milliseconds=860)
@@ -79,46 +83,61 @@ def audioSplit(arglist=None):
 
         pipe = subprocess.Popen(command, stderr=subprocess.PIPE)
         
-        SILENCE_END_REGEX = re.compile(R".*silence_end: (?P<silence_end>[0-9]*(\.[0-9]*)?).*silence_duration: (?P<silence_duration>[0-9]*(\.[0-9]*)?)")
-        
-        sound_start = None
-        silence_end = None
+        SILENCE_START_REGEX = re.compile(R".*silence_start: (?P<silence_start>[0-9]*(\.[0-9]*)?)")
+        SILENCE_END_REGEX   = re.compile(R".*silence_end: (?P<silence_end>[0-9]*(\.[0-9]*)?).*silence_duration: (?P<silence_duration>[0-9]*(\.[0-9]*)?)")
+
+        silence_end = 0
         while True:
             line = pipe.stderr.readline().decode()
             if not line:
                 break
              
-            silence_end_match = SILENCE_END_REGEX.match(line)
-            if silence_end_match:
-                silence_end      = float(silence_end_match.group('silence_end'))
-                silence_duration = float(silence_end_match.group('silence_duration'))
-            
-            if sound_start:
-                datetime_start = basedatetime + timedelta(seconds = sound_start)
-                silence_start = round(silence_end - silence_duration, 4)
+            silence_start_match = SILENCE_START_REGEX.match(line)
+            if silence_start_match:
+                silence_start = float(silence_start_match.group('silence_start'))
 
-                print(sound_start, silence_start)
-                
-                if sound_start:
-                    datetime_start = basedatetime + timedelta(seconds = sound_start)
-                    if args.verbosity >= 2:
-                        print("Found chunk: ", sound_start, silence_start, file=sys.stderr)
-                    
+                if args.verbosity >= 2:
+                    print("Found chunk: ", silence_end, silence_start, file=sys.stderr)
+
+                if silence_end:
+                    datetime_start = basedatetime + timedelta(seconds = silence_end)
+                    datetime_end   = basedatetime + timedelta(seconds = silence_start)
+
                     subprocess.run( [ FFMPEG_BIN, '-nostats', '-loglevel', 'quiet',
                                     '-y',
                                     '-i', infile,
-                                    '-ss', str(sound_start),
+                                    '-ss', str(silence_end),
                                     '-to', str(silence_start),
                                     '-c', 'copy',
                                     prefix + datetime_start.strftime("%Y%m%d-%H%M%S") + infile_ext ] )
-                    # subprocess.run( [ 'touch',
-                    #                 prefix + datetime_start.strftime("%Y%m%d-%H%M%S") + infile_ext ],
-                    #                 '--reference='+infile ]     )
-                    
-            sound_start = silence_end
-            
-            
-    
+                    subprocess.run( [ 'touch',
+                                    '--date='+str(datetime_end),
+                                    prefix + datetime_start.strftime("%Y%m%d-%H%M%S") + infile_ext ] )
+
+                    silence_end = None
+
+            else:
+                silence_end_match = SILENCE_END_REGEX.match(line)
+                if silence_end_match:
+                    silence_end      = float(silence_end_match.group('silence_end'))
+                    silence_duration = float(silence_end_match.group('silence_duration'))
+
+        if silence_end:
+            datetime_start = basedatetime + timedelta(seconds = silence_end)
+
+            subprocess.run( [ FFMPEG_BIN, '-nostats', '-loglevel', 'quiet',
+                            '-y',
+                            '-i', infile,
+                            '-ss', str(silence_end),
+                            '-c', 'copy',
+                            prefix + datetime_start.strftime("%Y%m%d-%H%M%S") + infile_ext ] )
+
+            datetime_end = datetime_start + timedelta(milliseconds = MediaInfo.parse(prefix + datetime_start.strftime("%Y%m%d-%H%M%S") + infile_ext).tracks[0].duration)
+            subprocess.run( [ 'touch',
+                            '--date='+str(datetime_end),
+                            prefix + datetime_start.strftime("%Y%m%d-%H%M%S") + infile_ext ] )
+
+
         
 if __name__ == '__main__':
     audioSplit(None)
