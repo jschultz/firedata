@@ -43,7 +43,7 @@ def loadTranscript(arglist=None):
     parser.add_argument('--no-logfile', action='store_true', help='Do not output a logfile')
     parser.add_argument('--no-header',  action='store_true', help='Do not output header to CSV file')
 
-    parser.add_argument('infile',             type=str, help="Filename pattern to match", input=True)
+    parser.add_argument('inpattern', type=str, help="Filename pattern to match")
 
     args = parser.parse_args(arglist)
 
@@ -65,7 +65,7 @@ def loadTranscript(arglist=None):
             if args.logfile:
                 logfilename = args.logfile
             else:
-                logfilename = args.infile + '.log'
+                logfilename = 'load_transcript.log'
 
             logfile = open(logfilename, 'w')
             parser.write_comments(args, logfile, incomments=ArgumentHelper.separator())
@@ -80,8 +80,8 @@ def loadTranscript(arglist=None):
         # except sqlalchemy.exc.NoSuchTableError:
         transcript = Table('Transcript', metadata,
             Column('Name',          String(256)),
-            Column('Channel',       Integer),
-            Column('DateTime',      DateTime,       unique=True),
+            Column('Channel',       String(32)),
+            Column('DateTime',      DateTime),
             Column('Text',          String(256)))
         metadata.create_all(database)
 
@@ -90,9 +90,9 @@ def loadTranscript(arglist=None):
     filenameregexp = re.compile(R"(?P<name>.+?)(-Chan(?P<channel>[0-9]+))?-(?P<year>[0-9]{2,4})(?P<month>[0-9]{2})(?P<day>[0-9]{2})-(?P<hour>[0-9]{2})(?P<minute>[0-9]{2})(?P<second>[0-9]{2}).+", re.UNICODE)
     lineregexp = re.compile(r"^\[(?P<minute>[0-9]{2}):(?P<second>[0-9]{2}).(?P<csec>[0-9]{2})\]\s*(?P<text>.*)$", re.UNICODE)
 
-    for filename in glob.glob(args.infile):
-        basename = os.path.basename(filename)
-        filenamematch = filenameregexp.match(basename)
+    files = []
+    for filename in glob.glob(args.inpattern):
+        filenamematch = filenameregexp.match(os.path.basename(filename))
         if filenamematch:
             name      = filenamematch.group('name')
             channel   = int(filenamematch.group('channel') or 0)
@@ -105,14 +105,16 @@ def loadTranscript(arglist=None):
             minute    = int(filenamematch.group('minute'))
             second    = int(filenamematch.group('second'))
 
-            basetime=datetime.datetime(year, month, day, hour, minute, second)
+            files.append( {'fullname': filename, 'name': name, 'channel': channel, 'basetime': datetime.datetime(year, month, day, hour, minute, second)} )
         else:
-            print("ERROR: Filename " + basename + " does not match pattern", file=sys.stderr)
+            print("ERROR: File " + filename + " does not match pattern", file=sys.stderr)
 
-        infile = open(filename, 'r')
+
+    for fileinfo in sorted(files, key=lambda fileinfo: fileinfo['basetime']):
+        inpattern = open(fileinfo['fullname'], 'r')
 
         lasttext = ''
-        for line in infile:
+        for line in inpattern:
             linematch = lineregexp.match(line)
             if linematch:
                 minute = int(linematch.group('minute'))
@@ -123,15 +125,15 @@ def loadTranscript(arglist=None):
                 if text != lasttext:
                     lasttext = text
 
-                    finaltime = basetime + datetime.timedelta(minutes=minute, seconds=second, milliseconds = csec*10)
+                    finaltime = fileinfo['basetime'] + datetime.timedelta(minutes=minute, seconds=second, milliseconds = csec*10)
 
                     if args.csvfile:
-                        csvwriter.writerow({'name':name, 'channel':channel, 'datetime':finaltime, 'text':text})
+                        csvwriter.writerow({'name':fileinfo['name'], 'channel':fileinfo['channel'], 'datetime':finaltime, 'text':text})
                     if args.database:
                         connection.execute(transcript.delete().where(transcript.c.DateTime == finaltime))
                         connection.execute(transcript.insert().values({
-                            'Name': name,
-                            'Channel': channel,
+                            'Name': fileinfo['name'],
+                            'Channel': fileinfo['channel'],
                             'DateTime': finaltime,
                             'Text': text}))
 
