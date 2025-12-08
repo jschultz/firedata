@@ -1,0 +1,11 @@
+################################################################################
+# sendmail.py
+#    --nologfile
+#    --smtp "${smtp}"
+#    --user "${user}"
+#    --password "${password}"
+#    --port 587
+#    --sender "${sender}"
+#    --recipientfile "recipients.txt"
+#    --subject "${subject}"
+#    --csvfile "${csvfile}"

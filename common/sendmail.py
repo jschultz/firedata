@@ -33,12 +33,14 @@ def sendMail(arglist=None):
     parser.add_argument('-v', '--verbosity',  type=int, default=1, private=True)
     
     parser.add_argument('-s', '--smtp',       type=str, required=True)
-    parser.add_argument('-u', '--user',       type=str)
-    parser.add_argument('-p', '--password',   type=str, private=True)
+    parser.add_argument('-u', '--user',       type=str, required=True)
+    parser.add_argument('-p', '--password',   type=str, private=True, required=True)
     parser.add_argument('-P', '--port',       type=int, default=587)
 
     parser.add_argument('-S', '--sender',     type=str, required=True)
-    parser.add_argument('-R', '--recipient',  type=str, nargs='+')
+    parser.add_argument('-r', '--recipient',  type=str, nargs='*')
+    parser.add_argument('-R', '--recipientfile',
+                                              type=str, help='File containing one recipient email per line')
 
     parser.add_argument(      '--subject',    type=str)
     parser.add_argument('-c', '--csvfile',    type=str, required=True)
@@ -54,6 +56,15 @@ def sendMail(arglist=None):
         logfile = open(args.logfile, 'w')
         parser.write_comments(args, logfile)
         logfile.close()
+
+    recipients = args.recipient or []
+    if args.recipientfile:
+        with open(args.recipientfile, 'r') as recipientfile:
+            for recipient in recipientfile:
+                recipients += [recipient.strip()]
+
+    if not recipients:
+        raise RuntimeError("At least one recipient must be specified.")
 
     msg = MIMEMultipart()
     msg['Subject'] = args.subject
@@ -74,7 +85,7 @@ def sendMail(arglist=None):
     msg.attach(MIMEText(html, 'html'))
 
     with open(args.csvfile, 'r') as file:
-      text = file.read()
+        text = file.read()
 
     part = MIMEBase('application', "octet-stream")
     part.set_payload(text)
@@ -89,7 +100,7 @@ def sendMail(arglist=None):
         server.starttls(context=context)
         server.ehlo()  # Can be omitted
         server.login(args.user, args.password)
-        server.sendmail(args.sender, args.recipient, msg.as_string())
+        server.sendmail(args.sender, recipients, msg.as_string())
 
 if __name__ == '__main__':
     sendMail(None)
