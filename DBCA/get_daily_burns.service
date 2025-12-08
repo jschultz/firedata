@@ -6,7 +6,7 @@ Before=multi-user.target
 Type=simple
 Restart=always
 WorkingDirectory=/home/jschultz/src/firedata/DBCA
-Environment=PATH=/home/jschultz/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
+Environment=PATH=/home/jschultz/src/firedata/DBCA:/home/jschultz/src/firedata/common:/home/jschultz/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 ExecStart=/usr/bin/bash get_daily_burns_daemon.sh
 
 [Install]

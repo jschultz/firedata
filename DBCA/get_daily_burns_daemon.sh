@@ -15,13 +15,14 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+. $HOME/venvs/firedata/bin/activate
 DAILY_BURNS_DIR="$HOME/daily_burns"
 while :; do 
   argreplay get_daily_burns.log
   if [ $? -eq 0 ] && [ $(wc -c <"$DAILY_BURNS_DIR/daily_burns.csv") -gt 2 ]; then
     DAILY_BURNS_FILE="daily_burns.$(date "+%Y-%m-%d_%H:%M:%S").csv"
     cp -p "$DAILY_BURNS_DIR/daily_burns.csv" "$DAILY_BURNS_DIR"/"$DAILY_BURNS_FILE"
-    argreplay sendmail.log
+    argreplay --defaults defaults.txt sendmail.arg
   fi
   echo $DAILY_BURNS_FILE
 done

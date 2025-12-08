@@ -31,6 +31,10 @@ import sys
 import os
 import shutil
 
+# Force IPv4 since IPv6 requests seem to fail
+import requests.packages.urllib3.util.connection
+requests.packages.urllib3.util.connection.HAS_IPV6 = False
+
 def getDailyBurns(arglist=None):
     parser = ArgumentRecorder(description='Read Daily Burns from DBCA WMS server, stopping a change is detected.',
                               fromfile_prefix_chars='@')
@@ -162,11 +166,10 @@ def getDailyBurns(arglist=None):
                         print(e, file=sys.stderr)
                     continue
 
-        timenow = datetime.now()
         if lastpolltime is not None:
-            remaininginterval = args.interval - (timenow - lastpolltime).total_seconds()
+            remaininginterval = args.interval - (datetime.now() - lastpolltime).total_seconds()
         else:
-            remaininginterval = 0
+            remaininginterval = args.interval   # To avoid busy polling
 
         if args.verbosity >= 2:
             print("Remaining interval:", remaininginterval, file=sys.stderr)
@@ -180,10 +183,14 @@ def getDailyBurns(arglist=None):
             print(e, file=sys.stderr)
             wms = None
 
+        lastpolltime = datetime.now()
         if wms:
-            lastpolltime = timenow
+            try:
+                outdata = decodeDailyBurns(wms)
+            except Exception as e:
+                print(e, file=sys.stderr)
+                outdata = None
 
-            outdata = decodeDailyBurns(wms)
             if outdata is not None:
                 outfieldnames = list(set(sum([list(item.keys()) for item in outdata], start=[])))
                 if set(outfieldnames) != set(infieldnames) or len(outdata) != len(indata):

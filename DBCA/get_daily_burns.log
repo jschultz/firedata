@@ -1,6 +1,7 @@
 ################################################################################
 # ./get_daily_burns.py
 #    --no-comments
-#    --proxy free
-#    --csvfile "/home/jschultz/daily_burns/daily_burns.csv"
+##    --proxy free
+#    --interval 300
+#    --csvfile "/tmp/daily_burns.csv"
 #    --verbosity 2
