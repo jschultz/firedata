@@ -47,11 +47,13 @@ if [[ "${nologfile}" != "true" ]]; then
             logfile="${logfile%.*}.log"
         elif [[ -n "${csvfile}" ]]; then
             logfile="${csvfile%.*}.log"
-        else
-            logfile="/dev/stderr"
         fi
     fi
-    echo -n "${COMMENTS}" > "${logfile}"
+    if [[ -n "${csvfile}" ]]; then
+        echo -n "${COMMENTS}" > "${logfile}"
+    else
+        echo -n "${COMMENTS}" >&2
+    fi
 fi
 
 if [[ "${debug}" == "true" ]]; then
@@ -114,13 +116,13 @@ if [[ -n "${filter}" ]]; then
 fi
 
 if [[ "${debug}" == "true" ]]; then
-    echo "---------------------------------------------" > /dev/stderr
-    echo "$HISTORY_QUERY"                                > /dev/stderr  
-    echo "---------------------------------------------" > /dev/stderr
+    echo "---------------------------------------------" >&2
+    echo "$HISTORY_QUERY"                                >&2  
+    echo "---------------------------------------------" >&2
 fi
 
 if [[ -n "${shapefile}" ]]; then
-    echo "Creating shapefile ${shapefile}" > /dev/stderr
+    echo "Creating shapefile ${shapefile}" >&2
     if [[ -f "${shapefile}" && "${nobackup}" != "true" ]]; then
         mv "${shapefile}" "${shapefile}.bak"
     fi
@@ -130,7 +132,7 @@ if [[ -n "${shapefile}" ]]; then
 #    pgsql2shp -f "${shapefile}" -u $PGUSER $PGDATABASE "SELECT * FROM (${HISTORY_QUERY}) AS query"
     zip --move --junk-paths "${shapefile}".zip "${shapefile}".{cpg,dbf,prj,shp,shx}
 elif [[ -n "${table}" ]]; then
-    echo "Creating table ${table}" > /dev/stderr
+    echo "Creating table ${table}" >&2
     if [[ "${nobackup}" != "true" ]]; then
         backupcommand="CALL cycle_table('${table}'"
     else
@@ -147,7 +149,7 @@ elif [[ -n "${table}" ]]; then
          --command="${commentcommand}"
 else
     if [[ -n "${csvfile}" ]]; then
-        echo "Creating CSV file ${csvfile}" > /dev/stderr
+        echo "Creating CSV file ${csvfile}" >&2
         if [[ -f "${csvfile}" ]]; then
             if [[ "${nobackup}" != "true" ]]; then
                 mv "${csvfile}" "${csvfile}.bak"

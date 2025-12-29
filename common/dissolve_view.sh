@@ -80,10 +80,10 @@ jointable="${TEMPSCHEMA}.${viewtable##*.}_join"
 maptable="${TEMPSCHEMA}.${viewtable##*.}_map"
 
 if [[ "${force}" != "true" && "${existing}" == "true" && $(table_exists "${touchestable}") == 1 ]]; then
-    echo "Touches table ${touchestable} exists - skipping" >> /dev/stderr
+    echo "Touches table ${touchestable} exists - skipping" >&2
 else
     force=true
-    echo "Creating touches table ${touchestable}" >> /dev/stderr
+    echo "Creating touches table ${touchestable}" >&2
     if [[ "${nobackup}" != "true" ]]; then
         backupcommand="CALL cycle_table('${touchestable}')"
     else
@@ -99,9 +99,9 @@ else
                         AND ST_RelateMatch(ST_Relate(poly_1.geom, poly_2.geom),'****1****'))"
 fi
 if [[ "${force}" != "true" && "${existing}" == "true" && $(table_exists "${jointable}") == 1 ]]; then
-    echo "Join table ${jointable} exists - skipping" >> /dev/stderr
+    echo "Join table ${jointable} exists - skipping" >&2
 else
-    echo "Creating join table ${jointable}" >> /dev/stderr
+    echo "Creating join table ${jointable}" >&2
     if [[ "${nobackup}" != "true" ]]; then
         backupcommand="CALL cycle_table('${jointable}')"
     else
@@ -134,7 +134,7 @@ else
     done
 
     if [[ ${verbosity} -ge 2 ]]; then
-        echo "$JOIN_QUERY" > /dev/stderr
+        echo "$JOIN_QUERY" >&2
     fi
     psql --variable=ON_ERROR_STOP=1 \
         --command="${backupcommand}" \
@@ -144,10 +144,10 @@ else
 fi
 
 if [[ "${force}" != "true" && "${existing}" == "true" && $(table_exists "${maptable}") == 1 ]]; then
-    echo "Map table ${maptable} exists - skipping" >> /dev/stderr
+    echo "Map table ${maptable} exists - skipping" >&2
 else
     force=true
-    echo "Creating map table ${maptable}" >> /dev/stderr
+    echo "Creating map table ${maptable}" >&2
     if [[ "${nobackup}" != "true" ]]; then
         backupcommand="CALL cycle_table('${maptable}')"
     else
@@ -162,7 +162,7 @@ else
         --command="CREATE INDEX ON ${maptable}(poly_id)" \
         --command="CREATE INDEX ON ${maptable}(map_id)"
 
-    echo "Updating map table ${maptable}" >> /dev/stderr
+    echo "Updating map table ${maptable}" >&2
     newmaptable=${maptable##*.}_new # Temporary table has no schema
     while true; do
         psql --variable=ON_ERROR_STOP=1 --tuples-only --no-align \
@@ -182,7 +182,7 @@ else
 fi
 
 if [[ "${force}" != "true" && "${existing}" == "true" && $(table_exists "${outtable}") == 1 ]]; then
-    echo "Table ${outtable} exists - skipping" >> /dev/stderr
+    echo "Table ${outtable} exists - skipping" >&2
 else
     force=true
     if [[ "${nobackup}" != "true" ]]; then
@@ -208,7 +208,7 @@ else
         DISSOLVE_QUERY+=" AND event.object_id = view.object_id[1]"
     fi
     if [[ ${verbosity} -ge 2 ]]; then
-        echo "$DISSOLVE_QUERY" > /dev/stderr
+        echo "$DISSOLVE_QUERY" >&2
     fi
 
     if [[ -n "${outfile}" ]]; then
@@ -239,11 +239,11 @@ else
 fi
 
 if [[ "${keep}" != "true" ]]; then
-    echo "Dropping join table ${jointable}" >> /dev/stderr
+    echo "Dropping join table ${jointable}" >&2
     psql --variable=ON_ERROR_STOP=1 \
          --command="DROP TABLE ${jointable}"
 
-    echo "Dropping map table ${maptable}" >> /dev/stderr
+    echo "Dropping map table ${maptable}" >&2
     psql --variable=ON_ERROR_STOP=1 \
          --command="DROP TABLE ${maptable}"
 fi

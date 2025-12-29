@@ -37,11 +37,13 @@ if [[ "${nologfile}" != "true" ]]; then
     if [[ ! -n "${logfile}" ]]; then
         if [[ -n "${csvfile}" ]]; then
             logfile="${csvfile%.*}.log"
-        else
-            logfile="/dev/stderr"
         fi
     fi
-    echo -n "${COMMENTS}" > "${logfile}"
+    if [[ -n "${csvfile}" ]]; then
+        echo -n "${COMMENTS}" > "${logfile}"
+    else
+        echo -n "${COMMENTS}" >&2
+    fi
 fi
 
 if [[ "${debug}" == "true" ]]; then

@@ -61,9 +61,9 @@ fi
 if [[ -f "${outfile}.lrc" ]] \
 && [[ "$(date -r "${outfile}.lrc")" == "$(date -r "${filename}")" ]];
 then
-    echo "Output file ${outfile}.lrc already exists" >> /dev/stderr
+    echo "Output file ${outfile}.lrc already exists" >&2
 else
-    echo "Transcribing file ${filename} to ${outfile}.lrc" >> /dev/stderr
+    echo "Transcribing file ${filename} to ${outfile}.lrc" >&2
 #     ffmpeg -y -hide_banner -loglevel quiet -i "${filename}" -ac 1 -ar 16000 "${filename%.*}.16k.wav"
 #     ${executable} --threads ${threads} --output-lrc --model "${model}" --output-file "${outfile}" "${filename%.*}.16k.wav" 2> /dev/null
 #     rm "${filename%.*}.16k.wav"

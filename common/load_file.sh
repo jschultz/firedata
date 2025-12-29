@@ -38,7 +38,7 @@ if [[ ! -n "${table}" ]]; then
         table=$(basename "${filename}")
         table="${table%.*}"
     else
-        echo "At least one of 'table' and 'filename' must be specified" > /dev/stderr
+        echo "At least one of 'table' and 'filename' must be specified" >&2
         exit 1
     fi
 fi

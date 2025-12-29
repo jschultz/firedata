@@ -65,14 +65,14 @@ done
 
 force=false
 
-echo "Testing SRIDs" >> /dev/stderr
+echo "Testing SRIDs" >&2
 
 SRID=$(psql \
             --quiet --tuples-only --no-align --command="\timing off" \
             --command "SELECT ST_SRID(${geometry_array[0]}) AS srid FROM ${eventtable_array[0]} LIMIT 1" )
             
 if [[ $SRID -eq 0 ]]; then
-    echo "ERROR: Missing SRID in shape table geometries" >> /dev/stderr
+    echo "ERROR: Missing SRID in shape table geometries" >&2
     return 1
 fi
 
@@ -82,7 +82,7 @@ for ((tableidx=0; tableidx<${#eventtable_array[@]}; tableidx++)) do
                 --command "SELECT EXISTS(
                             SELECT ST_SRID(${geometry_array[tableidx]}) AS srid FROM ${eventtable_array[tableidx]} WHERE ST_SRID(${geometry_array[tableidx]}) != '${SRID}')" )
     if [[ "$MULTIPLE_SRID" == "t" ]]; then
-        echo "ERROR: Multiple SRIDs in shape table geometries" >> /dev/stderr
+        echo "ERROR: Multiple SRIDs in shape table geometries" >&2
         return 1
     fi
 done

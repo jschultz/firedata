@@ -97,14 +97,14 @@ done
 
 force=false
 
-echo "Testing SRIDs" >> /dev/stderr
+echo "Testing SRIDs" >&2
 
 SRID=$(psql --variable=ON_ERROR_STOP=1 \
             --quiet --tuples-only --no-align --command="\timing off" \
             --command "SELECT ST_SRID(${geometry_array[0]}) AS srid FROM ${eventtable_array[0]} LIMIT 1" )
 
 if [[ $SRID -eq 0 ]]; then
-    echo "ERROR: Missing SRID in shape table geometries" >> /dev/stderr
+    echo "ERROR: Missing SRID in shape table geometries" >&2
     exit 1
 fi
 
@@ -114,7 +114,7 @@ for ((tableidx=0; tableidx<${#eventtable_array[@]}; tableidx++)) do
                 --command "SELECT EXISTS(
                             SELECT ST_SRID(${geometry_array[tableidx]}) AS srid FROM ${canonical_array[tableidx]} WHERE ST_SRID(${geometry_array[tableidx]}) != '${SRID}')" )
     if [[ "$MULTIPLE_SRID" == "t" ]]; then
-        echo "ERROR: Multiple SRIDs in shape table geometries" >> /dev/stderr
+        echo "ERROR: Multiple SRIDs in shape table geometries" >&2
         exit 1
     fi
 done
@@ -127,16 +127,16 @@ else
 fi
 
 if [[ "${force}" != "true" && "${existing}" == "true" && $(table_exists "${outtable}") == 1 ]]; then
-    echo "Table ${outtable} exists - skipping" >> /dev/stderr
+    echo "Table ${outtable} exists - skipping" >&2
 else
 
     for ((tableidx=0; tableidx<${#eventtable_array[@]}; tableidx++)) do
         if [[ "${existing}" == "true" && $(table_exists "${dumptable[tableidx]}") == 1 ]]; then
-            echo "Dump table ${dumptable[tableidx]} exists - skipping" >> /dev/stderr
+            echo "Dump table ${dumptable[tableidx]} exists - skipping" >&2
             continue
         else
             force=true
-            echo "Creating dump table ${dumptable[tableidx]}" >> /dev/stderr
+            echo "Creating dump table ${dumptable[tableidx]}" >&2
 
             if [[ "${nobackup}" != "true" ]]; then
                 backupcommand="CALL cycle_table('${dumptable[tableidx]}')"
@@ -191,7 +191,7 @@ else
             fi
 
             if [[ "${debug}" == "true" ]]; then
-                echo $DUMP_QUERY >> /dev/stderr
+                echo $DUMP_QUERY >&2
             fi
             psql --variable=ON_ERROR_STOP=1 \
                 --command="${backupcommand}" \
@@ -201,7 +201,7 @@ else
     done
 
     force=true
-    echo "Creating table ${outtable}" >> /dev/stderr
+    echo "Creating table ${outtable}" >&2
     if [[ "${existing}" != "true" && "${nobackup}" != "true" ]]; then
         backupcommand="CALL cycle_table('${outtable}')"
     else
@@ -233,7 +233,7 @@ fi
 if [[ "${merge}" == "true" ]]; then
     mergepolyjunction=${CALCSCHEMA}.${basename}_${suffix}_merge_poly_junction
     if [[ "${force}" != "true" && "${existing}" == "true" && $(table_exists "${mergepolyjunction}") == 1 ]]; then
-        echo "Junction table ${mergepolyjunction} exists - skipping" >> /dev/stderr
+        echo "Junction table ${mergepolyjunction} exists - skipping" >&2
     else
         psql --variable=ON_ERROR_STOP=1 \
             --command="\echo Creating junction table ${mergepolyjunction}"
@@ -284,9 +284,9 @@ WHERE poly.id = poly_id"
 fi
 
 if [[ "${force}" != "true" && "${existing}" == "true" && $(table_exists "${pointtable}") == 1 ]]; then
-    echo "Point in polygon table ${pointtable} exists - skipping" >> /dev/stderr
+    echo "Point in polygon table ${pointtable} exists - skipping" >&2
 else
-    echo "Creating point in polygon table ${pointtable}" >> /dev/stderr
+    echo "Creating point in polygon table ${pointtable}" >&2
     psql --variable=ON_ERROR_STOP=1 \
         --command="DROP TABLE IF EXISTS ${pointtable}" \
         --command="CREATE TABLE ${pointtable} AS
@@ -298,9 +298,9 @@ fi
 for ((tableidx=0; tableidx<${#eventtable_array[@]}; tableidx++)) do
     junctiontable=${CALCSCHEMA}.${junction_array[tableidx]}
     if [[ "${force}" != "true" && "${existing}" == "true" && $(table_exists "${junctiontable}") == 1 ]]; then
-        echo "Junction table ${junctiontable} exists - skipping" >> /dev/stderr
+        echo "Junction table ${junctiontable} exists - skipping" >&2
     else
-        echo "Creating junction table ${junctiontable}" >> /dev/stderr
+        echo "Creating junction table ${junctiontable}" >&2
         if [[ "${nobackup}" != "true" ]]; then
             backupcommand="CALL cycle_table('${junctiontable}')"
         else
@@ -333,11 +333,11 @@ for ((tableidx=0; tableidx<${#eventtable_array[@]}; tableidx++)) do
 done
 
 if [[ "${keep}" != "true" ]]; then
-    echo "Dropping point in polygon table ${pointtable}" >> /dev/stderr
+    echo "Dropping point in polygon table ${pointtable}" >&2
     psql --variable=ON_ERROR_STOP=1 \
         --command="DROP TABLE ${pointtable}"
     for ((tableidx=0; tableidx<${#eventtable_array[@]}; tableidx++)) do
-        echo "Dropping dump table ${dumptable[tableidx]}" >> /dev/stderr
+        echo "Dropping dump table ${dumptable[tableidx]}" >&2
         psql --variable=ON_ERROR_STOP=1 \
             --command="DROP TABLE IF EXISTS ${dumptable[tableidx]}"
     done

@@ -113,7 +113,7 @@ for ((colidx=0; colidx<${#calccolumn_array[@]}; colidx++)) do
 done
 
 if [[ "${append}" == "true" && -n "${viewfile}" ]]; then
-    echo "'append' option cannot be used when producing a shapefile" > /dev/stderr
+    echo "'append' option cannot be used when producing a shapefile" >&2
     exit 1
 fi
 
@@ -307,7 +307,7 @@ if [[ ${#polycolumn_array[@]} -gt 0 ]]; then
 fi
 
 if [[ ${verbosity} -ge 2 ]]; then
-    echo "$VIEW_QUERY" > /dev/stderr  
+    echo "$VIEW_QUERY" >&2  
 fi
 
 if [[ -n "${viewfile}" ]]; then

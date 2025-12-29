@@ -61,9 +61,9 @@ if [[ -f "${outfile}" ]] \
 && [[ "$(date -r "${outfile}")" == "$(date -r "${filename}")" ]] \
 && (( $(echo $(mediainfo --inform="Audio;%Duration%" "${outfile}") '>=' $(mediainfo --inform="Audio;%Duration%" "${filename}") | bc -l) ));
 then
-    echo "Output file ${outfile} already exists" > /dev/stderr
+    echo "Output file ${outfile} already exists" >&2
 else
-    echo "Encoding file ${filename} to ${outfile}" > /dev/stderr
+    echo "Encoding file ${filename} to ${outfile}" >&2
 # 2025-11-06 lame seems to have gone buggy. Complaints about ReplayGain
 #     lame --quiet --preset ${preset} ${filename} ${outfile}
     ffmpeg -i ${filename} -b:a ${bitrate} -y ${outfile}
