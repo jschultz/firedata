@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/bash
 #
 # Copyright 2024 Jonathan Schultz
 #

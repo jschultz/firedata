@@ -1,5 +1,5 @@
 ################################################################################
-# ./get_daily_burns.py
+# get_daily_burns.py
 #    --no-comments
 ##    --proxy free
 #    --interval 300
