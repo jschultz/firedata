@@ -44,8 +44,31 @@ fi
 
 IFS=';' read -r -a match_array <<< "${match}"
 
+canonicalviewtable=$(psql --variable=ON_ERROR_STOP=1 \
+        --quiet --tuples-only --no-align --command="\timing off" \
+        --command="SELECT canonical_table('${viewtable}')")
+if [[ ! -n "${canonicalviewtable}" ]]; then
+    canonicalviewtable="${viewtable}"
+fi
+
+canonicalpolytable=$(psql --variable=ON_ERROR_STOP=1 \
+        --quiet --tuples-only --no-align --command="\timing off" \
+        --command="SELECT canonical_table('${polytable}')")
+if [[ ! -n "${canonicalpolytable}" ]]; then
+    canonicalpolytable="${polytable}"
+fi
+
+if [[ -n "${eventtable}" ]]; then
+    canonicaleventtable=$(psql --variable=ON_ERROR_STOP=1 \
+            --quiet --tuples-only --no-align --command="\timing off" \
+            --command="SELECT canonical_table('${eventtable}')")
+    if [[ ! -n "${canonicaleventtable}" ]]; then
+        canonicaleventtable="${eventtable}"
+    fi
+fi
+
 if [[ ! -n "${outtable}" ]]; then
-    outtable="${viewtable}_dissolve"
+    outtable="${canonicalviewtable}_dissolve"
 fi
 
 if [[ "${nologfile}" != "true" ]]; then
@@ -75,9 +98,9 @@ TEMPSCHEMA=temp
 CALCSCHEMA=calc
 
 force=false
-touchestable="${CALCSCHEMA}.${polytable##*.}_touches"
-jointable="${TEMPSCHEMA}.${viewtable##*.}_join"
-maptable="${TEMPSCHEMA}.${viewtable##*.}_map"
+touchestable="${CALCSCHEMA}.${canonicalpolytable##*.}_touches"
+jointable="${TEMPSCHEMA}.${canonicalviewtable##*.}_join"
+maptable="${TEMPSCHEMA}.${canonicalviewtable##*.}_map"
 
 if [[ "${force}" != "true" && "${existing}" == "true" && $(table_exists "${touchestable}") == 1 ]]; then
     echo "Touches table ${touchestable} exists - skipping" >&2
@@ -94,7 +117,7 @@ else
         --command="${backupcommand}" \
         --command="CREATE TABLE ${touchestable} AS
                         SELECT poly_1.id AS poly_id_1, poly_2.id AS poly_id_2
-                        FROM ${polytable} AS poly_1, ${polytable} AS poly_2
+                        FROM ${canonicalpolytable} AS poly_1, ${canonicalpolytable} AS poly_2
                         WHERE poly_1.id = poly_2.id OR (ST_Touches(poly_1.geom, poly_2.geom)
                         AND ST_RelateMatch(ST_Relate(poly_1.geom, poly_2.geom),'****1****'))"
 fi
@@ -114,18 +137,18 @@ else
     for ((matchidx=0; matchidx<${#match_array[@]}; matchidx++)) do
         JOIN_QUERY+=", ${match_array[matchidx]} AS match_${matchidx}"
     done
-    JOIN_QUERY+=" FROM ${viewtable} AS view"
-    if [[ -n "${eventtable}" ]]; then
-        JOIN_QUERY+=", ${eventtable} AS event WHERE event.object_id = view.object_id[1]"
+    JOIN_QUERY+=" FROM ${canonicalviewtable} AS view"
+    if [[ -n "${canonicaleventtable}" ]]; then
+        JOIN_QUERY+=", ${canonicaleventtable} AS event WHERE event.object_id = view.object_id[1]"
     fi
     JOIN_QUERY+=") AS event_1, "
     JOIN_QUERY+="(SELECT poly_id"
     for ((matchidx=0; matchidx<${#match_array[@]}; matchidx++)) do
         JOIN_QUERY+=", ${match_array[matchidx]} AS match_${matchidx}"
     done
-    JOIN_QUERY+=" FROM ${viewtable} AS view"
-    if [[ -n "${eventtable}" ]]; then
-        JOIN_QUERY+=", ${eventtable} AS event WHERE event.object_id = view.object_id[1]"
+    JOIN_QUERY+=" FROM ${canonicalviewtable} AS view"
+    if [[ -n "${canonicaleventtable}" ]]; then
+        JOIN_QUERY+=", ${canonicaleventtable} AS event WHERE event.object_id = view.object_id[1]"
     fi
     JOIN_QUERY+=") AS event_2 "
     JOIN_QUERY+="WHERE event_1.poly_id = poly_id_1 AND event_2.poly_id = poly_id_2"
@@ -158,7 +181,7 @@ else
         --command="${backupcommand}" \
         --command="CREATE TABLE ${maptable} AS
                        SELECT poly_id, poly_id as map_id
-                       FROM ${viewtable}" \
+                       FROM ${canonicalviewtable}" \
         --command="CREATE INDEX ON ${maptable}(poly_id)" \
         --command="CREATE INDEX ON ${maptable}(map_id)"
 
@@ -191,20 +214,20 @@ else
         backupcommand=
     fi
 
-    DISSOLVE_QUERY="SELECT map_id, unionq.geom"
+    DISSOLVE_QUERY="SELECT unionq.geom"
     for ((matchidx=0; matchidx<${#match_array[@]}; matchidx++)) do
         DISSOLVE_QUERY+=", ${match_array[matchidx]}"
     done
     DISSOLVE_QUERY+=" FROM (SELECT map_id, ST_Union(geom) AS geom
-                            FROM ${maptable} AS map, ${polytable} AS poly
+                            FROM ${maptable} AS map, ${canonicalpolytable} AS poly
                             WHERE poly.id = map.poly_id
                             GROUP BY map_id) AS unionq,
-                            ${viewtable} AS view"
-    if [[ -n "${eventtable}" ]]; then
-        DISSOLVE_QUERY+=", ${eventtable} AS event"
+                            ${canonicalviewtable} AS view"
+    if [[ -n "${canonicaleventtable}" ]]; then
+        DISSOLVE_QUERY+=", ${canonicaleventtable} AS event"
     fi
     DISSOLVE_QUERY+=" WHERE poly_id = map_id"
-    if [[ -n "${eventtable}" ]]; then
+    if [[ -n "${canonicaleventtable}" ]]; then
         DISSOLVE_QUERY+=" AND event.object_id = view.object_id[1]"
     fi
     if [[ ${verbosity} -ge 2 ]]; then

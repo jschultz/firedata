@@ -1,0 +1,8 @@
+################################################################################
+# dissolve_view.sh
+#    --nologfile
+#    --verbosity "1"
+#    --match "fih_date1"
+#    --viewtable "dbca_fire_history_dbca_060_southern_view"
+#    --polytable "dbca_fire_history_dbca_060_southern_poly"
+#    --eventtable "dbca_fire_history_dbca_060"

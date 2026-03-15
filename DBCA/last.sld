@@ -6,9 +6,9 @@
       <se:Name>dbca_fire_history_dbca_060_southern_last_dissolve</se:Name>
       <se:FeatureTypeStyle>
         <se:Rule>
-          <se:Name>- 1950</se:Name>
+          <se:Name>- 1951</se:Name>
           <se:Description>
-            <se:Title>- 1950</se:Title>
+            <se:Title>- 1951</se:Title>
           </se:Description>
           <ogc:Filter xmlns:ogc="http://www.opengis.net/ogc">
             <ogc:And>
@@ -18,7 +18,7 @@
               </ogc:PropertyIsGreaterThanOrEqualTo>
               <ogc:PropertyIsLessThanOrEqualTo>
                 <ogc:PropertyName>year</ogc:PropertyName>
-                <ogc:Literal>1950</ogc:Literal>
+                <ogc:Literal>1951</ogc:Literal>
               </ogc:PropertyIsLessThanOrEqualTo>
             </ogc:And>
           </ogc:Filter>
@@ -29,19 +29,19 @@
           </se:PolygonSymbolizer>
         </se:Rule>
         <se:Rule>
-          <se:Name>1950 - 1980</se:Name>
+          <se:Name>1951 - 1981</se:Name>
           <se:Description>
-            <se:Title>1950 - 1980</se:Title>
+            <se:Title>1951 - 1981</se:Title>
           </se:Description>
           <ogc:Filter xmlns:ogc="http://www.opengis.net/ogc">
             <ogc:And>
               <ogc:PropertyIsGreaterThan>
                 <ogc:PropertyName>year</ogc:PropertyName>
-                <ogc:Literal>1950</ogc:Literal>
+                <ogc:Literal>1951</ogc:Literal>
               </ogc:PropertyIsGreaterThan>
               <ogc:PropertyIsLessThanOrEqualTo>
                 <ogc:PropertyName>year</ogc:PropertyName>
-                <ogc:Literal>1980</ogc:Literal>
+                <ogc:Literal>1981</ogc:Literal>
               </ogc:PropertyIsLessThanOrEqualTo>
             </ogc:And>
           </ogc:Filter>
@@ -52,19 +52,19 @@
           </se:PolygonSymbolizer>
         </se:Rule>
         <se:Rule>
-          <se:Name>1980 - 2000</se:Name>
+          <se:Name>1981 - 2001</se:Name>
           <se:Description>
-            <se:Title>1980 - 2000</se:Title>
+            <se:Title>1981 - 2001</se:Title>
           </se:Description>
           <ogc:Filter xmlns:ogc="http://www.opengis.net/ogc">
             <ogc:And>
               <ogc:PropertyIsGreaterThan>
                 <ogc:PropertyName>year</ogc:PropertyName>
-                <ogc:Literal>1980</ogc:Literal>
+                <ogc:Literal>1981</ogc:Literal>
               </ogc:PropertyIsGreaterThan>
               <ogc:PropertyIsLessThanOrEqualTo>
                 <ogc:PropertyName>year</ogc:PropertyName>
-                <ogc:Literal>2000</ogc:Literal>
+                <ogc:Literal>2001</ogc:Literal>
               </ogc:PropertyIsLessThanOrEqualTo>
             </ogc:And>
           </ogc:Filter>
@@ -75,19 +75,19 @@
           </se:PolygonSymbolizer>
         </se:Rule>
         <se:Rule>
-          <se:Name>2000 - 2010</se:Name>
+          <se:Name>2001 - 2011</se:Name>
           <se:Description>
-            <se:Title>2000 - 2010</se:Title>
+            <se:Title>2001 - 2011</se:Title>
           </se:Description>
           <ogc:Filter xmlns:ogc="http://www.opengis.net/ogc">
             <ogc:And>
               <ogc:PropertyIsGreaterThan>
                 <ogc:PropertyName>year</ogc:PropertyName>
-                <ogc:Literal>2000</ogc:Literal>
+                <ogc:Literal>2001</ogc:Literal>
               </ogc:PropertyIsGreaterThan>
               <ogc:PropertyIsLessThanOrEqualTo>
                 <ogc:PropertyName>year</ogc:PropertyName>
-                <ogc:Literal>2010</ogc:Literal>
+                <ogc:Literal>2011</ogc:Literal>
               </ogc:PropertyIsLessThanOrEqualTo>
             </ogc:And>
           </ogc:Filter>
@@ -98,19 +98,19 @@
           </se:PolygonSymbolizer>
         </se:Rule>
         <se:Rule>
-          <se:Name>2010 - 2015</se:Name>
+          <se:Name>2011 - 2016</se:Name>
           <se:Description>
-            <se:Title>2010 - 2015</se:Title>
+            <se:Title>2011 - 2016</se:Title>
           </se:Description>
           <ogc:Filter xmlns:ogc="http://www.opengis.net/ogc">
             <ogc:And>
               <ogc:PropertyIsGreaterThan>
                 <ogc:PropertyName>year</ogc:PropertyName>
-                <ogc:Literal>2010</ogc:Literal>
+                <ogc:Literal>2011</ogc:Literal>
               </ogc:PropertyIsGreaterThan>
               <ogc:PropertyIsLessThanOrEqualTo>
                 <ogc:PropertyName>year</ogc:PropertyName>
-                <ogc:Literal>2015</ogc:Literal>
+                <ogc:Literal>2016</ogc:Literal>
               </ogc:PropertyIsLessThanOrEqualTo>
             </ogc:And>
           </ogc:Filter>
@@ -121,19 +121,19 @@
           </se:PolygonSymbolizer>
         </se:Rule>
         <se:Rule>
-          <se:Name>2015 - 2018</se:Name>
+          <se:Name>2016 - 2019</se:Name>
           <se:Description>
-            <se:Title>2015 - 2018</se:Title>
+            <se:Title>2016 - 2019</se:Title>
           </se:Description>
           <ogc:Filter xmlns:ogc="http://www.opengis.net/ogc">
             <ogc:And>
               <ogc:PropertyIsGreaterThan>
                 <ogc:PropertyName>year</ogc:PropertyName>
-                <ogc:Literal>2015</ogc:Literal>
+                <ogc:Literal>2016</ogc:Literal>
               </ogc:PropertyIsGreaterThan>
               <ogc:PropertyIsLessThanOrEqualTo>
                 <ogc:PropertyName>year</ogc:PropertyName>
-                <ogc:Literal>2018</ogc:Literal>
+                <ogc:Literal>2019</ogc:Literal>
               </ogc:PropertyIsLessThanOrEqualTo>
             </ogc:And>
           </ogc:Filter>
@@ -144,38 +144,15 @@
           </se:PolygonSymbolizer>
         </se:Rule>
         <se:Rule>
-          <se:Name>2018 - 2020</se:Name>
+          <se:Name>2019 - 2021</se:Name>
           <se:Description>
-            <se:Title>2018 - 2020</se:Title>
+            <se:Title>2019 - 2021</se:Title>
           </se:Description>
           <ogc:Filter xmlns:ogc="http://www.opengis.net/ogc">
             <ogc:And>
               <ogc:PropertyIsGreaterThan>
                 <ogc:PropertyName>year</ogc:PropertyName>
-                <ogc:Literal>2018</ogc:Literal>
-              </ogc:PropertyIsGreaterThan>
-              <ogc:PropertyIsLessThanOrEqualTo>
-                <ogc:PropertyName>year</ogc:PropertyName>
-                <ogc:Literal>2020</ogc:Literal>
-              </ogc:PropertyIsLessThanOrEqualTo>
-            </ogc:And>
-          </ogc:Filter>
-          <se:PolygonSymbolizer>
-            <se:Fill>
-              <se:SvgParameter name="fill">#fff0ae</se:SvgParameter>
-            </se:Fill>
-          </se:PolygonSymbolizer>
-        </se:Rule>
-        <se:Rule>
-          <se:Name>2020 - 2021</se:Name>
-          <se:Description>
-            <se:Title>2020 - 2021</se:Title>
-          </se:Description>
-          <ogc:Filter xmlns:ogc="http://www.opengis.net/ogc">
-            <ogc:And>
-              <ogc:PropertyIsGreaterThan>
-                <ogc:PropertyName>year</ogc:PropertyName>
-                <ogc:Literal>2020</ogc:Literal>
+                <ogc:Literal>2019</ogc:Literal>
               </ogc:PropertyIsGreaterThan>
               <ogc:PropertyIsLessThanOrEqualTo>
                 <ogc:PropertyName>year</ogc:PropertyName>
@@ -185,7 +162,7 @@
           </ogc:Filter>
           <se:PolygonSymbolizer>
             <se:Fill>
-              <se:SvgParameter name="fill">#fed38c</se:SvgParameter>
+              <se:SvgParameter name="fill">#fff0ae</se:SvgParameter>
             </se:Fill>
           </se:PolygonSymbolizer>
         </se:Rule>
@@ -208,7 +185,7 @@
           </ogc:Filter>
           <se:PolygonSymbolizer>
             <se:Fill>
-              <se:SvgParameter name="fill">#fdb56a</se:SvgParameter>
+              <se:SvgParameter name="fill">#fed38c</se:SvgParameter>
             </se:Fill>
           </se:PolygonSymbolizer>
         </se:Rule>
@@ -231,7 +208,7 @@
           </ogc:Filter>
           <se:PolygonSymbolizer>
             <se:Fill>
-              <se:SvgParameter name="fill">#f3854e</se:SvgParameter>
+              <se:SvgParameter name="fill">#fdb56a</se:SvgParameter>
             </se:Fill>
           </se:PolygonSymbolizer>
         </se:Rule>
@@ -254,7 +231,7 @@
           </ogc:Filter>
           <se:PolygonSymbolizer>
             <se:Fill>
-              <se:SvgParameter name="fill">#e54f35</se:SvgParameter>
+              <se:SvgParameter name="fill">#f3854e</se:SvgParameter>
             </se:Fill>
           </se:PolygonSymbolizer>
         </se:Rule>
@@ -272,6 +249,29 @@
               <ogc:PropertyIsLessThanOrEqualTo>
                 <ogc:PropertyName>year</ogc:PropertyName>
                 <ogc:Literal>2025</ogc:Literal>
+              </ogc:PropertyIsLessThanOrEqualTo>
+            </ogc:And>
+          </ogc:Filter>
+          <se:PolygonSymbolizer>
+            <se:Fill>
+              <se:SvgParameter name="fill">#e54f35</se:SvgParameter>
+            </se:Fill>
+          </se:PolygonSymbolizer>
+        </se:Rule>
+        <se:Rule>
+          <se:Name>2025 - 2026</se:Name>
+          <se:Description>
+            <se:Title>2025 - 2026</se:Title>
+          </se:Description>
+          <ogc:Filter xmlns:ogc="http://www.opengis.net/ogc">
+            <ogc:And>
+              <ogc:PropertyIsGreaterThan>
+                <ogc:PropertyName>year</ogc:PropertyName>
+                <ogc:Literal>2025</ogc:Literal>
+              </ogc:PropertyIsGreaterThan>
+              <ogc:PropertyIsLessThanOrEqualTo>
+                <ogc:PropertyName>year</ogc:PropertyName>
+                <ogc:Literal>2026</ogc:Literal>
               </ogc:PropertyIsLessThanOrEqualTo>
             </ogc:And>
           </ogc:Filter>
