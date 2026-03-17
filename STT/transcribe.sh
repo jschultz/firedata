@@ -26,8 +26,8 @@ args=(
   ":--nologfile:::Don't write a log file:private,flag"
   ":--nobackup:::Don't back up existing output file:private,flag"
   
-  "-x:--executable::main-openvino:Whisper executable:"
-  "-m:--model::ggml-large.bin:Whisper model to use:"
+  "-x:--executable::whisper-cli:Whisper executable:"
+  "-m:--model::ggml-large-v3-turbo.bin:Whisper model to use:"
   "-t:--threads::4:Number of threads to use"
   "-d:--directory:::Directory to place output file; otherwise same directory as audio file"
 #   "-O:--overwrite:::OK to overwrite output file:flag"
