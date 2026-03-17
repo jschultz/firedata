@@ -30,7 +30,7 @@ args=(
   "-m:--model::ggml-large-v3-turbo.bin:Whisper model to use:"
   "-t:--threads::4:Number of threads to use"
   "-d:--directory:::Directory to place output file; otherwise same directory as audio file"
-#   "-O:--overwrite:::OK to overwrite output file:flag"
+  "-O:--overwrite::false:Overwrite output file with matching timestampe:flag"
 
   ":filename:::Name of audio file to transcribe:input,required"
   
@@ -58,15 +58,38 @@ else
     outfile="${filename%.*}"
 fi
 
-if [[ -f "${outfile}.lrc" ]] \
+if [[ "${overwrite}" == "false" ]] \
+&& [[ -f "${outfile}.lrc" ]] \
 && [[ "$(date -r "${outfile}.lrc")" == "$(date -r "${filename}")" ]];
 then
     echo "Output file ${outfile}.lrc already exists" >&2
 else
+    # Look for model file
+    if [[ ! -f ""${model}"" ]];
+    then
+        modeldir=""$(dirname "$(readlink -f "$(which "${executable}")")")""
+        while [[ "${modeldir}" != "/" ]];
+        do
+            if [[ -f "${modeldir}"/models/"${model}" ]];
+            then
+                model="${modeldir}"/models/"${model}"
+                break
+            else
+                modeldir="$(dirname "${modeldir}")"
+            fi
+        done
+    fi
+    if [[ ! -f ""${model}"" ]];
+    then
+        echo "Model \"${model}\" could not be found" >&2
+        exit 1
+    fi
+
     echo "Transcribing file ${filename} to ${outfile}.lrc" >&2
-#     ffmpeg -y -hide_banner -loglevel quiet -i "${filename}" -ac 1 -ar 16000 "${filename%.*}.16k.wav"
-#     ${executable} --threads ${threads} --output-lrc --model "${model}" --output-file "${outfile}" "${filename%.*}.16k.wav" 2> /dev/null
-#     rm "${filename%.*}.16k.wav"
-    ${executable} --threads ${threads} --output-lrc --model "${model}" --output-file "${outfile}" "${filename}" 2> /dev/null
+    if [[ "${debug}" == "true" ]]; then
+        ${executable} --threads ${threads} --output-lrc --model "${model}" --output-file "${outfile}" "${filename}"
+    else
+        ${executable} --threads ${threads} --output-lrc --model "${model}" --output-file "${outfile}" "${filename}" 2> /dev/null
+    fi
     touch "${outfile}.lrc" --reference="${filename}"
 fi
