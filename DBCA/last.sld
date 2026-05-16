@@ -301,9 +301,12 @@
                 </se:AnchorPoint>
               </se:PointPlacement>
             </se:LabelPlacement>
-            <se:Fill>
-              <se:SvgParameter name="fill">#323232</se:SvgParameter>
-            </se:Fill>
+            <se:Halo>
+              <se:Radius>3</se:Radius>
+              <se:Fill>
+                <se:SvgParameter name="fill">#FFFFFF</se:SvgParameter>
+              </se:Fill>
+            </se:Halo>
             <se:VendorOption name="maxDisplacement">1</se:VendorOption>
           </se:TextSymbolizer>
         </se:Rule>
