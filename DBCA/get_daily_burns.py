@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 #
-# Copyright 2024 Jonathan Schultz
+# Copyright 2026 Jonathan Schultz
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -54,6 +54,9 @@ def getDailyBurns(arglist=None):
                                               help='Polling interval.')
     parser.add_argument('-t', '--timeout',    type=int, default=30,
                                               help='Timeout for WMS request.')
+    parser.add_argument('-F', '--fields',     type=str, nargs='+', help='Ordered list of fields',
+                        default=['burn_id','location','indicative_area','burn_purpose','burn_planned_area_today','burn_stat','burn_est_start','burn_target_lat','burn_target_long'])
+
 
     parser.add_argument('--no-comments',      action='store_true', help='Do not output descriptive comments')
     parser.add_argument('--no-header',        action='store_true', help='Do not output CSV header with column names')
@@ -192,7 +195,9 @@ def getDailyBurns(arglist=None):
                 outdata = None
 
             if outdata is not None:
-                outfieldnames = list(set(sum([list(item.keys()) for item in outdata], start=[])))
+                outfieldnames = args.fields
+                outfieldnames += list(set(sum([list(item.keys()) for item in outdata], start=[])) - set(outfieldnames))
+
                 if set(outfieldnames) != set(infieldnames) or len(outdata) != len(indata):
                     break
 

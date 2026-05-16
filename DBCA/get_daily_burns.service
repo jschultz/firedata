@@ -1,15 +1,17 @@
 [Unit]
 Description=Email daily burn updates
-Before=multi-user.target
+#Before=multi-user.target
 
 [Service]
 Type=simple
-Restart=always
-RestartSec=60
 WorkingDirectory=/home/jschultz/src/firedata/DBCA
 Environment=PATH=/home/jschultz/src/firedata/DBCA:/home/jschultz/src/firedata/common:/home/jschultz/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 ExecSearchPath=/home/jschultz/src/firedata/DBCA:/home/jschultz/src/firedata/common:/home/jschultz/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 ExecStart=get_daily_burns_daemon.sh
+Restart=always
+RestartSec=60
+RestartSteps=4
+RestartMaxDelaySec=480
 
 [Install]
 WantedBy=default.target
