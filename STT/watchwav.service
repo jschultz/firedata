@@ -1,0 +1,10 @@
+[Unit]
+Description=Encode recordings from scan125 as mp3
+Before=multi-user.target
+
+[Service]
+Type=simple
+Restart=always
+ExecStart=sh -c 'inotifywait --monitor --event close_write --format %%w%%f /home/jschultz/wav | while read f; do /home/jschultz/bin/wav2mp3.sh --purge --nologfile --directory mp3 $f 2>&1; done'
+
+WantedBy=default.target

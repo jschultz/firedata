@@ -24,7 +24,8 @@ args=(
 
   "-l:--logfile:::Log file to record processing, defaults to filename with extension '.log':private"
   ":--nologfile:::Don't write a log file:private,flag"
-  ":--trash:::Trash original file on success:private,flag"
+  ":--trash:::Move original file to Trash on success:private,flag"
+  ":--purge:::Purge original file on success:private,flag"
 
 #   "-p:--preset::voice:lame preset to use"
   "-b:--bitrate::64k:Output bitrate"
@@ -77,6 +78,9 @@ then
     if [[ "${trash}" == "true" ]]; then
         echo "Moving file ${filename} to $HOME/Trash"
         mv "${filename}" $HOME/Trash
+    elif [[ "${purge}" == "true" ]]; then
+        echo "Removing file ${filename}"
+        rm "${filename}"
     fi
 else
     echo "ERROR: output file ${outfile} mismatch"
