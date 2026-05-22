@@ -114,11 +114,19 @@ def getDailyBurns(arglist=None):
                 for n in range(len(spans) // 2):
                     attributes[spans[2 * n].get_text()] = spans[2 * n + 1].get_text()
 
+                attributes['location'] = f"{attributes.get('location')}"
+                attributes['burn_purpose'] = ', '.join(sorted(list(map(str.strip, attributes.get('burn_purpose').split(',')))))
                 attributes['burn_target_date'] = str(dateutil.parser.parse(attributes.get('burn_target_date_raw')).date())
                 del attributes['burn_target_date_raw']
                 attributes['indicative_area']  = float2str(attributes.get('indicative_area'))
+                if attributes['indicative_area'] != '':
+                    attributes['indicative_area'] = str(round(float(attributes['indicative_area'])))
                 attributes['burn_target_long'] = float2str(attributes.get('burn_target_long'))
+                if attributes['burn_target_long'] != '':
+                    attributes['burn_target_long'] = str(round(float(attributes['burn_target_long']),8))
                 attributes['burn_target_lat']  = float2str(attributes.get('burn_target_lat'))
+                if attributes['burn_target_lat'] != '':
+                    attributes['burn_target_lat'] = str(round(float(attributes['burn_target_lat']),8))
                 attributes['burn_planned_area_today'] = float2str(attributes.get('burn_planned_area_today'))
                 try:
                     attributes['burn_est_start'] = str(dateutil.parser.parse(attributes.get('burn_est_start', '')).time())
@@ -194,7 +202,7 @@ def getDailyBurns(arglist=None):
                 print(e, file=sys.stderr)
                 outdata = None
 
-            if outdata is not None:
+            if outdata is not None and len(outdata) > 1:
                 outfieldnames = args.fields
                 outfieldnames += list(set(sum([list(item.keys()) for item in outdata], start=[])) - set(outfieldnames))
 
@@ -205,9 +213,9 @@ def getDailyBurns(arglist=None):
                     for fieldname in outfieldnames:
                         data[fieldname] = data.get(fieldname, '')
 
-                if not all((indata[idx] == outdata[idx] for idx in range(len(indata)))):
+                if not all((indata[idx][fieldname] == outdata[idx][fieldname] for idx in range(len(indata)) for fieldname in outfieldnames)):
                     if args.verbosity >= 2:
-                        print([(indata[idx], outdata[idx]) for idx in range(len(indata)) if indata[idx] != outdata[idx]], file=sys.stderr)
+                        print([(indata[idx][fieldname], outdata[idx][fieldname]) for idx in range(len(indata)) for fieldname in outfieldnames if indata[idx][fieldname] != outdata[idx][fieldname]], file=sys.stderr)
                     break
 
     if args.csvfile is not None:

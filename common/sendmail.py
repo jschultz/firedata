@@ -69,12 +69,12 @@ def sendMail(arglist=None):
     msg = MIMEMultipart()
     msg['Subject'] = args.subject
 
-    table_html = pandas.read_csv(args.csvfile).to_html()
+    table_html = pandas.read_csv(args.csvfile).to_html(float_format=str, na_rep='')
     html = """\
     <html>
       <head></head>
       <body>
-        """ + table_html + """
+        """ + table_html.replace(r'\n', '<br>') + """
       </body>
     </html>
     """
