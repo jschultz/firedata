@@ -277,6 +277,10 @@ for ((tableidx=0; tableidx<${#eventtable_array[@]}; tableidx++)) do
         separator="AND"
     fi
     if [[ -n "${eventlimit_array[tableidx]}" ]]; then
+        # Ordering is done in array_agg but need to do it here too if there is a limit
+        if [[ -n "${eventorder_array[tableidx]}" ]]; then
+            VIEW_QUERY+=" ORDER BY ${eventorder_array[tableidx]}"
+        fi
         VIEW_QUERY+=" LIMIT ${eventlimit_array[tableidx]}"
     fi
     VIEW_QUERY+=") AS ${eventtable_array[tableidx]}"

@@ -16,10 +16,16 @@
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##
 ################################################################################
+# dissolve_view.sh
+#    --match "fih_date1[1];burnid"
+#    --viewtable "calc.dbca_fire_history_dbca_060_20260603_burn_options_view"
+#    --polytable "calc.dbca_fire_history_dbca_060_20260603_burn_options_poly"
+################################################################################
 # overlay_view.sh
 #    --nologfile
 #    --eventtable "dbca_fire_history_dbca_060;dbca_burn_options_program_dbca_007"
 #    --eventid "object_id;object_id"
+#    --eventlimit 1
 #    --eventorder "fih_date1 DESC; burnid"
 #    --suffix "burn_options"
 #    --polycolumns "id;geom"
