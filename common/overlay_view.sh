@@ -213,10 +213,13 @@ for ((colidx=0; colidx<${#eventalias_array[@]}; colidx++)) do
         separator=","
     else
         for ((tableidx=0; tableidx<${#eventtable_array[@]}; tableidx++)) do
-            for ((linkidx=1; linkidx<=${eventlimit_array[tableidx]}; linkidx++)) do
-                VIEW_QUERY+="${separator} ${eventcolumn_array[colidx]}_${linkidx} AS \"${eventalias_array[colidx]}_${linkidx}\""
-                separator=","
-            done
+            if [[ "${eventcolumncorrelation_array[colidx]}" == ""
+               || "${eventcolumncorrelation_array[colidx]}" == "${eventtable_array[tableidx]}" ]]; then
+                for ((linkidx=1; linkidx<=${eventlimit_array[tableidx]}; linkidx++)) do
+                    VIEW_QUERY+="${separator} ${eventcolumn_array[colidx]}_${linkidx} AS \"${eventalias_array[colidx]}_${linkidx}\""
+                    separator=","
+                done
+            fi
         done
     fi
     separator=","
@@ -237,11 +240,18 @@ for ((tableidx=0; tableidx<${#eventtable_array[@]}; tableidx++)) do
            || "${eventcolumncorrelation_array[colidx]}" == "${eventtable_array[tableidx]}" ]]; then
             if [[ "${flatten}" == "true" ]]; then
                 for ((linkidx=1; linkidx<=${eventlimit_array[tableidx]}; linkidx++)) do
-                    VIEW_QUERY+="${separator} (array_agg(${eventcolumn_array[colidx]}))[${linkidx}] AS \"${eventcolumn_array[colidx]#*.}_${linkidx}\""
+                    VIEW_QUERY+="${separator} (array_agg(${eventcolumn_array[colidx]}"
+                    if [[ -n "${eventorder_array[tableidx]}" ]]; then
+                        VIEW_QUERY+=" ORDER BY ${eventorder_array[tableidx]}"
+                    fi
+                    VIEW_QUERY+="))[${linkidx}] AS \"${eventcolumn_array[colidx]#*.}_${linkidx}\""
                     separator=","
                 done
             else
                 VIEW_QUERY+="${separator} array_agg(${eventcolumn_array[colidx]}"
+                if [[ -n "${eventorder_array[tableidx]}" ]]; then
+                    VIEW_QUERY+=" ORDER BY ${eventorder_array[tableidx]}"
+                fi
                 VIEW_QUERY+=") AS \"${eventcolumn_array[colidx]#*.}\""
                 separator=","
             fi
@@ -265,9 +275,6 @@ for ((tableidx=0; tableidx<${#eventtable_array[@]}; tableidx++)) do
     if [[ -n "${eventfilter_array[tableidx]}" ]]; then
         VIEW_QUERY+=" ${separator} (${eventfilter_array[tableidx]})"
         separator="AND"
-    fi
-    if [[ -n "${eventorder_array[tableidx]}" ]]; then
-        VIEW_QUERY+=" ORDER BY ${eventorder_array[tableidx]}"
     fi
     if [[ -n "${eventlimit_array[tableidx]}" ]]; then
         VIEW_QUERY+=" LIMIT ${eventlimit_array[tableidx]}"
@@ -297,10 +304,13 @@ if [[ ${#polycolumn_array[@]} -gt 0 ]]; then
             separator=","
         else
             for ((tableidx=0; tableidx<${#eventtable_array[@]}; tableidx++)) do
-                for ((linkidx=1; linkidx<=${eventlimit_array[tableidx]}; linkidx++)) do
-                    VIEW_QUERY+="${separator} ${eventcolumn_array[colidx]}_${linkidx}"
-                    separator=","
-                done
+                if [[ "${eventcolumncorrelation_array[colidx]}" == ""
+                   || "${eventcolumncorrelation_array[colidx]}" == "${eventtable_array[tableidx]}" ]]; then
+                    for ((linkidx=1; linkidx<=${eventlimit_array[tableidx]}; linkidx++)) do
+                        VIEW_QUERY+="${separator} ${eventcolumn_array[colidx]}_${linkidx}"
+                        separator=","
+                    done
+                fi
             done
         fi
     done

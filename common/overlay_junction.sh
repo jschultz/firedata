@@ -146,13 +146,15 @@ else
             DUMP_QUERY=""
             withintro="WITH"
             if [[ -n "${area}" ]]; then
-                DUMP_QUERY+="${withintro} area as (${area})"
+                DUMP_QUERY+="${withintro} area as (SELECT ${area} AS geom)"
                 withintro=","
             fi
             if [[ -n "${exclude}" ]]; then
                 DUMP_QUERY+="${withintro} exclude as (${exclude})"
                 withintro=","
             fi
+            DUMP_QUERY+="
+                SELECT ${eventid_array[tableidx]}, geom FROM ("
             DUMP_QUERY+="
                 SELECT ${eventid_array[tableidx]},
                     (ST_Dump("
@@ -189,6 +191,7 @@ else
                 DUMP_QUERY+=" ${whereintro} ${where}"
                 whereintro="AND"
             fi
+            DUMP_QUERY+=") WHERE ST_GeometryType(geom) = 'ST_Polygon'"
 
             if [[ "${debug}" == "true" ]]; then
                 echo $DUMP_QUERY >&2
@@ -308,7 +311,7 @@ for ((tableidx=0; tableidx<${#eventtable_array[@]}; tableidx++)) do
         fi
         if [[ -n "${area}" ]]; then
             junctioncommand="CREATE TABLE ${junctiontable} AS
-                                WITH area as (${area})
+                                WITH area as (SELECT ${area} AS geom)
                                 SELECT DISTINCT point.id AS poly_id, event.${eventid_array[tableidx]}
                                 FROM area,
                                     ${canonical_array[tableidx]} AS event,

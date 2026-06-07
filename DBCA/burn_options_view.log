@@ -1,0 +1,35 @@
+################################################################################
+##
+## Copyright 2026 Jonathan Schultz
+##
+## This program is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+##
+## This program is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with this program.  If not, see <http://www.gnu.org/licenses/>.
+##
+################################################################################
+# overlay_view.sh
+#    --nologfile
+#    --eventtable "dbca_fire_history_dbca_060;dbca_burn_options_program_dbca_007"
+#    --eventid "object_id;object_id"
+#    --eventorder "fih_date1 DESC; burnid"
+#    --suffix "burn_options"
+#    --polycolumns "id;geom"
+#    --polyaliases "poly_id"
+#    --eventcolumns "dbca_fire_history_dbca_060.object_id;dbca_burn_options_program_dbca_007.object_id;dbca_burn_options_program_dbca_007.burnid;dbca_fire_history_dbca_060.fih_date1"
+#    --eventaliases "fire_history_object_id;burn_object_id"
+################################################################################
+# overlay_junction.sh
+#    --nologfile
+#    --eventtable "dbca_fire_history_dbca_060;dbca_burn_options_program_dbca_007"
+#    --eventid "object_id;object_id"
+#    --suffix "burn_options"
+#    --area "ST_Intersection((SELECT ST_Union(geom) AS geom FROM dbca_burn_options_program_dbca_007), (SELECT ST_Union(geom) AS geom FROM dbca_region_boundaries_dbca_022 WHERE drg_region_name IN ('SOUTH COAST', 'SOUTH WEST', 'SWAN', 'WARREN')))"
