@@ -34,7 +34,7 @@ args=(
   "-C:--computed:::Semicolon-delimited list of computed columns to include in junction table"
   "-A:--computedalias:::Semicolon-delimited list of aliases for computed columns"
   
-  "-j:--junction:::Name of junction table:required"
+  "-j:--junction:::Name of junction table, otherwise default is based on two table names:"
 
   "-l:--logfile:::Log file to record processing, defaults to 'junctio' + .log"
   ":--nologfile:::Don't write a log file:private,flag"
@@ -42,6 +42,32 @@ args=(
 )
 
 source $(dirname "$0")/argparse.sh
+
+
+IFS=';' read -r -a column1_array        <<< "${column1}"
+IFS=';' read -r -a alias1_array         <<< "${alias1}"
+IFS=';' read -r -a column2_array        <<< "${column2}"
+IFS=';' read -r -a alias2_array         <<< "${alias2}"
+IFS=';' read -r -a computed_array       <<< "${computed}"
+IFS=';' read -r -a computedalias_array  <<< "${computedalias}"
+
+canonicaltable1=$(psql --variable=ON_ERROR_STOP=1 \
+        --quiet --tuples-only --no-align --command="\timing off" \
+        --command="SELECT canonical_table('${table1}')")
+if [[ ! -n "${canonicaltable1}" ]]; then
+    canonicaltable1="${table1}"
+fi
+
+canonicaltable2=$(psql --variable=ON_ERROR_STOP=1 \
+        --quiet --tuples-only --no-align --command="\timing off" \
+        --command="SELECT canonical_table('${table2}')")
+if [[ ! -n "${canonicaltable2}" ]]; then
+    canonicaltable2="${table2}"
+fi
+
+if [[ ! -n ${junction} ]]; then
+    junction=calc.${canonicaltable1##*.}_${canonicaltable2##*.}_junction
+fi
 
 if [[ "${nologfile}" != "true" ]]; then
     if [[ ! -n ${logfile} ]]; then
@@ -53,13 +79,6 @@ fi
 if [[ "${debug}" == "true" ]]; then
     set -x
 fi
-
-IFS=';' read -r -a column1_array        <<< "${column1}"
-IFS=';' read -r -a alias1_array         <<< "${alias1}"
-IFS=';' read -r -a column2_array        <<< "${column2}"
-IFS=';' read -r -a alias2_array         <<< "${alias2}"
-IFS=';' read -r -a computed_array       <<< "${computed}"
-IFS=';' read -r -a computedalias_array  <<< "${computedalias}"
 
 for ((colidx=0; colidx<${#column1_array[@]}; colidx++)) do
     if [[ ! -n "${alias1_array[colidx]}" ]]; then
@@ -78,7 +97,7 @@ else
     backupcommand=
 fi
 
-createcommand="CREATE TABLE \"${junction}\" AS SELECT"
+createcommand="CREATE TABLE ${junction} AS SELECT"
 separator=" "
 for ((colidx=0; colidx<${#column1_array[@]}; colidx++)) do
     createcommand+="${separator}table1.\"${column1_array[colidx]}\" AS \"${alias1_array[colidx]}\""
@@ -92,7 +111,7 @@ for ((colidx=0; colidx<${#computed_array[@]}; colidx++)) do
     createcommand+="${separator}${computed_array[colidx]} AS \"${computedalias_array[colidx]}\""
     separator=","
 done
-createcommand+=" FROM \"${table1}\" AS table1, \"${table2}\" AS table2 WHERE ST_Intersects(table1.\"${geometry1}\", table2.\"${geometry2}\") GROUP BY"
+createcommand+=" FROM ${canonicaltable1} AS table1, ${canonicaltable2} AS table2 WHERE ST_Intersects(table1.\"${geometry1}\", table2.\"${geometry2}\") GROUP BY"
 separator=" "
 for ((colidx=0; colidx<${#column1_array[@]}; colidx++)) do
     createcommand+="${separator}table1.\"${column1_array[colidx]}\""

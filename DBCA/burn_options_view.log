@@ -16,10 +16,36 @@
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##
 ################################################################################
+# psql_command.sh
+#    --nologfile
+#    --command "
+CREATE TABLE burn_options_average_last_burn_year AS
+    SELECT
+        data.dbca_burn_options_program_dbca_007_20260527.*,
+        ST_Area(data.dbca_burn_options_program_dbca_007_20260527.geom::geography) AS area,
+        ROUND( SUM(st_area(dbca_fire_history_dbca_060_burn_options_view_dissolve.geom) * EXTRACT (YEAR FROM fih_date1 + 184)) / SUM(st_area(dbca_fire_history_dbca_060_burn_options_view_dissolve.geom)) ) AS average_year
+    FROM data.dbca_burn_options_program_dbca_007_20260527
+    JOIN dbca_fire_history_dbca_060_burn_options_view_dissolve
+    ON  ARRAY[data.dbca_burn_options_program_dbca_007_20260527.burnid] <@ dbca_fire_history_dbca_060_burn_options_view_dissolve.burnid
+    WHERE fih_date1 IS NOT NULL
+    GROUP BY data.dbca_burn_options_program_dbca_007_20260527.object_id"
+################################################################################
+# psql_command.sh
+#    --nologfile
+#    --command "SELECT * FROM (SELECT burnid, ROUND(SUM(ST_Area(geom::geography))/10000) AS area, ROUND( SUM(st_area(geom) * EXTRACT (YEAR FROM fih_date1 + 184)) / SUM(st_area(geom)) ) AS average_year FROM dbca_fire_history_dbca_060_burn_options_view_dissolve WHERE array_length(burnid,1) > 0 AND fih_date1 IS NOT NULL GROUP BY burnid ORDER BY burnid) WHERE area > 0"
+#    --csvfile "burn_options_average_last_burn_year.csv"
+################################################################################
+# psql_command.sh
+#    --nologfile
+#    --command "SELECT * FROM (SELECT burnid,round(sum(st_area(geom::geography)/10000)) AS area FROM dbca_fire_history_dbca_060_burn_options_view_dissolve WHERE array_length(burnid,1) > 0 AND fih_date1 < '2011-07-01' GROUP BY
+burnid ORDER BY burnid) WHERE area >= 10"
+#    --csvfile "planned_burn_15.csv"
+################################################################################
 # dissolve_view.sh
+#    --nologfile
 #    --match "fih_date1[1];burnid"
-#    --viewtable "calc.dbca_fire_history_dbca_060_20260603_burn_options_view"
-#    --polytable "calc.dbca_fire_history_dbca_060_20260603_burn_options_poly"
+#    --viewtable "dbca_fire_history_dbca_060_burn_options_view"
+#    --polytable "dbca_fire_history_dbca_060_burn_options_poly"
 ################################################################################
 # overlay_view.sh
 #    --nologfile

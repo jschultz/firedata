@@ -1,0 +1,32 @@
+################################################################################
+##
+## Copyright 2022 Jonathan Schultz
+##
+## This program is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+##
+## This program is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with this program.  If not, see <http://www.gnu.org/licenses/>.
+##
+################################################################################
+#  pdfjam
+#     "Block previous fires/${block} previous fires map.pdf"
+#     --nup 2x2
+#     --outfile "Block previous fires/${block} previous fires map tiled.pdf"
+################################################################################
+# exportBlockAtlas.py
+#    --nologfile
+#    --block "${block}"
+#    --filter "fire_in_block_area / ($area/10000) >= 0.1"
+#    --layout "Layout 1"
+##    --imagefile "Block previous fires/${block} previous fires map.jpg"
+#    --pdffile "Block previous fires/${block} previous fires map.pdf"
+#    -- "/home/jschultz/src/firedata/DBCA/block_previous_fires_map.qgs"
+################################################################################
