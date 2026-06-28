@@ -21,14 +21,14 @@
     <customproperties>
       <Option/>
     </customproperties>
-    <layer-tree-layer source="dbname='fire' host=localhost port=5432 user='qgis' sslmode=disable key='id' srid=4283 type=MultiSurface checkPrimaryKeyUnicity='0' table=&quot;public&quot;.&quot;dbca_fire_history_dbca_060&quot; (geom)" providerKey="postgres" patch_size="-1,-1" expanded="1" name="dbca_fire_history_dbca_060" legend_exp="" checked="Qt::Checked" id="dbca_fire_history_dbca_060_089b27af_928d_4058_837b_7c3bf188bf05" legend_split_behavior="0">
+    <layer-tree-layer source="dbname='fire' port=5432 key='object_id' srid=4283 type=MultiSurface checkPrimaryKeyUnicity='0' table=&quot;public&quot;.&quot;dbca_fire_history_dbca_060&quot; (geom)" providerKey="postgres" patch_size="-1,-1" expanded="1" name="dbca_fire_history_dbca_060" legend_exp="" checked="Qt::Checked" id="dbca_fire_history_dbca_060_089b27af_928d_4058_837b_7c3bf188bf05" legend_split_behavior="0">
       <customproperties>
         <Option type="Map">
           <Option value="dbca_fire_history_dbca_060" name="cached_name" type="QString"/>
         </Option>
       </customproperties>
     </layer-tree-layer>
-    <layer-tree-layer source="dbname='fire' port=5432 user='qgis' sslmode=disable key='tid' srid=4283 type=MultiSurface checkPrimaryKeyUnicity='0' table=&quot;public&quot;.&quot;burn_previous_fires&quot; (geom)" providerKey="postgres" patch_size="-1,-1" expanded="1" name="burn_previous_fires" legend_exp="" checked="Qt::Unchecked" id="burn_previous_fires_eef2fe47_4338_4a19_af2c_eb368e9f9bdb" legend_split_behavior="0">
+    <layer-tree-layer source="dbname='fire' port=5432 key='tid' srid=4283 type=MultiSurface checkPrimaryKeyUnicity='0' table=&quot;public&quot;.&quot;burn_previous_fires&quot; (geom)" providerKey="postgres" patch_size="-1,-1" expanded="1" name="burn_previous_fires" legend_exp="" checked="Qt::Unchecked" id="burn_previous_fires_eef2fe47_4338_4a19_af2c_eb368e9f9bdb" legend_split_behavior="0">
       <customproperties>
         <Option type="Map">
           <Option value="burn_previous_fires" name="cached_name" type="QString"/>
@@ -806,7 +806,7 @@
         <ymax>-13.98229621662296296</ymax>
       </wgs84extent>
       <id>burn_previous_fires_eef2fe47_4338_4a19_af2c_eb368e9f9bdb</id>
-      <datasource>dbname='fire' port=5432 user='qgis' sslmode=disable key='tid' srid=4283 type=MultiSurface checkPrimaryKeyUnicity='0' table="public"."burn_previous_fires" (geom)</datasource>
+      <datasource>dbname='fire' port=5432 sslmode=disable key='tid' srid=4283 type=MultiSurface checkPrimaryKeyUnicity='0' table="public"."burn_previous_fires" (geom)</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -1111,7 +1111,7 @@
       <customproperties>
         <Option type="Map">
           <Option name="dualview/previewExpressions" type="List">
-            <Option value="&quot;sfb_block&quot;" type="QString"/>
+            <Option value="&quot;burnid&quot;" type="QString"/>
           </Option>
         </Option>
       </customproperties>
@@ -1127,7 +1127,7 @@
       <legend type="default-vector" showLabelLegend="0"/>
       <referencedLayers/>
       <fieldConfiguration>
-        <field name="sfb_block" configurationFlags="None">
+        <field name="burnid" configurationFlags="None">
           <editWidget type="">
             <config>
               <Option/>
@@ -1164,28 +1164,28 @@
         </field>
       </fieldConfiguration>
       <aliases>
-        <alias field="sfb_block" name="" index="0"/>
+        <alias field="burnid" name="" index="0"/>
         <alias field="location" name="" index="1"/>
         <alias field="fireseason" name="" index="2"/>
         <alias field="fire_in_burn_area" name="" index="3"/>
         <alias field="fire_area" name="" index="4"/>
       </aliases>
       <defaults>
-        <default expression="" field="sfb_block" applyOnUpdate="0"/>
+        <default expression="" field="burnid" applyOnUpdate="0"/>
         <default expression="" field="location" applyOnUpdate="0"/>
         <default expression="" field="fireseason" applyOnUpdate="0"/>
         <default expression="" field="fire_in_burn_area" applyOnUpdate="0"/>
         <default expression="" field="fire_area" applyOnUpdate="0"/>
       </defaults>
       <constraints>
-        <constraint constraints="0" field="sfb_block" unique_strength="0" notnull_strength="0" exp_strength="0"/>
+        <constraint constraints="0" field="burnid" unique_strength="0" notnull_strength="0" exp_strength="0"/>
         <constraint constraints="0" field="location" unique_strength="0" notnull_strength="0" exp_strength="0"/>
         <constraint constraints="0" field="fireseason" unique_strength="0" notnull_strength="0" exp_strength="0"/>
         <constraint constraints="0" field="fire_in_burn_area" unique_strength="0" notnull_strength="0" exp_strength="0"/>
         <constraint constraints="0" field="fire_area" unique_strength="0" notnull_strength="0" exp_strength="0"/>
       </constraints>
       <constraintExpressions>
-        <constraint exp="" field="sfb_block" desc=""/>
+        <constraint exp="" field="burnid" desc=""/>
         <constraint exp="" field="location" desc=""/>
         <constraint exp="" field="fireseason" desc=""/>
         <constraint exp="" field="fire_in_burn_area" desc=""/>
@@ -1197,7 +1197,7 @@
       </attributeactions>
       <attributetableconfig sortOrder="0" actionWidgetStyle="dropDown" sortExpression="">
         <columns>
-          <column width="-1" hidden="0" name="sfb_block" type="field"/>
+          <column width="-1" hidden="0" name="burnid" type="field"/>
           <column width="-1" hidden="0" name="location" type="field"/>
           <column width="-1" hidden="0" name="fireseason" type="field"/>
           <column width="-1" hidden="0" name="fire_in_burn_area" type="field"/>
@@ -1222,7 +1222,7 @@
       <reuseLastValue/>
       <dataDefinedFieldProperties/>
       <widgets/>
-      <previewExpression>"sfb_block"</previewExpression>
+      <previewExpression>"burnid"</previewExpression>
       <mapTip></mapTip>
     </maplayer>
     <maplayer geometry="Polygon" symbologyReferenceScale="-1" wkbType="MultiSurface" legendPlaceholderImage="" hasScaleBasedVisibilityFlag="0" type="vector" simplifyAlgorithm="0" refreshOnNotifyEnabled="0" refreshOnNotifyMessage="" autoRefreshEnabled="0" styleCategories="AllStyleCategories" simplifyLocal="1" simplifyMaxScale="1" simplifyDrawingTol="1" labelsEnabled="0" minScale="100000000" maxScale="0" readOnly="0" simplifyDrawingHints="1" autoRefreshTime="0">
@@ -1239,7 +1239,7 @@
         <ymax>-13.74038755780123999</ymax>
       </wgs84extent>
       <id>dbca_fire_history_dbca_060_089b27af_928d_4058_837b_7c3bf188bf05</id>
-      <datasource>dbname='fire' host=localhost port=5432 user='qgis' password='qgis' sslmode=disable key='id' srid=4283 type=MultiSurface checkPrimaryKeyUnicity='0' table="public"."dbca_fire_history_dbca_060" (geom)</datasource>
+      <datasource>dbname='fire' port=5432 key='object_id' srid=4283 type=MultiSurface checkPrimaryKeyUnicity='0' table="public"."dbca_fire_history_dbca_060" (geom)</datasource>
       <keywordList>
         <value></value>
       </keywordList>
@@ -2197,7 +2197,7 @@
           <customproperties>
             <Option/>
           </customproperties>
-          <layer-tree-layer source="dbname='fire' host=localhost port=5432 user='qgis' sslmode=disable key='id' srid=4283 type=MultiSurface checkPrimaryKeyUnicity='0' table=&quot;public&quot;.&quot;dbca_fire_history_dbca_060&quot; (geom)" providerKey="postgres" patch_size="-1,-1" expanded="1" name="dbca_fire_history_dbca_060" legend_exp="" checked="Qt::Checked" id="dbca_fire_history_dbca_060_089b27af_928d_4058_837b_7c3bf188bf05" legend_split_behavior="0">
+          <layer-tree-layer source="dbname='fire' port=5432 key='object_id' srid=4283 type=MultiSurface checkPrimaryKeyUnicity='0' table=&quot;public&quot;.&quot;dbca_fire_history_dbca_060&quot; (geom)" providerKey="postgres" patch_size="-1,-1" expanded="1" name="dbca_fire_history_dbca_060" legend_exp="" checked="Qt::Checked" id="dbca_fire_history_dbca_060_089b27af_928d_4058_837b_7c3bf188bf05" legend_split_behavior="0">
             <customproperties>
               <Option type="Map">
                 <Option value="dbca_fire_history_dbca_060" name="cached_name" type="QString"/>
@@ -2281,7 +2281,7 @@
           </dd_properties>
         </text-style>
       </LayoutItem>
-      <LayoutItem referencePoint="0" id="" uuid="{6b5d99cf-0d1b-4a36-a133-80a35b34d421}" marginY="0" labelText="[%sfb_block + ' - ' + location%]" position="9.39901,5.78497,mm" outlineWidthM="0.3,mm" background="false" type="65641" valign="128" groupUuid="" halign="4" zValue="2" positionLock="false" templateUuid="{6b5d99cf-0d1b-4a36-a133-80a35b34d421}" frame="false" blendMode="0" visibility="1" opacity="1" htmlState="0" itemRotation="0" marginX="0" excludeFromExports="0" frameJoinStyle="miter" size="193.463,39.6969,mm" positionOnPage="9.39901,5.78497,mm">
+      <LayoutItem referencePoint="0" id="" uuid="{6b5d99cf-0d1b-4a36-a133-80a35b34d421}" marginY="0" labelText="[%burnid + ' - ' + location%]" position="9.39901,5.78497,mm" outlineWidthM="0.3,mm" background="false" type="65641" valign="128" groupUuid="" halign="4" zValue="2" positionLock="false" templateUuid="{6b5d99cf-0d1b-4a36-a133-80a35b34d421}" frame="false" blendMode="0" visibility="1" opacity="1" htmlState="0" itemRotation="0" marginX="0" excludeFromExports="0" frameJoinStyle="miter" size="193.463,39.6969,mm" positionOnPage="9.39901,5.78497,mm">
         <FrameColor alpha="255" red="0" blue="0" green="0"/>
         <BackgroundColor alpha="255" red="255" blue="255" green="255"/>
         <LayoutObject>
@@ -2395,7 +2395,7 @@
           <Option value="true" name="singleFile" type="bool"/>
         </Option>
       </customproperties>
-      <Atlas sortFeatures="1" coverageLayerProvider="postgres" sortKey="-&quot;fireseason&quot;" pageNameExpression="array_to_string(array(attribute('sfb_block'), attribute('fireseason')))" coverageLayerSource="dbname='fire' port=5432 user='qgis' sslmode=disable key='tid' srid=4283 type=MultiSurface checkPrimaryKeyUnicity='0' table=&quot;public&quot;.&quot;burn_previous_fires&quot; (geom)" hideCoverage="0" enabled="1" sortAscending="1" coverageLayer="burn_previous_fires_eef2fe47_4338_4a19_af2c_eb368e9f9bdb" coverageLayerName="burn_previous_fires" filterFeatures="1" filenamePattern="'output_'||@atlas_featurenumber" featureFilter="sfb_block='FRK_073'"/>
+      <Atlas sortFeatures="1" coverageLayerProvider="postgres" sortKey="-&quot;fireseason&quot;" pageNameExpression="array_to_string(array(attribute('burnid'), attribute('fireseason')))" coverageLayerSource="dbname='fire' port=5432 key='tid' srid=4283 type=MultiSurface checkPrimaryKeyUnicity='0' table=&quot;public&quot;.&quot;burn_previous_fires&quot; (geom)" hideCoverage="0" enabled="1" sortAscending="1" coverageLayer="burn_previous_fires_eef2fe47_4338_4a19_af2c_eb368e9f9bdb" coverageLayerName="burn_previous_fires" filterFeatures="1" filenamePattern="'output_'||@atlas_featurenumber" featureFilter="burnid='FRK_073'"/>
     </Layout>
   </Layouts>
   <mapViewDocks3D/>
