@@ -33,10 +33,11 @@ args=(
   
   "-C:--computed:::Semicolon-delimited list of computed columns to include in junction table"
   "-A:--computedalias:::Semicolon-delimited list of aliases for computed columns"
-  
-  "-j:--junction:::Name of junction table, otherwise default is based on two table names:"
+  "-G:--group:::Semicolon-delimited list of columns to group query"
 
-  "-l:--logfile:::Log file to record processing, defaults to 'junctio' + .log"
+  "-v:--view:::Name of view to create on junction table:"
+
+  "-l:--logfile:::Log file to record processing, defaults to 'view' + .log"
   ":--nologfile:::Don't write a log file:private,flag"
   ":--nobackup:::Don't back up existing junction table:private,flag"
 )
@@ -50,6 +51,7 @@ IFS=';' read -r -a column2_array        <<< "${column2}"
 IFS=';' read -r -a alias2_array         <<< "${alias2}"
 IFS=';' read -r -a computed_array       <<< "${computed}"
 IFS=';' read -r -a computedalias_array  <<< "${computedalias}"
+IFS=';' read -r -a group_array          <<< "${group}"
 
 canonicaltable1=$(psql --variable=ON_ERROR_STOP=1 \
         --quiet --tuples-only --no-align --command="\timing off" \
@@ -65,13 +67,15 @@ if [[ ! -n "${canonicaltable2}" ]]; then
     canonicaltable2="${table2}"
 fi
 
-if [[ ! -n ${junction} ]]; then
-    junction=calc.${canonicaltable1##*.}_${canonicaltable2##*.}_junction
-fi
+junction=calc.${canonicaltable1##*.}_${canonicaltable2##*.}_junction
 
 if [[ "${nologfile}" != "true" ]]; then
     if [[ ! -n ${logfile} ]]; then
-        logfile="${junction}.log"
+        if [[ -n ${view} ]]; then
+            logfile="${view}.log"
+        else
+            logfile="${0##.}.log"
+        fi
     fi
     echo "${COMMENTS}" > ${logfile}
 fi
@@ -93,6 +97,11 @@ done
 
 if [[ "${nobackup}" != "true" ]]; then  
     backupcommand="CALL cycle_table('${junction}')"
+    if [[ -n ${view} ]]; then
+        backupviewcommand="CALL cycle_table('${view}')"
+    else
+        backupviewcommand=
+    fi
 else
     backupcommand=
 fi
@@ -121,7 +130,19 @@ for ((colidx=0; colidx<${#column2_array[@]}; colidx++)) do
     createcommand+="${separator}table2.\"${column2_array[colidx]}\""
     separator=","
 done
+for ((colidx=0; colidx<${#group_array[@]}; colidx++)) do
+    createcommand+="${separator}\"${group_array[colidx]}\""
+    separator=","
+done
+
+if [[ -n ${view} ]]; then
+    viewcommand="CREATE VIEW ${view} AS (SELECT * from ${junction})"
+else
+    viewcommand=
+fi
 
 psql --variable=ON_ERROR_STOP=1 \
     --command="${backupcommand}" \
-    --command="${createcommand}"
+    --command="${createcommand}" \
+    --command="${backupviewcommand}" \
+    --command="${viewcommand}"

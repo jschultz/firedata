@@ -66,17 +66,20 @@ def exportburnAtlas(arglist=None):
     project = QgsProject.instance()
     project.read(args.qgisfile[0])
 
-    QgsExpressionContextUtils.setProjectVariable(project, "burnid", args.burnid)
-        
+    burnPreviousFiresLayer = project.mapLayersByName("burn_previous_fires")[0]
+    burnPreviousFiresLayer.setSubsetString ("burnid='" + args.burnid + "'")
+
     manager = project.layoutManager()
     itemnum = 0
     for layout in args.layout:
         layoutitem = manager.layoutByName(layout)
         
         atlas = layoutitem.atlas()
-        # if args.filter:
-        #     atlas.setFilterFeatures(True)
-        #     atlas.setFilterExpression(args.filter)
+        if args.filter:
+            atlas.setFilterExpression(args.filter)
+            atlas.setFilterFeatures(True)
+        else:
+            atlas.setFilterFeatures(False)
         
         exporter = QgsLayoutExporter(atlas.layout())
         if args.pdffile:

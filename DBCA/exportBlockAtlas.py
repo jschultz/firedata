@@ -66,7 +66,8 @@ def exportBlockAtlas(arglist=None):
     project = QgsProject.instance()
     project.read(args.qgisfile[0])
 
-    QgsExpressionContextUtils.setProjectVariable(project, "block", args.block)
+    blockPreviousFiresLayer = project.mapLayersByName("block_previous_fires")[0]
+    blockPreviousFiresLayer.setSubsetString ("sfb_block='" + args.block + "'")
         
     manager = project.layoutManager()
     itemnum = 0
@@ -74,10 +75,12 @@ def exportBlockAtlas(arglist=None):
         layoutitem = manager.layoutByName(layout)
         
         atlas = layoutitem.atlas()
-        # if args.filter:
-        #     atlas.setFilterFeatures(True)
-        #     atlas.setFilterExpression(args.filter)
-        
+        if args.filter:
+            atlas.setFilterExpression(args.filter)
+            atlas.setFilterFeatures(True)
+        else:
+            atlas.setFilterFeatures(False)
+
         exporter = QgsLayoutExporter(atlas.layout())
         if args.pdffile:
             pdfsettings = QgsLayoutExporter.PdfExportSettings()

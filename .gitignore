@@ -1,1 +1,4 @@
 common/argparse.sh
+STT/argparse.sh
+*.zip
+*~

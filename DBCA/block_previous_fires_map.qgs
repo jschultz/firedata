@@ -1,5 +1,5 @@
 <!DOCTYPE qgis PUBLIC 'http://mrcc.com/qgis.dtd' 'SYSTEM'>
-<qgis projectname="" saveDateTime="2026-06-27T08:44:16" saveUser="jschultz" saveUserFull="Jonathan Schultz" version="4.0.3-Norrköping">
+<qgis projectname="" saveDateTime="2026-06-29T11:09:53" saveUser="jschultz" saveUserFull="Jonathan Schultz" version="4.0.3-Norrköping">
   <homePath path=""/>
   <title></title>
   <transaction mode="Disabled"/>
@@ -42,21 +42,21 @@
         </Option>
       </customproperties>
     </layer-tree-layer>
-    <layer-tree-layer checked="Qt::Unchecked" expanded="1" id="block_previous_fires_eef2fe47_4338_4a19_af2c_eb368e9f9bdb" legend_exp="" legend_split_behavior="0" name="block_previous_fires" patch_size="-1,-1" providerKey="postgres" source="dbname='fire' port=5432 key='object_id' srid=4283 type=MultiSurface checkPrimaryKeyUnicity='0' table=&quot;public&quot;.&quot;block_previous_fires&quot; (geom)">
+    <layer-tree-layer checked="Qt::Unchecked" expanded="1" id="block_previous_fires_eef2fe47_4338_4a19_af2c_eb368e9f9bdb" legend_exp="" legend_split_behavior="0" name="block_previous_fires" patch_size="-1,-1" providerKey="postgres" source="dbname='fire' port=5432 key='object_id' srid=4283 type=MultiSurface checkPrimaryKeyUnicity='0' table=&quot;public&quot;.&quot;block_previous_fires&quot; (geom) sql=&quot;sfb_block&quot;='SURPRISE'">
       <customproperties>
         <Option type="Map">
           <Option name="cached_name" type="QString" value="block_previous_fires"/>
         </Option>
       </customproperties>
     </layer-tree-layer>
-    <layer-tree-layer checked="Qt::Checked" expanded="1" id="Mask_c93eb6ec_36bb_4183_80da_e7960895f802" legend_exp="" legend_split_behavior="0" name="Mask" patch_size="-1,-1" providerKey="memory" source="memory?geometry=MultiPolygon&amp;crs=EPSG:4283&amp;field=params:string(0,0)&amp;uid={9bb6212b-f26b-41a0-aa5e-a22e3949b4cb}">
+    <layer-tree-layer checked="Qt::Checked" expanded="1" id="Mask_c93eb6ec_36bb_4183_80da_e7960895f802" legend_exp="" legend_split_behavior="0" name="Mask" patch_size="-1,-1" providerKey="memory" source="memory?geometry=MultiPolygon&amp;crs=EPSG:4283&amp;field=params:string(0,0)&amp;uid={15de820c-361c-4b57-8530-5f4c1673ca67}">
       <customproperties>
         <Option type="Map">
           <Option name="cached_name" type="QString" value="Mask"/>
         </Option>
       </customproperties>
     </layer-tree-layer>
-    <layer-tree-layer checked="Qt::Checked" expanded="1" id="Custom_a5b2bd81_d6e1_4971_bde4_5cbe6e13de82" legend_exp="" legend_split_behavior="0" name="Custom" patch_size="-1,-1" providerKey="wms" source="crs=EPSG:3857&amp;dpiMode=7&amp;format=image/png&amp;layers=cl03rc0di002b14n8pag7n8p5&amp;styles=default&amp;tileMatrixSet=GoogleMapsCompatible&amp;url=https://api.mapbox.com/styles/v1/jschultz/cl03rc0di002b14n8pag7n8p5/wmts?access_token%3Dpk.eyJ1IjoianNjaHVsdHoiLCJhIjoiY2wwM3JtbnJmMWdxODNldDgzanU3ZmVpdCJ9.PWbiFDAIHNucVfMjR2nCHg">
+    <layer-tree-layer checked="Qt::Checked" expanded="0" id="Custom_a5b2bd81_d6e1_4971_bde4_5cbe6e13de82" legend_exp="" legend_split_behavior="0" name="Custom" patch_size="-1,-1" providerKey="wms" source="crs=EPSG:3857&amp;dpiMode=7&amp;format=image/png&amp;layers=cl03rc0di002b14n8pag7n8p5&amp;styles=default&amp;tileMatrixSet=GoogleMapsCompatible&amp;url=https://api.mapbox.com/styles/v1/jschultz/cl03rc0di002b14n8pag7n8p5/wmts?access_token%3Dpk.eyJ1IjoianNjaHVsdHoiLCJhIjoiY2wwM3JtbnJmMWdxODNldDgzanU3ZmVpdCJ9.PWbiFDAIHNucVfMjR2nCHg">
       <customproperties>
         <Option type="Map">
           <Option name="cached_name" type="QString" value="Custom"/>
@@ -73,8 +73,8 @@
   <snapping-settings enabled="0" intersection-snapping="0" maxScale="0" minScale="0" mode="2" scaleDependencyMode="0" self-snapping="0" tolerance="12" type="1" unit="1">
     <individual-layer-settings>
       <layer-setting enabled="0" id="block_previous_fires_eef2fe47_4338_4a19_af2c_eb368e9f9bdb" maxScale="0" minScale="0" tolerance="12" type="1" units="1"/>
-      <layer-setting enabled="0" id="dbca_fire_history_dbca_060_089b27af_928d_4058_837b_7c3bf188bf05" maxScale="0" minScale="0" tolerance="12" type="1" units="1"/>
       <layer-setting enabled="0" id="Mask_c93eb6ec_36bb_4183_80da_e7960895f802" maxScale="0" minScale="0" tolerance="12" type="1" units="1"/>
+      <layer-setting enabled="0" id="dbca_fire_history_dbca_060_089b27af_928d_4058_837b_7c3bf188bf05" maxScale="0" minScale="0" tolerance="12" type="1" units="1"/>
     </individual-layer-settings>
   </snapping-settings>
   <relations/>
@@ -85,7 +85,7 @@
       <xmin>12555172.36974799819290638</xmin>
       <ymin>-4247842.46939141117036343</ymin>
       <xmax>14480387.20035472325980663</xmax>
-      <ymax>-1478510.53713277517817914</ymax>
+      <ymax>-1478510.53713277541100979</ymax>
     </extent>
     <rotation>0</rotation>
     <destinationsrs>
@@ -121,8 +121,8 @@
         <legendlayerfile isInOverview="0" layerid="Mask_c93eb6ec_36bb_4183_80da_e7960895f802" visible="1"/>
       </filegroup>
     </legendlayer>
-    <legendlayer checked="Qt::Checked" drawingOrder="-1" name="Custom" open="true" showFeatureCount="0">
-      <filegroup hidden="false" open="true">
+    <legendlayer checked="Qt::Checked" drawingOrder="-1" name="Custom" open="false" showFeatureCount="0">
+      <filegroup hidden="false" open="false">
         <legendlayerfile isInOverview="0" layerid="Custom_a5b2bd81_d6e1_4971_bde4_5cbe6e13de82" visible="1"/>
       </filegroup>
     </legendlayer>
@@ -251,7 +251,7 @@
       <flags>
         <Identifiable>1</Identifiable>
         <Removable>1</Removable>
-        <Searchable>1</Searchable>
+        <Searchable>0</Searchable>
         <Private>0</Private>
       </flags>
       <temporal bandNumber="1" enabled="0" fetchMode="0" mode="0">
@@ -723,7 +723,7 @@
         <ymax>-31.10505820399993127</ymax>
       </wgs84extent>
       <id>block_previous_fires_eef2fe47_4338_4a19_af2c_eb368e9f9bdb</id>
-      <datasource>dbname='fire' port=5432 key='object_id' srid=4283 type=MultiSurface checkPrimaryKeyUnicity='0' table="public"."block_previous_fires" (geom)</datasource>
+      <datasource>dbname='fire' port=5432 key='object_id' srid=4283 type=MultiSurface checkPrimaryKeyUnicity='0' table="public"."block_previous_fires" (geom) sql="sfb_block"='SURPRISE'</datasource>
       <layername>block_previous_fires</layername>
       <srs>
         <spatialrefsys nativeFormat="Wkt">
@@ -1005,7 +1005,7 @@
             </config>
           </editWidget>
         </field>
-        <field configurationFlags="NoFlag" name="fire_in_burn_area">
+        <field configurationFlags="NoFlag" name="fire_in_block_area">
           <editWidget type="">
             <config>
               <Option/>
@@ -1024,28 +1024,28 @@
         <alias field="sfb_block" index="0" name=""/>
         <alias field="object_id" index="1" name=""/>
         <alias field="fireseason" index="2" name=""/>
-        <alias field="fire_in_burn_area" index="3" name=""/>
+        <alias field="fire_in_block_area" index="3" name=""/>
         <alias field="fire_area" index="4" name=""/>
       </aliases>
       <defaults>
         <default applyOnUpdate="0" expression="" field="sfb_block"/>
         <default applyOnUpdate="0" expression="" field="object_id"/>
         <default applyOnUpdate="0" expression="" field="fireseason"/>
-        <default applyOnUpdate="0" expression="" field="fire_in_burn_area"/>
+        <default applyOnUpdate="0" expression="" field="fire_in_block_area"/>
         <default applyOnUpdate="0" expression="" field="fire_area"/>
       </defaults>
       <constraints>
         <constraint constraints="0" exp_strength="0" field="sfb_block" notnull_strength="0" unique_strength="0"/>
         <constraint constraints="3" exp_strength="0" field="object_id" notnull_strength="1" unique_strength="1"/>
         <constraint constraints="0" exp_strength="0" field="fireseason" notnull_strength="0" unique_strength="0"/>
-        <constraint constraints="0" exp_strength="0" field="fire_in_burn_area" notnull_strength="0" unique_strength="0"/>
+        <constraint constraints="0" exp_strength="0" field="fire_in_block_area" notnull_strength="0" unique_strength="0"/>
         <constraint constraints="0" exp_strength="0" field="fire_area" notnull_strength="0" unique_strength="0"/>
       </constraints>
       <constraintExpressions>
         <constraint desc="" exp="" field="sfb_block"/>
         <constraint desc="" exp="" field="object_id"/>
         <constraint desc="" exp="" field="fireseason"/>
-        <constraint desc="" exp="" field="fire_in_burn_area"/>
+        <constraint desc="" exp="" field="fire_in_block_area"/>
         <constraint desc="" exp="" field="fire_area"/>
       </constraintExpressions>
       <expressionfields/>
@@ -1058,7 +1058,7 @@
           <column hidden="0" name="fire_area" type="field" width="-1"/>
           <column hidden="0" name="sfb_block" type="field" width="-1"/>
           <column hidden="0" name="object_id" type="field" width="-1"/>
-          <column hidden="0" name="fire_in_burn_area" type="field" width="195"/>
+          <column hidden="0" name="fire_in_block_area" type="field" width="290"/>
           <column hidden="1" type="actions" width="-1"/>
         </columns>
       </attributetableconfig>
@@ -1707,10 +1707,13 @@
       <properties name="SelectionColorRedPart" type="int">255</properties>
     </properties>
     <properties name="Layouts">
-      <properties name="lastLayoutExportDir" type="QString">/home/jschultz/Transfer/output_4.pdf</properties>
+      <properties name="lastLayoutExportDir" type="QString">/home/jschultz/data/Fire/Layout 1.pdf</properties>
     </properties>
     <properties name="Legend">
       <properties name="filterByMap" type="bool">false</properties>
+    </properties>
+    <properties name="Macros">
+      <properties name="pythonCode" type="QString"></properties>
     </properties>
     <properties name="Mask">
       <properties name="layer_id" type="QString">Mask_c93eb6ec_36bb_4183_80da_e7960895f802</properties>
@@ -1745,9 +1748,72 @@
       <properties name="Automatic" type="bool">true</properties>
       <properties name="DecimalPlaces" type="int">2</properties>
     </properties>
+    <properties name="RenderMapTile" type="bool">false</properties>
     <properties name="SpatialRefSys">
       <properties name="ProjectionsEnabled" type="int">1</properties>
     </properties>
+    <properties name="Variables">
+      <properties name="variableNames" type="QStringList"/>
+      <properties name="variableValues" type="QStringList"/>
+    </properties>
+    <properties name="WCSLayers" type="QStringList"/>
+    <properties name="WCSUrl" type="QString"></properties>
+    <properties name="WFSLayers" type="QStringList"/>
+    <properties name="WFSTLayers">
+      <properties name="Delete" type="QStringList"/>
+      <properties name="Insert" type="QStringList"/>
+      <properties name="Update" type="QStringList"/>
+    </properties>
+    <properties name="WFSUrl" type="QString"></properties>
+    <properties name="WMSAccessConstraints" type="QString">None</properties>
+    <properties name="WMSAddLayerGroupsLegendGraphic" type="bool">false</properties>
+    <properties name="WMSAddWktGeometry" type="bool">false</properties>
+    <properties name="WMSContactMail" type="QString"></properties>
+    <properties name="WMSContactOrganization" type="QString"></properties>
+    <properties name="WMSContactPerson" type="QString"></properties>
+    <properties name="WMSContactPhone" type="QString"></properties>
+    <properties name="WMSContactPosition" type="QString"></properties>
+    <properties name="WMSDefaultMapUnitsPerMm" type="double">1</properties>
+    <properties name="WMSFeatureInfoUseAttributeFormSettings" type="bool">false</properties>
+    <properties name="WMSFees" type="QString">conditions unknown</properties>
+    <properties name="WMSHTMLFeatureInfoUseOnlyMaptip" type="bool">false</properties>
+    <properties name="WMSImageQuality" type="int">90</properties>
+    <properties name="WMSKeywordList" type="QStringList">
+      <value></value>
+    </properties>
+    <properties name="WMSMaxAtlasFeatures" type="int">1</properties>
+    <properties name="WMSOnlineResource" type="QString"></properties>
+    <properties name="WMSPrecision" type="QString">8</properties>
+    <properties name="WMSRootName" type="QString"></properties>
+    <properties name="WMSSegmentizeFeatureInfoGeometry" type="bool">false</properties>
+    <properties name="WMSServiceAbstract" type="QString"></properties>
+    <properties name="WMSServiceCapabilities" type="bool">false</properties>
+    <properties name="WMSServiceTitle" type="QString"></properties>
+    <properties name="WMSSkipNameForGroup" type="bool">false</properties>
+    <properties name="WMSTileBuffer" type="int">0</properties>
+    <properties name="WMSUrl" type="QString"></properties>
+    <properties name="WMSUseLayerIDs" type="bool">false</properties>
+    <properties name="WMTSGrids">
+      <properties name="CRS" type="QStringList"/>
+      <properties name="Config" type="QStringList"/>
+    </properties>
+    <properties name="WMTSJpegLayers">
+      <properties name="Group" type="QStringList"/>
+      <properties name="Layer" type="QStringList"/>
+      <properties name="Project" type="bool">false</properties>
+    </properties>
+    <properties name="WMTSLayers">
+      <properties name="Group" type="QStringList"/>
+      <properties name="Layer" type="QStringList"/>
+      <properties name="Project" type="bool">false</properties>
+    </properties>
+    <properties name="WMTSMinScale" type="int">5000</properties>
+    <properties name="WMTSPngLayers">
+      <properties name="Group" type="QStringList"/>
+      <properties name="Layer" type="QStringList"/>
+      <properties name="Project" type="bool">false</properties>
+    </properties>
+    <properties name="WMTSUrl" type="QString"></properties>
   </properties>
   <dataDefinedServerProperties>
     <Option type="Map">
@@ -1794,12 +1860,21 @@
     <type></type>
     <title></title>
     <abstract></abstract>
+    <contact>
+      <name></name>
+      <organization></organization>
+      <position></position>
+      <voice></voice>
+      <fax></fax>
+      <email></email>
+      <role></role>
+    </contact>
     <links/>
     <dates>
-      <date type="Created" value="2022-03-16T11:46:27"/>
+      <date type="Created" value="2022-03-16T11:46:27+08:00"/>
     </dates>
     <author>Jonathan Schultz</author>
-    <creation>2022-03-16T11:46:27</creation>
+    <creation>2022-03-16T11:46:27+08:00</creation>
   </projectMetadata>
   <Annotations/>
   <Layouts>
@@ -1887,7 +1962,7 @@
         </LayoutItem>
         <GuideCollection visible="1"/>
       </PageCollection>
-      <LayoutItem background="true" blendMode="0" boxSpace="2" columnCount="1" columnSpace="2" equalColumnWidth="0" excludeFromExports="0" frame="false" frameJoinStyle="miter" groupUuid="" id="" itemRotation="0" legendFilterByAtlas="0" map_uuid="{5a2fd9aa-4ac7-440d-8cdb-a336010a62ca}" maxSymbolSize="0" minSymbolSize="0" opacity="1" outlineWidthM="0.3,mm" position="6.24007,79.281,mm" positionLock="false" positionOnPage="6.24007,79.281,mm" rasterBorder="1" rasterBorderColor="0,0,0,255,rgb:0,0,0,1" rasterBorderWidth="0" referencePoint="0" resizeToContents="1" size="63.5305,24.5,mm" splitLayer="0" symbolAlignment="1" symbolHeight="4" symbolWidth="7" templateUuid="{13700b62-0489-4e08-86bf-cce58127e6ba}" title="" titleAlignment="1" type="65642" uuid="{13700b62-0489-4e08-86bf-cce58127e6ba}" visibility="1" wmsLegendHeight="25" wmsLegendWidth="50" wrapChar="" zValue="4">
+      <LayoutItem background="true" blendMode="0" boxSpace="2" columnCount="1" columnSpace="2" equalColumnWidth="0" excludeFromExports="0" frame="false" frameJoinStyle="miter" groupUuid="" id="" itemRotation="0" legendFilterByAtlas="0" map_uuid="{5a2fd9aa-4ac7-440d-8cdb-a336010a62ca}" maxSymbolSize="0" minSymbolSize="0" opacity="1" outlineWidthM="0.3,mm" position="6.24007,79.281,mm" positionLock="false" positionOnPage="6.24007,79.281,mm" rasterBorder="1" rasterBorderColor="0,0,0,255,rgb:0,0,0,1" rasterBorderWidth="0" referencePoint="0" resizeToContents="1" size="62.5604,24.5,mm" splitLayer="0" symbolAlignment="1" symbolHeight="4" symbolWidth="7" templateUuid="{13700b62-0489-4e08-86bf-cce58127e6ba}" title="" titleAlignment="1" type="65642" uuid="{13700b62-0489-4e08-86bf-cce58127e6ba}" visibility="1" wmsLegendHeight="25" wmsLegendWidth="50" wrapChar="" zValue="4">
         <FrameColor alpha="255" blue="0" green="0" red="0"/>
         <BackgroundColor alpha="255" blue="255" green="255" red="255"/>
         <LayoutObject>
@@ -2154,7 +2229,8 @@
           <layer-tree-layer checked="Qt::Checked" expanded="1" id="dbca_fire_history_dbca_060_089b27af_928d_4058_837b_7c3bf188bf05" legend_exp="" legend_split_behavior="0" name="dbca_fire_history_dbca_060" patch_size="-1,-1" providerKey="postgres" source="dbname='fire' port=5432 key='object_id' srid=4283 type=MultiSurface checkPrimaryKeyUnicity='0' table=&quot;public&quot;.&quot;dbca_fire_history_dbca_060&quot; (geom)">
             <customproperties>
               <Option type="Map">
-                <Option name="cached_name" type="QString" value="dbca_fire_history_dbca_060"/>
+                <Option name="legend/label-0" type="QString" value="Prescribed burn"/>
+                <Option name="legend/label-1" type="QString" value="Escaped prescribed burn"/>
                 <Option name="legend/title-style" type="QString" value="hidden"/>
               </Option>
             </customproperties>
@@ -2286,7 +2362,7 @@
           </dd_properties>
         </text-style>
       </LayoutItem>
-      <LayoutItem background="true" blendMode="0" drawCanvasItems="true" enableZRange="0" excludeFromExports="0" followPreset="false" followPresetName="" frame="false" frameJoinStyle="miter" groupUuid="" id="Map 1" isTemporal="0" itemRotation="0" keepLayerSet="false" labelMargin="0,mm" mapFlags="0" mapRotation="0" opacity="1" outlineWidthM="0.3,mm" position="9.39901,103.781,mm" positionLock="false" positionOnPage="9.39901,103.781,mm" referencePoint="0" size="193.463,185.239,mm" templateUuid="{5a2fd9aa-4ac7-440d-8cdb-a336010a62ca}" type="65639" uuid="{5a2fd9aa-4ac7-440d-8cdb-a336010a62ca}" visibility="1" zValue="1">
+      <LayoutItem background="true" blendMode="0" drawCanvasItems="true" enableZRange="0" excludeFromExports="0" followPreset="false" followPresetName="" frame="false" frameJoinStyle="miter" groupUuid="" id="Map 1" isTemporal="0" itemRotation="0" keepLayerSet="true" labelMargin="0,mm" mapFlags="0" mapRotation="0" opacity="1" outlineWidthM="0.3,mm" position="9.39901,103.781,mm" positionLock="false" positionOnPage="9.39901,103.781,mm" referencePoint="0" size="193.463,185.239,mm" templateUuid="{5a2fd9aa-4ac7-440d-8cdb-a336010a62ca}" type="65639" uuid="{5a2fd9aa-4ac7-440d-8cdb-a336010a62ca}" visibility="1" zValue="1">
         <FrameColor alpha="255" blue="0" green="0" red="0"/>
         <BackgroundColor alpha="255" blue="255" green="255" red="255"/>
         <LayoutObject>
@@ -2301,8 +2377,12 @@
             <Option/>
           </customproperties>
         </LayoutObject>
-        <Extent xmax="13049980.72566859424114227" xmin="13030593.84979330748319626" ymax="-4104098.92313510132953525" ymin="-4122661.66056224703788757"/>
-        <LayerSet/>
+        <Extent xmax="13024909.15712889656424522" xmin="13010348.7427208237349987" ymax="-4121450.55814023735001683" ymin="-4135392.00756335072219372"/>
+        <LayerSet>
+          <Layer name="dbca_fire_history_dbca_060" provider="postgres" source="dbname='fire' port=5432 key='object_id' srid=4283 type=MultiSurface checkPrimaryKeyUnicity='0' table=&quot;public&quot;.&quot;dbca_fire_history_dbca_060&quot; (geom)">dbca_fire_history_dbca_060_089b27af_928d_4058_837b_7c3bf188bf05</Layer>
+          <Layer name="Mask" provider="memory" source="memory?geometry=MultiPolygon&amp;crs=EPSG:4283&amp;field=params:string(0,0)&amp;uid={15de820c-361c-4b57-8530-5f4c1673ca67}">Mask_c93eb6ec_36bb_4183_80da_e7960895f802</Layer>
+          <Layer name="Custom" provider="wms" source="crs=EPSG:3857&amp;dpiMode=7&amp;format=image/png&amp;layers=cl03rc0di002b14n8pag7n8p5&amp;styles=default&amp;tileMatrixSet=GoogleMapsCompatible&amp;url=https://api.mapbox.com/styles/v1/jschultz/cl03rc0di002b14n8pag7n8p5/wmts?access_token%3Dpk.eyJ1IjoianNjaHVsdHoiLCJhIjoiY2wwM3JtbnJmMWdxODNldDgzanU3ZmVpdCJ9.PWbiFDAIHNucVfMjR2nCHg">Custom_a5b2bd81_d6e1_4971_bde4_5cbe6e13de82</Layer>
+        </LayerSet>
         <AtlasMap atlasDriven="1" margin="0.10000000000000001" scalingMode="2"/>
         <labelBlockingItems/>
         <atlasClippingSettings clippingType="1" enabled="0" forceLabelsInside="0" restrictLayers="0">
@@ -2318,6 +2398,7 @@
           <Option name="pdfCreateGeoPdf" type="int" value="0"/>
           <Option name="pdfDisableRasterTiles" type="int" value="0"/>
           <Option name="pdfExportThemes" type="invalid"/>
+          <Option name="pdfGroupOrder" type="invalid"/>
           <Option name="pdfIncludeMetadata" type="int" value="1"/>
           <Option name="pdfLayerOrder" type="QString" value="dbca_fire_history_dbca_060_089b27af_928d_4058_837b_7c3bf188bf05~~~Custom_a5b2bd81_d6e1_4971_bde4_5cbe6e13de82~~~block_previous_fires_eef2fe47_4338_4a19_af2c_eb368e9f9bdb~~~Mask_c93eb6ec_36bb_4183_80da_e7960895f802"/>
           <Option name="pdfLosslessImages" type="int" value="0"/>
@@ -2327,7 +2408,7 @@
           <Option name="singleFile" type="bool" value="true"/>
         </Option>
       </customproperties>
-      <Atlas coverageLayer="block_previous_fires_eef2fe47_4338_4a19_af2c_eb368e9f9bdb" coverageLayerName="block_previous_fires" coverageLayerProvider="postgres" coverageLayerSource="dbname='fire' port=5432 key='object_id' srid=4283 type=MultiSurface checkPrimaryKeyUnicity='0' table=&quot;public&quot;.&quot;block_previous_fires&quot; (geom)" enabled="1" featureFilter="sfb_block='SURPRISE'" filenamePattern="'output_'||@atlas_featurenumber" filterFeatures="1" hideCoverage="0" pageNameExpression="array_to_string(array(attribute('sfb_block'), attribute('fireseason')))" sortAscending="1" sortFeatures="1" sortKey="-&quot;fireseason&quot;"/>
+      <Atlas coverageLayer="block_previous_fires_eef2fe47_4338_4a19_af2c_eb368e9f9bdb" coverageLayerName="block_previous_fires" coverageLayerProvider="postgres" coverageLayerSource="dbname='fire' port=5432 key='object_id' srid=4283 type=MultiSurface checkPrimaryKeyUnicity='0' table=&quot;public&quot;.&quot;block_previous_fires&quot; (geom)" enabled="1" filenamePattern="'output_'||@atlas_featurenumber" filterFeatures="0" hideCoverage="0" pageNameExpression="array_to_string(array(attribute('sfb_block'), attribute('fireseason')))" sortAscending="1" sortFeatures="1" sortKey="-&quot;fireseason&quot;"/>
     </Layout>
   </Layouts>
   <ElevationProfiles/>
@@ -2337,7 +2418,7 @@
   <Sensors/>
   <ProjectViewSettings UseProjectScales="0" rotation="0">
     <Scales/>
-    <DefaultViewExtent xmax="15468589.96393305994570255" xmin="11566969.60616966150701046" ymax="-1478510.53713277517817914" ymin="-4247842.46939141117036343">
+    <DefaultViewExtent xmax="15652590.6534014493227005" xmin="11382968.91670127213001251" ymax="-1478510.53713277541100979" ymin="-4247842.46939141117036343">
       <spatialrefsys nativeFormat="Wkt">
         <wkt>PROJCRS["WGS 84 / Pseudo-Mercator",BASEGEOGCRS["WGS 84",ENSEMBLE["World Geodetic System 1984 ensemble",MEMBER["World Geodetic System 1984 (Transit)"],MEMBER["World Geodetic System 1984 (G730)"],MEMBER["World Geodetic System 1984 (G873)"],MEMBER["World Geodetic System 1984 (G1150)"],MEMBER["World Geodetic System 1984 (G1674)"],MEMBER["World Geodetic System 1984 (G1762)"],MEMBER["World Geodetic System 1984 (G2139)"],MEMBER["World Geodetic System 1984 (G2296)"],ELLIPSOID["WGS 84",6378137,298.257223563,LENGTHUNIT["metre",1]],ENSEMBLEACCURACY[2.0]],PRIMEM["Greenwich",0,ANGLEUNIT["degree",0.0174532925199433]],ID["EPSG",4326]],CONVERSION["Popular Visualisation Pseudo-Mercator",METHOD["Popular Visualisation Pseudo Mercator",ID["EPSG",1024]],PARAMETER["Latitude of natural origin",0,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8801]],PARAMETER["Longitude of natural origin",0,ANGLEUNIT["degree",0.0174532925199433],ID["EPSG",8802]],PARAMETER["False easting",0,LENGTHUNIT["metre",1],ID["EPSG",8806]],PARAMETER["False northing",0,LENGTHUNIT["metre",1],ID["EPSG",8807]]],CS[Cartesian,2],AXIS["easting (X)",east,ORDER[1],LENGTHUNIT["metre",1]],AXIS["northing (Y)",north,ORDER[2],LENGTHUNIT["metre",1]],USAGE[SCOPE["Web mapping and visualisation."],AREA["World between 85.06°S and 85.06°N."],BBOX[-85.06,-180,85.06,180]],ID["EPSG",3857]]</wkt>
         <proj4>+proj=merc +a=6378137 +b=6378137 +lat_ts=0 +lon_0=0 +x_0=0 +y_0=0 +k=1 +units=m +nadgrids=@null +wktext +no_defs</proj4>

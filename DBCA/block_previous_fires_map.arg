@@ -24,7 +24,7 @@
 # exportBlockAtlas.py
 #    --nologfile
 #    --block "${block}"
-#    --filter "fire_in_block_area / ($area/10000) >= 0.1"
+#    --filter "fire_in_block_area / ($area/10000) >= 0.1 AND fireseason = 2025"
 #    --layout "Layout 1"
 ##    --imagefile "Block previous fires/${block} previous fires map.jpg"
 #    --pdffile "Block previous fires/${block} previous fires map.pdf"
