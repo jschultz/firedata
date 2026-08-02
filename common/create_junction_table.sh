@@ -67,7 +67,10 @@ if [[ ! -n "${canonicaltable2}" ]]; then
     canonicaltable2="${table2}"
 fi
 
-junction=calc.${canonicaltable1##*.}_${canonicaltable2##*.}_junction
+# junction=calc.${canonicaltable1##*.}_${canonicaltable2##*.}_junction
+junction=$(psql --variable=ON_ERROR_STOP=1 \
+        --quiet --tuples-only --no-align --command="\timing off" \
+        --command="SELECT abbreviated_name('calc.${canonicaltable1##*.}_${canonicaltable2##*.}_junction')")
 
 if [[ "${nologfile}" != "true" ]]; then
     if [[ ! -n ${logfile} ]]; then
