@@ -241,18 +241,11 @@ for ((tableidx=0; tableidx<${#eventtable_array[@]}; tableidx++)) do
             if [[ "${flatten}" == "true" ]]; then
                 for ((linkidx=1; linkidx<=${eventlimit_array[tableidx]}; linkidx++)) do
                     VIEW_QUERY+="${separator} (array_agg(${eventcolumn_array[colidx]}"
-                    if [[ -n "${eventorder_array[tableidx]}" ]]; then
-                        VIEW_QUERY+=" ORDER BY ${eventorder_array[tableidx]}"
-                    fi
                     VIEW_QUERY+="))[${linkidx}] AS \"${eventcolumn_array[colidx]#*.}_${linkidx}\""
                     separator=","
                 done
             else
-                VIEW_QUERY+="${separator} array_agg(${eventcolumn_array[colidx]}"
-                if [[ -n "${eventorder_array[tableidx]}" ]]; then
-                    VIEW_QUERY+=" ORDER BY ${eventorder_array[tableidx]}"
-                fi
-                VIEW_QUERY+=") AS \"${eventcolumn_array[colidx]#*.}\""
+                VIEW_QUERY+="${separator} array_agg(${eventcolumn_array[colidx]}) AS \"${eventcolumn_array[colidx]#*.}\""
                 separator=","
             fi
         fi
@@ -276,11 +269,10 @@ for ((tableidx=0; tableidx<${#eventtable_array[@]}; tableidx++)) do
         VIEW_QUERY+=" ${separator} (${eventfilter_array[tableidx]})"
         separator="AND"
     fi
+    if [[ -n "${eventorder_array[tableidx]}" ]]; then
+        VIEW_QUERY+=" ORDER BY ${eventorder_array[tableidx]}"
+    fi
     if [[ -n "${eventlimit_array[tableidx]}" ]]; then
-        # Ordering is done in array_agg but need to do it here too if there is a limit
-        if [[ -n "${eventorder_array[tableidx]}" ]]; then
-            VIEW_QUERY+=" ORDER BY ${eventorder_array[tableidx]}"
-        fi
         VIEW_QUERY+=" LIMIT ${eventlimit_array[tableidx]}"
     fi
     VIEW_QUERY+=") AS ${eventtable_array[tableidx]}"
