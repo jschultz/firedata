@@ -55,12 +55,12 @@ if [[ -n "${csvfile}" ]]; then
 #         >> "${csvfile}"
     command_array=("\timing off" "${command_array[@]/%/;}")
     printf "%s\n" "${command_array[@]}" | psql ${database} \
-        --quiet --csv \
+        --quiet --csv --tuples-only \
         >> "${csvfile}"
 else
 #     printf -- "--command\0%s\0" "${command_array[@]}" | xargs -0 psql ${database} \
 #         --quiet --command "\timing off"
     command_array=("\timing off" "${command_array[@]/%/;}")
     printf "%s\n" "${command_array[@]}" | psql ${database} \
-        --quiet --csv
+        --quiet --csv --tuples-only
 fi

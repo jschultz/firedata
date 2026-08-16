@@ -16,6 +16,19 @@
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##
 ################################################################################
+# psql_command.sh
+#    --command "CREATE VIEW DBCA_Fire_History_DBCA_060_${suffix}_view AS SELECT * FROM calc.DBCA_Fire_History_DBCA_060_${datetime}_${suffix}_view"
+#################################################################################
+# psql_command.sh
+#    --command "DROP VIEW IF EXISTS DBCA_Fire_History_DBCA_060_${suffix}_view"
+################################################################################
+#<>datetime sed
+#    -z
+#    s/.*\\\([0-9]\\\{8\\\}\\\).*/\\\1/;s/\n//
+################################################################################
+#> psql_command.sh
+#    --command "SELECT canonical_table('DBCA_Fire_History_DBCA_060')"
+################################################################################
 # overlay_view.sh
 #    --nologfile
 #    --eventtable "dbca_fire_history_dbca_060"
@@ -32,3 +45,4 @@
 #    --eventid "object_id"
 #    --suffix "${suffix}"
 #    --area "${area}"
+#################################################################################
