@@ -1,4 +1,34 @@
 ################################################################################
+##
+## Copyright 2026 Jonathan Schultz
+##
+## This program is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+##
+## This program is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with this program.  If not, see <http://www.gnu.org/licenses/>.
+##
+################################################################################
+# psql_command.sh
+#    --command "CREATE VIEW DBCA_Fire_History_DBCA_060_southern_view_dissolve AS SELECT * FROM calc.DBCA_Fire_History_DBCA_060_${datetime}_southern_view_dissolve"
+#################################################################################
+# psql_command.sh
+#    --command "DROP VIEW IF EXISTS DBCA_Fire_History_DBCA_060_southern_view_dissolve"
+################################################################################
+#<>datetime sed
+#    -z
+#    s/.*\\\([0-9]\\\{8\\\}\\\).*/\\\1/;s/\n//
+################################################################################
+#> psql_command.sh
+#    --command "SELECT canonical_table('DBCA_Fire_History_DBCA_060')"
+################################################################################
 # dissolve_view.sh
 #    --nologfile
 #    --verbosity "1"
