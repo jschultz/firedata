@@ -209,16 +209,25 @@ for ((colidx=0; colidx<${#calcalias_array[@]}; colidx++)) do
 done
 for ((colidx=0; colidx<${#eventalias_array[@]}; colidx++)) do
     if [[ "${flatten}" != "true" ]]; then
-        VIEW_QUERY+="${separator} coalesce(${eventcolumn_array[colidx]}, '{}'::${eventtype_array[colidx]}[]) AS \"${eventalias_array[colidx]}\""
+        if [[ ${eventlimit_array[tableidx]} > 1 ]]; then
+            VIEW_QUERY+="${separator} coalesce(${eventcolumn_array[colidx]}, '{}'::${eventtype_array[colidx]}[]) AS \"${eventalias_array[colidx]}\""
+        else
+            VIEW_QUERY+="${separator} ${eventcolumn_array[colidx]}[1] AS \"${eventalias_array[colidx]}\""
+        fi
         separator=","
     else
         for ((tableidx=0; tableidx<${#eventtable_array[@]}; tableidx++)) do
             if [[ "${eventcolumncorrelation_array[colidx]}" == ""
                || "${eventcolumncorrelation_array[colidx]}" == "${eventtable_array[tableidx]}" ]]; then
-                for ((linkidx=1; linkidx<=${eventlimit_array[tableidx]}; linkidx++)) do
-                    VIEW_QUERY+="${separator} ${eventcolumn_array[colidx]}_${linkidx} AS \"${eventalias_array[colidx]}_${linkidx}\""
+                if [[ ${eventlimit_array[tableidx]} > 1 ]]; then
+                    for ((linkidx=1; linkidx<=${eventlimit_array[tableidx]}; linkidx++)) do
+                        VIEW_QUERY+="${separator} ${eventcolumn_array[colidx]}_${linkidx} AS \"${eventalias_array[colidx]}_${linkidx}\""
+                        separator=","
+                    done
+                else
+                    VIEW_QUERY+="${separator} ${eventcolumn_array[colidx]}_1 AS \"${eventalias_array[colidx]}\""
                     separator=","
-                done
+                fi
             fi
         done
     fi
