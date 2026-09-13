@@ -21,6 +21,7 @@ import subprocess
 import re
 import os
 import sys
+import shutil
 from datetime import datetime, timedelta
 from pymediainfo import MediaInfo
 
@@ -36,6 +37,7 @@ def audioSplit(arglist=None):
     parser.add_argument('--nologfile', action='store_true', help='Do not output a logfile')
 
     parser.add_argument('--outdir',    type=str, help="Directory to output files (must exist)")
+    parser.add_argument('--trash',     action='store_true', help="Move original file to Trash on success")
 
     parser.add_argument('infiles',     type=str, nargs='+', help="Name of audio file(s) to export", input=True)
 
@@ -51,11 +53,13 @@ def audioSplit(arglist=None):
         parser.write_comments(args, logfile, incomments=ArgumentHelper.separator())
         logfile.close()
 
-    INFILE_REGEX = re.compile(R"(?P<prefix>.*)(?P<year>(20)?[0-9]{2})(?P<month>[0-9]{2})(?P<day>[0-9]{2})\-(?P<hour>[0-9]{2})(?P<minute>[0-9]{2})(?P<second>[0-9]{2})(\-(?P<volume>[0-9]{2}))?.*")
+    trashdir = home_dir = os.path.expanduser("~/Trash")
+
+    INFILE_REGEX = re.compile(R"(?P<prefix>.*?)(?P<year>(20)?[0-9]{2})(?P<month>[0-9]{2})(?P<day>[0-9]{2})\-(?P<hour>[0-9]{2})(?P<minute>[0-9]{2})(?P<second>[0-9]{2})(\-(?P<volume>[0-9]{2}))?.*")
     
     for infile in args.infiles:
         if args.verbosity >= 1:
-            print("Processing file: ", infile, file=sys.stderr)
+            print("Processing file: " + infile, file=sys.stderr)
             
         infile_ext = os.path.splitext(infile)[1]
         infile_match = INFILE_REGEX.match(infile)
@@ -73,7 +77,7 @@ def audioSplit(arglist=None):
                 basedatetime = basedatetime + (volume - 1) * timedelta(hours=18, minutes=38, seconds=28, milliseconds=860)
 
         else:
-            print("ERROR: filename does not match date/time pattern", file=sys.stderr)
+            print("ERROR: filename " + infile + " does not match date/time pattern", file=sys.stderr)
             return
              
         command = [ FFMPEG_BIN, '-nostats',
@@ -96,12 +100,14 @@ def audioSplit(arglist=None):
             if silence_start_match:
                 silence_start = float(silence_start_match.group('silence_start'))
 
-                if args.verbosity >= 2:
-                    print("Found chunk: ", silence_end, silence_start, file=sys.stderr)
-
                 if silence_end:
                     datetime_start = basedatetime + timedelta(seconds = silence_end)
                     datetime_end   = basedatetime + timedelta(seconds = silence_start)
+
+                    outfile = prefix + datetime_start.strftime("%Y%m%d-%H%M%S") + infile_ext
+
+                    if args.verbosity >= 2:
+                        print("Writing file " + outfile, file=sys.stderr)
 
                     subprocess.run( [ FFMPEG_BIN, '-nostats', '-loglevel', 'quiet',
                                     '-y',
@@ -109,10 +115,12 @@ def audioSplit(arglist=None):
                                     '-ss', str(silence_end),
                                     '-to', str(silence_start),
                                     '-c', 'copy',
-                                    prefix + datetime_start.strftime("%Y%m%d-%H%M%S") + infile_ext ] )
+                                    outfile ],
+                                    check = True)
                     subprocess.run( [ 'touch',
                                     '--date='+str(datetime_end),
-                                    prefix + datetime_start.strftime("%Y%m%d-%H%M%S") + infile_ext ] )
+                                    outfile ],
+                                    check = True)
 
                     silence_end = None
 
@@ -125,19 +133,30 @@ def audioSplit(arglist=None):
         if silence_end:
             datetime_start = basedatetime + timedelta(seconds = silence_end)
 
+            outfile = prefix + datetime_start.strftime("%Y%m%d-%H%M%S") + infile_ext
+
+            if args.verbosity >= 2:
+                print("Writing file " + outfile, file=sys.stderr)
+
             subprocess.run( [ FFMPEG_BIN, '-nostats', '-loglevel', 'quiet',
                             '-y',
                             '-i', infile,
                             '-ss', str(silence_end),
                             '-c', 'copy',
-                            prefix + datetime_start.strftime("%Y%m%d-%H%M%S") + infile_ext ] )
+                            outfile ],
+                            check = True)
 
-            datetime_end = datetime_start + timedelta(milliseconds = MediaInfo.parse(prefix + datetime_start.strftime("%Y%m%d-%H%M%S") + infile_ext).tracks[0].duration)
+            datetime_end = datetime_start + timedelta(milliseconds = MediaInfo.parse(outfile).tracks[0].duration)
             subprocess.run( [ 'touch',
                             '--date='+str(datetime_end),
-                            prefix + datetime_start.strftime("%Y%m%d-%H%M%S") + infile_ext ] )
+                            outfile ],
+                            check = True)
 
+        if args.trash:
+            if args.verbosity >= 2:
+                print("Moving input file " + infile + " to " + trashdir, file=sys.stderr)
 
+            shutil.move(infile, trashdir)
         
 if __name__ == '__main__':
     audioSplit(None)
