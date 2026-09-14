@@ -30,6 +30,17 @@ import os
 
 from headlessMask import *
 
+# We defined the function fireseason here even though it is defined as a project function
+# because PyQGIS seems not to load project functions.
+from qgis.core import qgsfunction
+@qgsfunction(group='Custom', referenced_columns=[])
+def fireseason(fih_date1):
+    """
+    Calculates the fire season of the fih_date1 argument
+    """
+    fih_date1 = fih_date1.toPyDate()
+    return fih_date1.year if fih_date1.month <= 6 else fih_date1.year + 1
+
 def exportburnAtlas(arglist=None):
 
     parser = ArgumentRecorder(description='Exports an atlas from a QGIS file.',
@@ -37,9 +48,9 @@ def exportburnAtlas(arglist=None):
 
     parser.add_argument('-B', '--burnid',   type=str, required=True, help="ID of burn to export")
     parser.add_argument('-f', '--filter', type=str, help="Additional criteria for producing a page")
-    parser.add_argument('-l', '--layout', type=str, nargs='+', required=True, help="Print layout(s) to export")
-    parser.add_argument('-p', '--pdffile', type=str, nargs='*', help="Name(s) of PDF file(s) to export")
-    parser.add_argument('-i', '--imagefile', type=str, nargs='*', help="Name(s) of image file(s) to export")
+    parser.add_argument('-l', '--layout', type=str, required=True, help="Print layout(s) to export")
+    parser.add_argument('-p', '--pdffile', type=str, help="Name(s) of PDF file(s) to export")
+    parser.add_argument('-i', '--imagefile', type=str, help="Name(s) of image file(s) to export")
     
     parser.add_argument('--logfile',      type=str, help="Logfile", private=True)
     parser.add_argument('--nologfile',    action='store_true', help='Do not output a logfile')
@@ -70,34 +81,38 @@ def exportburnAtlas(arglist=None):
     burnPreviousFiresLayer.setSubsetString ("burnid='" + args.burnid + "'")
 
     manager = project.layoutManager()
-    itemnum = 0
-    for layout in args.layout:
-        layoutitem = manager.layoutByName(layout)
-        
-        atlas = layoutitem.atlas()
-        if args.filter:
-            atlas.setFilterExpression(args.filter)
-            atlas.setFilterFeatures(True)
-        else:
-            atlas.setFilterFeatures(False)
-        
-        exporter = QgsLayoutExporter(atlas.layout())
-        if args.pdffile:
-            pdfsettings = QgsLayoutExporter.PdfExportSettings()
-            pdfsettings.simplifyGeometries = False
-            #pdfsettings.forceVectorOutput = True
-            exporter.exportToPdf(atlas, args.pdffile[itemnum], pdfsettings)
-        if args.imagefile:
-            imagesettings = QgsLayoutExporter.ImageExportSettings()
-            imagesettings.simplifyGeometries = False
-            imagesettings.forceVectorOutput = True
-            imagebase, imagename = args.imagefile[itemnum].rsplit('/',1)
-            imageext = imagename.rsplit('.',1)[1]
-            exporter.exportToImage(atlas, imagebase + '/', imageext, imagesettings)
-            os.rename(imagebase + '/' + 'output_1.' + imageext, args.imagefile[itemnum])
-            
-        itemnum += 1
-    
+    layoutitem = manager.layoutByName(args.layout)
+
+    atlas = layoutitem.atlas()
+    if args.filter:
+        atlas.setFilterExpression(args.filter)
+        atlas.setFilterFeatures(True)
+    else:
+        atlas.setFilterFeatures(False)
+
+    exporter = QgsLayoutExporter(atlas.layout())
+    if args.pdffile:
+        pdfsettings = QgsLayoutExporter.PdfExportSettings()
+        pdfsettings.simplifyGeometries = False
+        #pdfsettings.forceVectorOutput = True
+        exporter.exportToPdf(atlas, args.pdffile, pdfsettings)
+    if args.imagefile:
+        imagesettings = QgsLayoutExporter.ImageExportSettings()
+        imagesettings.simplifyGeometries = False
+        imagesettings.forceVectorOutput = True
+        imagepath, imagename = args.imagefile.rsplit('/',1)
+        imagebase, imageext = imagename.rsplit('.',1)
+        rc = exporter.exportToImage(atlas, imagepath + '/' + imagebase, imageext, imagesettings)
+
+        # exportToImage seems not to respect output filename so we rename output files:
+        image_num = 1
+        while True:
+            try:
+                os.rename(imagepath + '/' + 'output_' + str(image_num) + '.' + imageext, imagepath + '/' + imagebase + '_' + str(image_num) + '.' + imageext)
+                image_num += 1
+            except:
+                break
+
     qgs.exitQgis()
 
 if __name__ == '__main__':
