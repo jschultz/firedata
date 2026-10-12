@@ -20,7 +20,6 @@ from argrecord import ArgumentHelper, ArgumentRecorder
 import urllib3
 from owslib.wms import WebMapService
 from owslib.util import Authentication
-from fp.fp import FreeProxy, FreeProxyException
 from bs4 import BeautifulSoup
 from shapely.geometry import Polygon, MultiPolygon
 import csv
@@ -152,6 +151,7 @@ def getDailyBurns(arglist=None):
             os.environ['http_proxy']  = args.proxy
             os.environ['https_proxy'] = args.proxy
         else:
+            from fp.fp import FreeProxy, FreeProxyException
             fp = FreeProxy(https=True, rand=True, timeout=2)
     else:
         auth = Authentication()
